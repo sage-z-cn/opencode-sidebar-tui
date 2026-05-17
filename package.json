@@ -266,11 +266,13 @@
       "editor/title": [
         {
           "command": "opencodeTui.openTerminalManager",
-          "group": "navigation"
+          "group": "navigation",
+          "when": "opencodeTui.active"
         },
         {
           "command": "opencodeTui.openTerminalInEditor",
-          "group": "navigation@1"
+          "group": "navigation@1",
+          "when": "opencodeTui.active"
         }
       ],
       "explorer/context": [

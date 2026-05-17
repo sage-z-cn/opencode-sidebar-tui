@@ -261,6 +261,11 @@ export class ExtensionLifecycle {
       const explainAndFixCommand = this.codeActionProvider.registerCommand();
       context.subscriptions.push(codeActionRegistration, explainAndFixCommand);
 
+      // Expose that the extension is fully active so editor/title buttons
+      // (openTerminalInEditor, openTerminalManager, etc.) only appear after
+      // commands are registered. This prevents "command not found" errors.
+      await vscode.commands.executeCommand("setContext", "opencodeTui.active", true);
+
       logger.info("Open Sidebar TUI activated successfully");
     } catch (error) {
       logger.error(
@@ -532,6 +537,13 @@ export class ExtensionLifecycle {
 
     this.captureManager = undefined;
     this.contextSharingService = undefined;
+
+    // Clear the context key so editor/title buttons disappear cleanly
+    try {
+      await vscode.commands.executeCommand("setContext", "opencodeTui.active", false);
+    } catch {
+      // ignore
+    }
 
     logger?.info("Open Sidebar TUI deactivated");
   }
