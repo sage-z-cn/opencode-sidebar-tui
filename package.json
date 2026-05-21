@@ -380,7 +380,7 @@
         },
         "opencodeTui.autoStartOnOpen": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Automatically start the AI tool when the sidebar is opened. When false, shows a tool selector each time."
         },
         "opencodeTui.shellPath": {
@@ -566,7 +566,7 @@
         },
         "opencodeTui.defaultAiTool": {
           "type": "string",
-          "default": "",
+          "default": "opencode",
           "description": "Name of the default AI tool to launch when creating a new terminal session"
         }
       }
