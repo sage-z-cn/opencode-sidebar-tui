@@ -2898,6 +2898,13 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
       expect(switchSpy).toHaveBeenCalledWith("project-a", undefined, {
         forceToolPrompt: true,
       });
+      expect(
+        (
+          sessionRuntime as unknown as {
+            tmuxSessionsCreatedForStartup: Set<string>;
+          }
+        ).tmuxSessionsCreatedForStartup.has("project-a"),
+      ).toBe(false);
     });
 
     it("starts with an existing valid stored zellij session", async () => {

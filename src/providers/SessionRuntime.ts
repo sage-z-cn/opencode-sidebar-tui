@@ -752,6 +752,7 @@ export class SessionRuntime {
 
   public async ensureWorkspaceSession(
     workspacePath: string,
+    options: { trackCreatedForStartup?: boolean } = {},
   ): Promise<string | undefined> {
     if (!this.tmuxSessionManager) {
       return undefined;
@@ -767,7 +768,7 @@ export class SessionRuntime {
       this.logger.info(
         `[TerminalProvider] tmux session ${result.action}: ${result.session.id}`,
       );
-      if (result.action === "created") {
+      if (options.trackCreatedForStartup !== false && result.action === "created") {
         this.tmuxSessionsCreatedForStartup.add(result.session.id);
       }
       return result.session.id;
@@ -984,7 +985,9 @@ export class SessionRuntime {
 
   private async ensureTmuxBackendSession(): Promise<string | undefined> {
     const { workspacePath } = this.resolveStartupWorkspacePath();
-    return this.ensureWorkspaceSession(workspacePath);
+    return this.ensureWorkspaceSession(workspacePath, {
+      trackCreatedForStartup: false,
+    });
   }
 
   private async ensureZellijBackendSession(): Promise<string | undefined> {
