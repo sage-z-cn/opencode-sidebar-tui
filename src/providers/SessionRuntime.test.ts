@@ -758,6 +758,48 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
       );
     });
 
+    it("launches the startup tool inside newly created tmux workspace sessions", async () => {
+      setConfiguration({
+        terminalBackend: "tmux" satisfies TerminalBackendType,
+        defaultAiTool: "opencode",
+        aiTools: [{ name: "opencode", label: "OpenCode", path: "", args: [] }],
+      });
+      upsertInstance({ workspaceUri: "file:///workspace/project-a" });
+      vi.mocked(mockTmuxSessionManager.ensureSession).mockResolvedValue({
+        action: "created" as const,
+        session: {
+          id: "project-a",
+          name: "project-a",
+          workspace: "/workspace/project-a",
+          isActive: true,
+        },
+      });
+      vi.mocked(mockTmuxSessionManager.listPanes).mockResolvedValue([
+        { paneId: "%1", isActive: true },
+      ] as unknown as Awaited<ReturnType<TmuxSessionManager["listPanes"]>>);
+      vi.mocked(mockAiToolRegistry.getForConfig).mockReturnValue({
+        getLaunchCommand: vi.fn(() => "opencode"),
+        supportsHttpApi: vi.fn(() => false),
+      } as never);
+
+      await sessionRuntime.startOpenCode();
+
+      expect(mockTmuxSessionManager.sendTextToPane).toHaveBeenCalledWith(
+        "%1",
+        "opencode",
+      );
+      expect(mockTerminalManager.createTerminal).toHaveBeenCalledWith(
+        "default",
+        "tmux attach-session -t project-a \\; set-option -u status off",
+        {},
+        undefined,
+        undefined,
+        undefined,
+        "default",
+        "/workspace/project-a",
+      );
+    });
+
     it("reuses an existing terminal for an instance and restores HTTP listeners", async () => {
       upsertInstance({ id: "instance-2", selectedAiTool: "preferred-tool" });
       sessionRuntime.setLastKnownTerminalSize(120, 40);

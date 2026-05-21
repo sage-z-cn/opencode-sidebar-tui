@@ -71,6 +71,7 @@ export class SessionRuntime {
   private sigusr2FiredSinceLastCheck = false;
   private externalChangeListener?: vscode.Disposable;
   private paneMonitorInterval?: ReturnType<typeof setInterval>;
+  private readonly tmuxSessionsCreatedForStartup = new Set<string>();
 
   public constructor(
     private readonly terminalManager: TerminalManager,
@@ -439,15 +440,9 @@ export class SessionRuntime {
         zellijSessionId,
       );
 
-      let port: number | undefined;
-      this.selectedTmuxSessionId = undefined;
-      this.selectedZellijSessionId = undefined;
-      this.pendingBackendOverride = undefined;
-      this.forceNativeShellNextStart = false;
-      this.pendingLaunchToolName = undefined;
-
       const activeOperator =
         this.activeTool && this.aiToolRegistry.getForConfig(this.activeTool);
+      let port: number | undefined;
       if (
         enableHttpApi &&
         command !== undefined &&
@@ -468,6 +463,18 @@ export class SessionRuntime {
           );
         }
       }
+
+      await this.launchToolInCreatedTmuxSession(
+        tmuxSessionId,
+        command,
+        port,
+      );
+
+      this.selectedTmuxSessionId = undefined;
+      this.selectedZellijSessionId = undefined;
+      this.pendingBackendOverride = undefined;
+      this.forceNativeShellNextStart = false;
+      this.pendingLaunchToolName = undefined;
 
       this.terminalManager.createTerminal(
         this.activeInstanceId,
@@ -758,6 +765,9 @@ export class SessionRuntime {
       this.logger.info(
         `[TerminalProvider] tmux session ${result.action}: ${result.session.id}`,
       );
+      if (result.action === "created") {
+        this.tmuxSessionsCreatedForStartup.add(result.session.id);
+      }
       return result.session.id;
     } catch (error) {
       if (error instanceof TmuxUnavailableError) {
@@ -786,6 +796,45 @@ export class SessionRuntime {
       return this.zellijSessionManager.getAttachCommand(zellijSessionId);
     }
     return defaultCommand;
+  }
+
+  private async launchToolInCreatedTmuxSession(
+    sessionId: string | undefined,
+    command: string | undefined,
+    port: number | undefined,
+  ): Promise<void> {
+    if (!sessionId || !command || !this.tmuxSessionManager) {
+      return;
+    }
+    if (!this.tmuxSessionsCreatedForStartup.delete(sessionId)) {
+      return;
+    }
+
+    try {
+      const panes = await this.tmuxSessionManager.listPanes(sessionId);
+      const targetPane = panes.find((pane) => pane.isActive) ?? panes[0];
+      if (!targetPane) {
+        this.logger.warn(
+          `[TerminalProvider] Cannot launch tool in tmux session '${sessionId}': no panes available`,
+        );
+        return;
+      }
+      await this.tmuxSessionManager.sendTextToPane(
+        targetPane.paneId,
+        this.withLaunchEnvironment(command, port),
+      );
+    } catch (error) {
+      this.logger.warn(
+        `[TerminalProvider] Failed to launch tool in tmux session '${sessionId}': ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  private withLaunchEnvironment(command: string, port: number | undefined): string {
+    if (!port) {
+      return command;
+    }
+    return `_EXTENSION_OPENCODE_PORT=${port} OPENCODE_CALLER=vscode ${command}`;
   }
 
   public resolveConfiguredBackend(
