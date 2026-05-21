@@ -1668,6 +1668,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
       );
       expect(switchSpy).toHaveBeenCalledWith("project-a-3", undefined, {
         forceToolPrompt: true,
+        respectPromptAiToolOnSession: true,
       });
     });
 
@@ -1742,6 +1743,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
       ).toBeUndefined();
       expect(switchSpy).toHaveBeenCalledWith("replacement-session", undefined, {
         forceToolPrompt: true,
+        respectPromptAiToolOnSession: true,
       });
       expect(mockPortManager.releaseTerminalPorts).toHaveBeenCalledWith(
         "default",

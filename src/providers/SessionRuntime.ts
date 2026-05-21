@@ -1040,13 +1040,17 @@ export class SessionRuntime {
   public async switchToTmuxSession(sessionId: string): Promise<void> {
     await this.switchToTmuxSessionWithTool(sessionId, undefined, {
       forceToolPrompt: true,
+      respectPromptAiToolOnSession: true,
     });
   }
 
   public async switchToTmuxSessionWithTool(
     sessionId: string,
     preferredToolName?: string,
-    options: { forceToolPrompt?: boolean } = {},
+    options: {
+      forceToolPrompt?: boolean;
+      respectPromptAiToolOnSession?: boolean;
+    } = {},
   ): Promise<void> {
     this.forceNativeShellNextStart = false;
     this.pendingBackendOverride = "tmux";
@@ -1087,7 +1091,13 @@ export class SessionRuntime {
     );
     this.notifyActiveSession(sessionId);
     if (options.forceToolPrompt && !preferredToolName) {
-      this.callbacks.showAiToolSelector(sessionId, sessionId, true);
+      const config = vscode.workspace.getConfiguration("opencodeTui");
+      if (
+        !options.respectPromptAiToolOnSession ||
+        config.get<boolean>("promptAiToolOnSession", true)
+      ) {
+        this.callbacks.showAiToolSelector(sessionId, sessionId, true);
+      }
     }
   }
 
@@ -1175,6 +1185,7 @@ export class SessionRuntime {
       await this.tmuxSessionManager.createSession(candidate, workspacePath);
       await this.switchToTmuxSessionWithTool(candidate, undefined, {
         forceToolPrompt: true,
+        respectPromptAiToolOnSession: true,
       });
 
       return candidate;

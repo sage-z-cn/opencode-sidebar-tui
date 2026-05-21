@@ -573,6 +573,11 @@
           "type": "string",
           "default": "opencode",
           "description": "Name of the default AI tool to launch when creating a new terminal session"
+        },
+        "opencodeTui.promptAiToolOnSession": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the AI tool selector popup when attaching to or creating a tmux/zellij session"
         }
       }
     }

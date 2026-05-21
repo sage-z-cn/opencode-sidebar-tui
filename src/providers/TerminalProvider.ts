@@ -609,6 +609,9 @@ export class TerminalProvider
     targetPaneId?: string,
   ): void {
     const config = vscode.workspace.getConfiguration("opencodeTui");
+    if (forceShow && !config.get<boolean>("promptAiToolOnSession", true)) {
+      return;
+    }
     const instanceId =
       this.sessionRuntime.resolveInstanceIdFromSessionId(sessionId);
     const effectiveSessionId =
