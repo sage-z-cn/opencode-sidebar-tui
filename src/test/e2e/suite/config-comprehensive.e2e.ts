@@ -229,3 +229,44 @@ suite("Comprehensive configuration contributions", () => {
     ]);
   });
 });
+
+suite("Runtime configuration defaults", () => {
+  test("reads key defaults from vscode.workspace.getConfiguration", async () => {
+    await activateExtension();
+
+    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const defaultValue = (key: string): unknown =>
+      config.inspect(key)?.defaultValue;
+
+    assert.strictEqual(defaultValue("promptAiToolOnSession"), true);
+    assert.strictEqual(defaultValue("defaultAiTool"), "opencode");
+    assert.deepStrictEqual(defaultValue("aiTools"), [
+      {
+        name: "opencode",
+        label: "OpenCode",
+        path: "",
+        args: [],
+        operator: "opencode",
+      },
+      {
+        name: "claude",
+        label: "Claude",
+        path: "",
+        args: [],
+        aliases: ["claude"],
+        operator: "claude",
+      },
+      {
+        name: "codex",
+        label: "Codex",
+        path: "",
+        args: [],
+        operator: "codex",
+      },
+    ]);
+    assert.strictEqual(defaultValue("terminalBackend"), "tmux");
+    assert.strictEqual(defaultValue("autoStartOnOpen"), true);
+    assert.strictEqual(defaultValue("enableHttpApi"), true);
+    assert.strictEqual(defaultValue("fontSize"), 14);
+  });
+});
