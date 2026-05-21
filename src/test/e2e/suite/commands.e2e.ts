@@ -28,6 +28,10 @@ suite("Command registration", () => {
 
     const commands = await vscode.commands.getCommands(true);
     if (!commands.includes("workbench.view.focus")) {
+      // The real VS Code E2E host does not always expose this internal
+      // workbench command in headless/extension-test mode. Keep this as the
+      // only environment skip: the extension command itself is still covered
+      // by registration tests, but executing focus depends on VS Code UI APIs.
       console.warn(
         "Skipping focus execution: workbench.view.focus is not available in this VS Code test host",
       );

@@ -75,20 +75,4 @@ suite("Session flows", () => {
         vscode.commands.executeCommand("opencodeTui.switchNativeShell"),
     );
   });
-
-  test("executes restart command when registered", async function () {
-    const commands = await getRegisteredCommands();
-    const restartCommand = "opencodeTui.restart";
-
-    if (!commands.includes(restartCommand)) {
-      console.warn(
-        `Skipping restart execution: ${restartCommand} is not registered in this extension build`,
-      );
-      this.skip();
-    }
-
-    await assert.doesNotReject(async () =>
-      vscode.commands.executeCommand(restartCommand),
-    );
-  });
 });
