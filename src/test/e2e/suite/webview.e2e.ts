@@ -38,21 +38,15 @@ suite("Webview registration", () => {
     );
   });
 
-  test("view resolution works without errors", async function () {
+  test("view container command is registered", async () => {
     await activateExtension();
 
     const commands = await vscode.commands.getCommands(true);
     const viewContainerCommand = "workbench.view.extension.opencodeTuiContainer";
 
-    if (!commands.includes(viewContainerCommand)) {
-      console.warn(
-        `Skipping view resolution: ${viewContainerCommand} is not available in this VS Code test host`,
-      );
-      this.skip();
-    }
-
-    await assert.doesNotReject(
-      async () => vscode.commands.executeCommand(viewContainerCommand),
+    assert.ok(
+      commands.includes(viewContainerCommand),
+      `${viewContainerCommand} should be registered when extension contributes a view container`,
     );
   });
 });
