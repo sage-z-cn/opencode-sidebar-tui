@@ -3106,12 +3106,26 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
 
       await sessionRuntime.switchToZellijSession("zellij-session");
 
+      expect(showAiToolSelectorMock).toHaveBeenCalledWith(
+        "zellij-session",
+        "zellij-session",
+        true,
+      );
       expect(mockLogger.warn).toHaveBeenCalledWith(
         expect.stringContaining("Failed to switch zellij session"),
       );
       expect(mockLogger.warn).toHaveBeenCalledWith(
         expect.stringContaining("Failed to start zellij change monitoring"),
       );
+    });
+
+    it("skips zellij AI tool selector when promptAiToolOnSession is disabled", async () => {
+      setConfiguration({ promptAiToolOnSession: false });
+      vi.spyOn(sessionRuntime, "switchToInstance").mockResolvedValue();
+
+      await sessionRuntime.switchToZellijSession("zellij-session");
+
+      expect(showAiToolSelectorMock).not.toHaveBeenCalled();
     });
 
     it("posts terminalExited when attached tmux restoration fails", async () => {

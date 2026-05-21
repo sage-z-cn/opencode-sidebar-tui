@@ -1165,6 +1165,12 @@ export class SessionRuntime {
         );
       }
     }
+
+    const config = vscode.workspace.getConfiguration("opencodeTui");
+    if (config.get<boolean>("promptAiToolOnSession", true)) {
+      this.callbacks.showAiToolSelector(sessionId, sessionId, true);
+    }
+
     await this.switchToInstance(
       this.resolveInstanceIdFromSessionId(sessionId),
       {
