@@ -183,11 +183,11 @@ export function registerTerminalCommands(
   );
 
   const focusCommand = vscode.commands.registerCommand(
-    "opencodeTui.focus",
-    () => {
-      vscode.commands.executeCommand("workbench.view.focus", "opencodeTui");
-    },
-  );
+  "opencodeTui.focus",
+  () => {
+    return vscode.commands.executeCommand("workbench.view.focus", "opencodeTui");
+  },
+);
 
   const openInEditorCommand = vscode.commands.registerCommand(
     "opencodeTui.openTerminalInEditor",

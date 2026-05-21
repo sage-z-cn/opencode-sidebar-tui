@@ -523,4 +523,18 @@ describe("registerTerminalCommands", () => {
     expect(deps.provider?.openInEditorTab).toHaveBeenCalledTimes(1);
     expect(deps.provider?.toggleEditorAttachment).toHaveBeenCalledTimes(1);
   });
+
+  it("returns the executeCommand promise from opencodeTui.focus", () => {
+    const deps = createDependencies();
+    const commands = registerAndGetCommands(deps);
+    const focusCommand = getCommand(commands, "opencodeTui.focus");
+
+    vi.mocked(vscode.commands.executeCommand).mockResolvedValueOnce(true);
+
+    const result = focusCommand();
+
+    expect(result).toBeDefined();
+    expect(result).toBe(vi.mocked(vscode.commands.executeCommand).mock.results[0]?.value);
+    expect(result).toHaveProperty("then");
+  });
 });
