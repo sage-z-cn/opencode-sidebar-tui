@@ -14,6 +14,9 @@ export interface TmuxPaneInfo {
 export class TmuxPaneSyncService {
   constructor(private readonly tmux: TmuxSessionManager) {}
 
+  dispose(): void {
+  }
+
   /**
    * List tmux panes for a session, parsing tmux list-panes output
    */

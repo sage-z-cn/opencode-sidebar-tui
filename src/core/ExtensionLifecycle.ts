@@ -17,6 +17,8 @@ import { PortManager } from "../services/PortManager";
 import { ConnectionResolver } from "../services/ConnectionResolver";
 import { TmuxSessionManager } from "../services/TmuxSessionManager";
 import { ZellijSessionManager } from "../services/ZellijSessionManager";
+import { TmuxPaneSyncService } from "../services/TmuxPaneSyncService";
+import { ZellijPaneSyncService } from "../services/ZellijPaneSyncService";
 import {
   StaticTerminalBackend,
   TerminalBackendRegistry,
@@ -46,6 +48,8 @@ export class ExtensionLifecycle {
   private portManager: PortManager | undefined;
   private tmuxSessionManager: TmuxSessionManager | undefined;
   private zellijSessionManager: ZellijSessionManager | undefined;
+  private tmuxPaneSyncService: TmuxPaneSyncService | undefined;
+  private zellijPaneSyncService: ZellijPaneSyncService | undefined;
   private backendRegistry: TerminalBackendRegistry | undefined;
   private terminalDashboardProvider: TerminalDashboardProvider | undefined;
   private activated = false;
@@ -134,6 +138,14 @@ export class ExtensionLifecycle {
           "[ExtensionLifecycle] zellij not detected; zellij backend unavailable",
         );
       }
+
+      if (this.tmuxSessionManager) {
+        this.tmuxPaneSyncService = new TmuxPaneSyncService(
+          this.tmuxSessionManager,
+        );
+      }
+      this.zellijPaneSyncService = new ZellijPaneSyncService();
+
       this.backendRegistry = new TerminalBackendRegistry([
         new StaticTerminalBackend("native", "Native", true),
         new StaticTerminalBackend("tmux", "Tmux", !!this.tmuxSessionManager),
@@ -184,6 +196,8 @@ export class ExtensionLifecycle {
         this.zellijSessionManager,
         this.backendRegistry,
         nativeTerminalManager,
+        this.tmuxPaneSyncService,
+        this.zellijPaneSyncService,
       );
 
       // Register webview provider — guard against double-registration on fast
@@ -496,6 +510,16 @@ export class ExtensionLifecycle {
       this.tuiProvider = undefined;
     }
 
+    if (this.tmuxPaneSyncService) {
+      this.tmuxPaneSyncService.dispose();
+      this.tmuxPaneSyncService = undefined;
+    }
+
+    if (this.zellijPaneSyncService) {
+      this.zellijPaneSyncService.dispose();
+      this.zellijPaneSyncService = undefined;
+    }
+
     if (this.terminalManager) {
       this.terminalManager.dispose();
       this.terminalManager = undefined;
@@ -537,6 +561,8 @@ export class ExtensionLifecycle {
 
     this.captureManager = undefined;
     this.contextSharingService = undefined;
+    this.tmuxPaneSyncService = undefined;
+    this.zellijPaneSyncService = undefined;
 
     // Clear the context key so editor/title buttons disappear cleanly
     try {

@@ -8,6 +8,8 @@ import { InstanceStore } from "../services/InstanceStore";
 import { OpenCodeApiClient } from "../services/OpenCodeApiClient";
 import { TmuxSessionManager } from "../services/TmuxSessionManager";
 import { ZellijSessionManager } from "../services/ZellijSessionManager";
+import { TmuxPaneSyncService } from "../services/TmuxPaneSyncService";
+import { ZellijPaneSyncService } from "../services/ZellijPaneSyncService";
 import type * as vscodeTypes from "../test/mocks/vscode";
 
 const vscode = await vi.importActual<typeof vscodeTypes>(
@@ -169,6 +171,17 @@ describe("ExtensionLifecycle", () => {
 
       expect(Reflect.get(lifecycle, "zellijSessionManager")).toBeInstanceOf(
         ZellijSessionManager,
+      );
+    });
+
+    it("should initialize pane sync services and pass them to TerminalProvider", async () => {
+      await lifecycle.activate(mockContext);
+
+      expect(Reflect.get(lifecycle, "tmuxPaneSyncService")).toBeInstanceOf(
+        TmuxPaneSyncService,
+      );
+      expect(Reflect.get(lifecycle, "zellijPaneSyncService")).toBeInstanceOf(
+        ZellijPaneSyncService,
       );
     });
 
@@ -337,6 +350,8 @@ describe("ExtensionLifecycle", () => {
       const instanceRegistry = { dispose: vi.fn() };
       const terminalDashboardProvider = { dispose: vi.fn() };
       const tuiProviderRegistration = { dispose: vi.fn() };
+      const tmuxPaneSyncService = { dispose: vi.fn() };
+      const zellijPaneSyncService = { dispose: vi.fn() };
 
       Reflect.set(lifecycle, "outputChannelService", logger);
       Reflect.set(lifecycle, "tuiProvider", tuiProvider);
@@ -355,6 +370,8 @@ describe("ExtensionLifecycle", () => {
         terminalDashboardProvider,
       );
       Reflect.set(lifecycle, "tuiProviderRegistration", tuiProviderRegistration);
+      Reflect.set(lifecycle, "tmuxPaneSyncService", tmuxPaneSyncService);
+      Reflect.set(lifecycle, "zellijPaneSyncService", zellijPaneSyncService);
 
       await lifecycle.deactivate();
 
@@ -367,6 +384,8 @@ describe("ExtensionLifecycle", () => {
       expect(instanceRegistry.dispose).toHaveBeenCalledTimes(1);
       expect(terminalDashboardProvider.dispose).toHaveBeenCalledTimes(1);
       expect(tuiProviderRegistration.dispose).toHaveBeenCalledTimes(1);
+      expect(tmuxPaneSyncService.dispose).toHaveBeenCalledTimes(1);
+      expect(zellijPaneSyncService.dispose).toHaveBeenCalledTimes(1);
       expect(Reflect.get(lifecycle, "tuiProvider")).toBeUndefined();
       expect(Reflect.get(lifecycle, "terminalManager")).toBeUndefined();
       expect(Reflect.get(lifecycle, "outputChannelService")).toBeUndefined();
@@ -376,10 +395,10 @@ describe("ExtensionLifecycle", () => {
       ).toBeUndefined();
       expect(Reflect.get(lifecycle, "instanceRegistry")).toBeUndefined();
       expect(Reflect.get(lifecycle, "instanceStore")).toBeUndefined();
-      expect(
-        Reflect.get(lifecycle, "terminalDashboardProvider"),
-      ).toBeUndefined();
+      expect(Reflect.get(lifecycle, "terminalDashboardProvider")).toBeUndefined();
       expect(Reflect.get(lifecycle, "tuiProviderRegistration")).toBeUndefined();
+      expect(Reflect.get(lifecycle, "tmuxPaneSyncService")).toBeUndefined();
+      expect(Reflect.get(lifecycle, "zellijPaneSyncService")).toBeUndefined();
       expect(logger.info).toHaveBeenLastCalledWith(
         "Open Sidebar TUI deactivated",
       );

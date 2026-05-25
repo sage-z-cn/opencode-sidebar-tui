@@ -11,6 +11,9 @@ export interface ZellijPaneInfo {
 }
 
 export class ZellijPaneSyncService {
+  dispose(): void {
+  }
+
   /**
    * List zellij panes for a session using zellij CLI
    * Uses `zellij list-clients` or `zellij action list-panes` if available

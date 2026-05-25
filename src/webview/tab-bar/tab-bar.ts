@@ -1,3 +1,4 @@
+import type { TerminalBackendType } from "../../types";
 import type { PaneManager } from "../pane-manager";
 import type { PaneMessageRouter } from "../pane-message-router";
 
@@ -92,6 +93,10 @@ export class TabBar {
     tabEl.setAttribute("role", "tab");
     tabEl.setAttribute("aria-selected", "false");
 
+    const iconEl = document.createElement("span");
+    iconEl.className = "tab-bar__icon";
+    iconEl.textContent = "$"; // Default icon
+
     const titleEl = document.createElement("span");
     titleEl.className = "tab-title";
     titleEl.textContent = displayTitle;
@@ -106,6 +111,7 @@ export class TabBar {
       this.tabCloseCallback?.(tabId);
     });
 
+    tabEl.appendChild(iconEl);
     tabEl.appendChild(titleEl);
     tabEl.appendChild(closeBtn);
 
@@ -233,6 +239,23 @@ export class TabBar {
   /** Number of tabs currently in the bar. */
   getTabCount(): number {
     return this.tabs.size;
+  }
+
+  /** Update the backend icon for a given tab. */
+  setTabBackend(tabId: string, backend: TerminalBackendType): void {
+    const rec = this.tabs.get(tabId);
+    if (!rec) return;
+
+    const icons: Record<TerminalBackendType, string> = {
+      native: "$",
+      tmux: "⊞",
+      zellij: "◈",
+    };
+
+    const iconEl = rec.el.querySelector(".tab-bar__icon") as HTMLElement;
+    if (iconEl) {
+      iconEl.textContent = icons[backend] ?? "$";
+    }
   }
 
   /** Cleanup: removes all DOM listeners and elements (does not dispose panes). */

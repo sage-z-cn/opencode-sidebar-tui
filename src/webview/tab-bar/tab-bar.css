@@ -72,6 +72,14 @@
   line-height: 1;
 }
 
+.tab-bar__icon {
+  font-size: 12px;
+  opacity: 0.8;
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+}
+
 .tab-close {
   display: flex;
   align-items: center;

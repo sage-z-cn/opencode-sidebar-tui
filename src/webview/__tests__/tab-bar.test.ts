@@ -80,8 +80,27 @@ describe("TabBar", () => {
 
     const tabEl = bar.getElement().querySelector('[data-tab-id="tab-1"]');
     expect(tabEl).not.toBeNull();
+    expect(tabEl!.querySelector(".tab-bar__icon")).not.toBeNull();
+    expect(tabEl!.querySelector(".tab-bar__icon")?.textContent).toBe("$"); // Default
     expect(tabEl!.querySelector(".tab-title")?.textContent).toBe("First Tab");
     expect(tabEl!.querySelector(".tab-close")).not.toBeNull();
+  });
+
+  it("setTabBackend updates the icon for an existing tab", () => {
+    const bar = new TabBar(paneManager);
+    bar.addTab("tab-1", "Tab 1");
+
+    const iconEl = bar.getElement().querySelector('[data-tab-id="tab-1"] .tab-bar__icon') as HTMLElement;
+    expect(iconEl.textContent).toBe("$");
+
+    bar.setTabBackend("tab-1", "tmux");
+    expect(iconEl.textContent).toBe("⊞");
+
+    bar.setTabBackend("tab-1", "zellij");
+    expect(iconEl.textContent).toBe("◈");
+
+    bar.setTabBackend("tab-1", "native");
+    expect(iconEl.textContent).toBe("$");
   });
 
   it("first added tab becomes active and calls switch", () => {

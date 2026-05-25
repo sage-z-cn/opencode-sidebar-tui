@@ -178,6 +178,10 @@ function initApp(): void {
   focusManager.registerPane("default", container);
   tabBar.addTab("default", "Terminal");
 
+  tabBar.onTabAdd(() => {
+    postMessage({ type: "paneCreate" });
+  });
+
   container.addEventListener(
     "paste",
     (event: ClipboardEvent) => {
@@ -234,6 +238,7 @@ function initApp(): void {
       const paneId = msg.paneId as string;
       const backend = msg.backend as TerminalBackendType;
       paneManager.setBackend(paneId, backend);
+      tabBar.setTabBackend(paneId, backend);
     }
     if (msg && msg.type === "paneDelete" && "paneId" in msg) {
       const paneId = msg.paneId as string;
