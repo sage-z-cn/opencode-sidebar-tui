@@ -74,6 +74,7 @@ export interface MessageRouterProviderBridge {
     tmux: boolean;
     zellij: boolean;
   };
+  switchPaneBackend(paneId: string, backend: TerminalBackendType): Promise<void>;
 }
 
 export class MessageRouter {
@@ -202,6 +203,9 @@ export class MessageRouter {
         break;
       case "cycleTerminalBackend":
         void this.provider.cycleTerminalBackend();
+        break;
+      case "paneSwitchBackend":
+        void this.provider.switchPaneBackend(message.paneId, message.backend);
         break;
       case "requestAiToolSelector": {
         const sessionId =

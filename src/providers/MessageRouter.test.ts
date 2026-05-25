@@ -128,6 +128,7 @@ describe("MessageRouter", () => {
         tmux: true,
         zellij: true,
       })),
+      switchPaneBackend: vi.fn(async () => undefined),
     };
   }
 
@@ -336,6 +337,11 @@ describe("MessageRouter", () => {
       type: "sendTmuxPromptChoice",
       choice: "zellij",
     });
+    await router.handleMessage({
+      type: "paneSwitchBackend",
+      paneId: "pane-1",
+      backend: "native",
+    });
     await router.handleMessage({ type: "cycleTerminalBackend" });
     await router.handleMessage({ type: "requestAiToolSelector" });
     await router.handleMessage({
@@ -361,6 +367,7 @@ describe("MessageRouter", () => {
     expect(provider.selectTerminalBackend).toHaveBeenCalledWith("zellij");
     expect(provider.cycleTerminalBackend).toHaveBeenCalledTimes(1);
     expect(provider.switchToNativeShell).toHaveBeenCalledTimes(1);
+    expect(provider.switchPaneBackend).toHaveBeenCalledWith("pane-1", "native");
     expect(provider.launchAiTool).toHaveBeenCalledWith(
       "tmux-c",
       "claude",

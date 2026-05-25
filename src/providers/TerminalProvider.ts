@@ -144,6 +144,8 @@ export class TerminalProvider
       isZellijAvailable: () => !!this.zellijSessionManager,
       getActiveBackend: () => this.sessionRuntime.getActiveBackend(),
       getBackendAvailability: () => this.sessionRuntime.getBackendAvailability(),
+      switchPaneBackend: (paneId, backend) =>
+        this.switchPaneBackend(paneId, backend),
     };
 
     this.messageRouter = new MessageRouter(
@@ -404,6 +406,13 @@ export class TerminalProvider
 
   public async cycleTerminalBackend(): Promise<void> {
     await this.sessionRuntime.cycleTerminalBackend();
+  }
+
+  public async switchPaneBackend(
+    paneId: string,
+    backend: TerminalBackendType,
+  ): Promise<void> {
+    await this.sessionRuntime.switchPaneBackend(paneId, backend);
   }
 
   public async createTmuxSession(): Promise<string | undefined> {
