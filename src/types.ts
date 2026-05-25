@@ -46,6 +46,21 @@ export interface DroppedBlobFile {
 
 export type TerminalBackendType = "native" | "tmux" | "zellij";
 
+export type PaneLayout = {
+  tabId: string;
+  paneId: string;
+  splitDirection?: "horizontal" | "vertical";
+  size?: number;
+  children?: PaneLayout[];
+};
+
+export type PaneConfig = {
+  paneId: string;
+  command?: string;
+  cwd?: string;
+  backend?: TerminalBackendType;
+};
+
 export interface TerminalBackendAvailability {
   native: boolean;
   tmux: boolean;
@@ -53,52 +68,70 @@ export interface TerminalBackendAvailability {
 }
 
 export type WebviewMessage =
-  | { type: "terminalInput"; data: string }
-  | { type: "terminalResize"; cols: number; rows: number }
-  | { type: "listTerminals" }
+  | { type: "terminalInput"; data: string; paneId?: string }
+  | { type: "terminalResize"; cols: number; rows: number; paneId?: string }
+  | { type: "listTerminals"; paneId?: string }
   | {
       type: "openFile";
       path: string;
       line?: number;
       endLine?: number;
       column?: number;
+      paneId?: string;
     }
-  | { type: "openUrl"; url: string }
-  | { type: "ready"; cols: number; rows: number }
+  | { type: "openUrl"; url: string; paneId?: string }
+  | { type: "ready"; cols: number; rows: number; paneId?: string }
   | {
       type: "filesDropped";
       files: string[];
       shiftKey: boolean;
       dropCell?: { col: number; row: number };
       blobFiles?: DroppedBlobFile[];
+      paneId?: string;
     }
-  | { type: "setClipboard"; text: string }
-  | { type: "triggerPaste" }
-  | { type: "imagePasted"; data: string }
-  | { type: "switchSession"; sessionId: string }
-  | { type: "killSession"; sessionId: string }
-  | { type: "createTmuxSession" }
+  | { type: "setClipboard"; text: string; paneId?: string }
+  | { type: "triggerPaste"; paneId?: string }
+  | { type: "imagePasted"; data: string; paneId?: string }
+  | { type: "switchSession"; sessionId: string; paneId?: string }
+  | { type: "killSession"; sessionId: string; paneId?: string }
+  | { type: "createTmuxSession"; paneId?: string }
   | {
       type: "launchAiTool";
       sessionId: string;
       tool: string;
       savePreference: boolean;
       targetPaneId?: string;
+      paneId?: string;
     }
-  | { type: "zoomTmuxPane" }
-  | { type: "toggleDashboard" }
-  | { type: "toggleEditorAttachment" }
-  | { type: "sendTmuxPromptChoice"; choice: "tmux" | "shell" | "zellij" }
-  | { type: "selectTerminalBackend"; backend: TerminalBackendType }
-  | { type: "cycleTerminalBackend" }
-  | { type: "requestAiToolSelector" }
-  | { type: "executeTmuxCommand"; commandId: TmuxWebviewCommandId }
+  | { type: "zoomTmuxPane"; paneId?: string }
+  | { type: "toggleDashboard"; paneId?: string }
+  | { type: "toggleEditorAttachment"; paneId?: string }
+  | {
+      type: "sendTmuxPromptChoice";
+      choice: "tmux" | "shell" | "zellij";
+      paneId?: string;
+    }
+  | {
+      type: "selectTerminalBackend";
+      backend: TerminalBackendType;
+      paneId?: string;
+    }
+  | { type: "cycleTerminalBackend"; paneId?: string }
+  | { type: "requestAiToolSelector"; paneId?: string }
+  | {
+      type: "executeTmuxCommand";
+      commandId: TmuxWebviewCommandId;
+      paneId?: string;
+    }
   | {
       type: "executeTmuxRawCommand";
       subcommand: TmuxRawSubcommand;
       args?: string[];
+      paneId?: string;
     }
-  | { type: "requestRestart" };
+  | { type: "requestRestart"; paneId?: string }
+  | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
+  | { type: "paneDelete"; paneId?: string };
 
 export type AiTool = string;
 
@@ -364,11 +397,11 @@ export type HostMessage =
   | { type: "requestPaste" }
   | { type: "clipboardContent"; text: string }
   | { type: "terminalList"; terminals: Array<{ name: string; cwd: string }> }
-  | { type: "terminalOutput"; data: string }
-  | { type: "terminalExited" }
-  | { type: "clearTerminal" }
-  | { type: "focusTerminal" }
-  | { type: "webviewVisible" }
+  | { type: "terminalOutput"; data: string; paneId?: string }
+  | { type: "terminalExited"; paneId?: string }
+  | { type: "clearTerminal"; paneId?: string }
+  | { type: "focusTerminal"; paneId?: string }
+  | { type: "webviewVisible"; paneId?: string }
   | {
       type: "platformInfo";
       platform: string;
@@ -419,7 +452,9 @@ export type HostMessage =
       tmuxAvailable?: boolean;
       zellijAvailable?: boolean;
       activeBackend?: TerminalBackendType;
-    };
+    }
+  | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
+  | { type: "paneDelete"; paneId?: string };
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 export type DiagnosticSeverity = "error" | "warning" | "information" | "hint";
@@ -447,4 +482,8 @@ export interface ExtensionConfig {
   collapseSecondaryBarOnEditorOpen: boolean;
   terminalBackend: TerminalBackendType;
   showTmuxWindowControls: boolean;
+  'pane.defaultSplitDirection': "horizontal" | "vertical";
+  'pane.focusOnClick': boolean;
+  'pane.showPaneActions': boolean;
+  'pane.renderer': "webgl" | "canvas" | "auto";
 }

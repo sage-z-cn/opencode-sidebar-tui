@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import type {
   HostMessage,
+  PaneConfig,
+  PaneLayout,
   TerminalBackendType,
   TmuxDashboardActionMessage,
   TmuxDashboardHostMessage,
@@ -17,6 +19,134 @@ import {
 
 describe("Types", () => {
   describe("WebviewMessage", () => {
+    it("should accept all variants with paneId", () => {
+      const messages: WebviewMessage[] = [
+        { type: "terminalInput", data: "test input", paneId: "pane-1" },
+        {
+          type: "terminalResize",
+          cols: 80,
+          rows: 24,
+          paneId: "pane-1",
+        },
+        { type: "listTerminals", paneId: "pane-1" },
+        {
+          type: "openFile",
+          path: "/test/file.ts",
+          line: 10,
+          paneId: "pane-1",
+        },
+        {
+          type: "openUrl",
+          url: "https://example.com",
+          paneId: "pane-1",
+        },
+        { type: "ready", cols: 80, rows: 24, paneId: "pane-1" },
+        {
+          type: "filesDropped",
+          files: ["/file1.ts", "/file2.ts"],
+          shiftKey: true,
+          paneId: "pane-1",
+        },
+        {
+          type: "setClipboard",
+          text: "clipboard text",
+          paneId: "pane-1",
+        },
+        { type: "triggerPaste", paneId: "pane-1" },
+        { type: "imagePasted", data: "data:image/png;base64,AA==", paneId: "pane-1" },
+        { type: "switchSession", sessionId: "workspace-a", paneId: "pane-1" },
+        { type: "killSession", sessionId: "workspace-a", paneId: "pane-1" },
+        { type: "createTmuxSession", paneId: "pane-1" },
+        {
+          type: "launchAiTool",
+          sessionId: "workspace-a",
+          tool: "opencode",
+          savePreference: true,
+          paneId: "pane-1",
+        },
+        { type: "zoomTmuxPane", paneId: "pane-1" },
+        { type: "toggleDashboard", paneId: "pane-1" },
+        { type: "toggleEditorAttachment", paneId: "pane-1" },
+        {
+          type: "sendTmuxPromptChoice",
+          choice: "tmux",
+          paneId: "pane-1",
+        },
+        {
+          type: "selectTerminalBackend",
+          backend: "zellij",
+          paneId: "pane-1",
+        },
+        { type: "cycleTerminalBackend", paneId: "pane-1" },
+        { type: "requestAiToolSelector", paneId: "pane-1" },
+        {
+          type: "executeTmuxCommand",
+          commandId: "opencodeTui.tmuxCreateWindow",
+          paneId: "pane-1",
+        },
+        {
+          type: "executeTmuxRawCommand",
+          subcommand: "rename-session",
+          args: ["workspace-renamed"],
+          paneId: "pane-1",
+        },
+        { type: "requestRestart", paneId: "pane-1" },
+      ];
+
+      expect(messages).toHaveLength(24);
+      expect(messages[0]?.paneId).toBe("pane-1");
+      expect(messages[22]?.type).toBe("executeTmuxRawCommand");
+    });
+
+    it("should accept all variants without paneId for backward compatibility", () => {
+      const messages: WebviewMessage[] = [
+        { type: "terminalInput", data: "test input" },
+        { type: "terminalResize", cols: 80, rows: 24 },
+        { type: "listTerminals" },
+        { type: "openFile", path: "/test/file.ts", line: 10 },
+        { type: "openUrl", url: "https://example.com" },
+        { type: "ready", cols: 80, rows: 24 },
+        {
+          type: "filesDropped",
+          files: ["/file1.ts", "/file2.ts"],
+          shiftKey: true,
+        },
+        { type: "setClipboard", text: "clipboard text" },
+        { type: "triggerPaste" },
+        { type: "imagePasted", data: "data:image/png;base64,AA==" },
+        { type: "switchSession", sessionId: "workspace-a" },
+        { type: "killSession", sessionId: "workspace-a" },
+        { type: "createTmuxSession" },
+        {
+          type: "launchAiTool",
+          sessionId: "workspace-a",
+          tool: "opencode",
+          savePreference: true,
+        },
+        { type: "zoomTmuxPane" },
+        { type: "toggleDashboard" },
+        { type: "toggleEditorAttachment" },
+        { type: "sendTmuxPromptChoice", choice: "tmux" },
+        { type: "selectTerminalBackend", backend: "zellij" },
+        { type: "cycleTerminalBackend" },
+        { type: "requestAiToolSelector" },
+        {
+          type: "executeTmuxCommand",
+          commandId: "opencodeTui.tmuxCreateWindow",
+        },
+        {
+          type: "executeTmuxRawCommand",
+          subcommand: "rename-session",
+          args: ["workspace-renamed"],
+        },
+        { type: "requestRestart" },
+      ];
+
+      expect(messages).toHaveLength(24);
+      expect(messages[0]?.paneId).toBeUndefined();
+      expect(messages[23]?.type).toBe("requestRestart");
+    });
+
     it("should accept terminalInput message", () => {
       const message: WebviewMessage = {
         type: "terminalInput",
@@ -242,6 +372,23 @@ describe("Types", () => {
   });
 
   describe("HostMessage", () => {
+    it("should accept data-related host messages with paneId", () => {
+      const messages: HostMessage[] = [
+        {
+          type: "terminalOutput",
+          data: "output data",
+          paneId: "pane-1",
+        },
+        { type: "terminalExited", paneId: "pane-1" },
+        { type: "clearTerminal", paneId: "pane-1" },
+        { type: "focusTerminal", paneId: "pane-1" },
+        { type: "webviewVisible", paneId: "pane-1" },
+      ];
+
+      expect(messages[0]?.paneId).toBe("pane-1");
+      expect(messages[4]?.type).toBe("webviewVisible");
+    });
+
     it("should accept terminalOutput message", () => {
       const message: HostMessage = {
         type: "terminalOutput",
@@ -266,6 +413,31 @@ describe("Types", () => {
       };
 
       expect(message.type).toBe("focusTerminal");
+    });
+
+    it("should define pane layout and pane config structures", () => {
+      const layout: PaneLayout = {
+        tabId: "tab-1",
+        paneId: "pane-1",
+        splitDirection: "horizontal",
+        size: 50,
+        children: [
+          {
+            tabId: "tab-1",
+            paneId: "pane-2",
+          },
+        ],
+      };
+
+      const config: PaneConfig = {
+        paneId: "pane-1",
+        command: "npm run dev",
+        cwd: "/workspace",
+        backend: "tmux",
+      };
+
+      expect(layout.children?.[0]?.paneId).toBe("pane-2");
+      expect(config.backend).toBe("tmux");
     });
   });
 
