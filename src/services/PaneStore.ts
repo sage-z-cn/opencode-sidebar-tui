@@ -1,4 +1,5 @@
 import { EventEmitter } from "node:events";
+import type { TerminalBackendType } from "../types";
 
 export interface PaneState {
   paneId: string;
@@ -8,6 +9,7 @@ export interface PaneState {
   splitDirection?: "horizontal" | "vertical";
   cwd?: string;
   command?: string;
+  backend?: TerminalBackendType;
 }
 
 export interface PaneLayoutSnapshot {
@@ -24,6 +26,7 @@ type PaneStoreEventMap = {
   "tab-add": [tabId: string];
   "tab-remove": [tabId: string];
   "tab-switch": [tabId: string];
+  "backendChanged": [paneId: string, oldBackend: TerminalBackendType | undefined, newBackend: TerminalBackendType];
 };
 
 export class PaneStore extends EventEmitter {
@@ -118,6 +121,29 @@ export class PaneStore extends EventEmitter {
     return this.activeTabId;
   }
 
+  public getPanesByBackend(backend: TerminalBackendType): PaneState[] {
+    return Array.from(this.panes.values())
+      .filter((pane) => (pane.backend ?? "native") === backend)
+      .map((pane) => this.clonePane(pane));
+  }
+
+  public switchPaneBackend(paneId: string, newBackend: TerminalBackendType): void {
+    const pane = this.panes.get(paneId);
+    if (!pane) {
+      throw new Error(`Cannot switch backend: unknown pane '${paneId}'`);
+    }
+
+    const oldBackend = pane.backend;
+    if (oldBackend === newBackend) {
+      return;
+    }
+
+    pane.backend = newBackend;
+    this.panes.set(paneId, pane);
+    this.emitTyped("backendChanged", paneId, oldBackend, newBackend);
+    this.emitTyped("change", this.getAllPanesSnapshot());
+  }
+
   public getAllPanes(): Map<string, PaneState> {
     const copy = new Map<string, PaneState>();
     for (const [paneId, pane] of this.panes.entries()) {
@@ -201,6 +227,7 @@ export class PaneStore extends EventEmitter {
       splitDirection: pane.splitDirection,
       cwd: pane.cwd,
       command: pane.command,
+      backend: pane.backend,
     };
   }
 
