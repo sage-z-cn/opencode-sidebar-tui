@@ -1,11 +1,13 @@
 import { describe, it, expect } from "vitest";
 import type {
+  BackendPaneConfig,
   HostMessage,
   PaneConfig,
   PaneLayout,
   TerminalBackendType,
   TmuxDashboardActionMessage,
   TmuxDashboardHostMessage,
+  TmuxPaneSyncMessage,
   WebviewMessage,
 } from "./types";
 import {
@@ -77,6 +79,11 @@ describe("Types", () => {
           backend: "zellij",
           paneId: "pane-1",
         },
+        {
+          type: "paneSwitchBackend",
+          paneId: "pane-1",
+          backend: "tmux",
+        },
         { type: "cycleTerminalBackend", paneId: "pane-1" },
         { type: "requestAiToolSelector", paneId: "pane-1" },
         {
@@ -93,9 +100,9 @@ describe("Types", () => {
         { type: "requestRestart", paneId: "pane-1" },
       ];
 
-      expect(messages).toHaveLength(24);
+      expect(messages).toHaveLength(25);
       expect(messages[0]?.paneId).toBe("pane-1");
-      expect(messages[22]?.type).toBe("executeTmuxRawCommand");
+      expect(messages[23]?.type).toBe("executeTmuxRawCommand");
     });
 
     it("should accept all variants without paneId for backward compatibility", () => {
@@ -278,9 +285,18 @@ describe("Types", () => {
         type: "selectTerminalBackend",
         backend,
       };
+      const switchMessage: WebviewMessage = {
+        type: "paneSwitchBackend",
+        paneId: "pane-2",
+        backend: "tmux",
+      };
       const cycleMessage: WebviewMessage = { type: "cycleTerminalBackend" };
 
       expect(selectMessage.backend).toBe("zellij");
+      if (switchMessage.type === "paneSwitchBackend") {
+        expect(switchMessage.paneId).toBe("pane-2");
+        expect(switchMessage.backend).toBe("tmux");
+      }
       expect(cycleMessage.type).toBe("cycleTerminalBackend");
     });
 
@@ -383,10 +399,11 @@ describe("Types", () => {
         { type: "clearTerminal", paneId: "pane-1" },
         { type: "focusTerminal", paneId: "pane-1" },
         { type: "webviewVisible", paneId: "pane-1" },
+        { type: "paneBackendChanged", paneId: "pane-1", backend: "zellij" },
       ];
 
       expect(messages[0]?.paneId).toBe("pane-1");
-      expect(messages[4]?.type).toBe("webviewVisible");
+      expect(messages[5]?.type).toBe("paneBackendChanged");
     });
 
     it("should accept terminalOutput message", () => {
@@ -434,10 +451,58 @@ describe("Types", () => {
         command: "npm run dev",
         cwd: "/workspace",
         backend: "tmux",
+        backendConfig: {
+          tmux: { sessionId: "workspace-a", paneId: "%1" },
+        },
+      };
+
+      const legacyConfig: PaneConfig = {
+        paneId: "pane-legacy",
+        command: "npm test",
+        cwd: "/workspace",
       };
 
       expect(layout.children?.[0]?.paneId).toBe("pane-2");
       expect(config.backend).toBe("tmux");
+      expect(config.backendConfig?.tmux?.paneId).toBe("%1");
+      expect(legacyConfig.backend).toBeUndefined();
+      expect(legacyConfig.backendConfig).toBeUndefined();
+    });
+
+    it("should accept backend pane config shapes and tmux pane sync messages", () => {
+      const backendConfig: BackendPaneConfig = {
+        tmux: { sessionId: "session-1", paneId: "%2" },
+        zellij: { sessionId: "zellij-session-1" },
+        native: {},
+      };
+      const syncMessages: TmuxPaneSyncMessage[] = [
+        { paneId: "pane-1", tmuxPaneId: "%1", action: "created" },
+        { paneId: "pane-1", tmuxPaneId: "%1", action: "resized" },
+        { paneId: "pane-1", tmuxPaneId: "%1", action: "removed" },
+      ];
+
+      expect(backendConfig.tmux?.sessionId).toBe("session-1");
+      expect(backendConfig.zellij?.sessionId).toBe("zellij-session-1");
+      expect(backendConfig.native).toEqual({});
+      expect(syncMessages.map((message) => message.action)).toEqual([
+        "created",
+        "resized",
+        "removed",
+      ]);
+    });
+
+    it("should narrow pane backend host messages by discriminant", () => {
+      const message: HostMessage = {
+        type: "paneBackendChanged",
+        paneId: "pane-3",
+        backend: "native",
+      };
+
+      if (message.type === "paneBackendChanged") {
+        const backend: TerminalBackendType = message.backend;
+        expect(message.paneId).toBe("pane-3");
+        expect(backend).toBe("native");
+      }
     });
   });
 

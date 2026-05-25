@@ -59,7 +59,14 @@ export type PaneConfig = {
   command?: string;
   cwd?: string;
   backend?: TerminalBackendType;
+  backendConfig?: BackendPaneConfig;
 };
+
+export interface BackendPaneConfig {
+  tmux?: { sessionId?: string; paneId?: string };
+  zellij?: { sessionId?: string };
+  native?: Record<string, never>;
+}
 
 export interface TerminalBackendAvailability {
   native: boolean;
@@ -115,6 +122,11 @@ export type WebviewMessage =
       type: "selectTerminalBackend";
       backend: TerminalBackendType;
       paneId?: string;
+    }
+  | {
+      type: "paneSwitchBackend";
+      paneId: string;
+      backend: TerminalBackendType;
     }
   | { type: "cycleTerminalBackend"; paneId?: string }
   | { type: "requestAiToolSelector"; paneId?: string }
@@ -393,6 +405,12 @@ export interface TreeSnapshot {
   emptyState?: "no-workspace" | "no-tmux" | "no-sessions";
 }
 
+export type TmuxPaneSyncMessage = {
+  paneId: string;
+  tmuxPaneId: string;
+  action: "created" | "removed" | "resized";
+};
+
 export type HostMessage =
   | { type: "requestPaste" }
   | { type: "clipboardContent"; text: string }
@@ -454,6 +472,11 @@ export type HostMessage =
       activeBackend?: TerminalBackendType;
     }
   | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
+  | {
+      type: "paneBackendChanged";
+      paneId: string;
+      backend: TerminalBackendType;
+    }
   | { type: "paneDelete"; paneId?: string };
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
