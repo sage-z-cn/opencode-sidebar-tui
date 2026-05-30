@@ -5,6 +5,16 @@ All notable changes to the "Open Sidebar TUI" extension will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-05-31
+
+### Added
+
+- Add l10n (localization) support with `vscode.l10n` translation bundle and `i18n` module.
+- Localize extension host modules (commands, providers, services) via `l10n.t()`.
+- Add `package.nls.json` for extension manifest localization.
+- Add terminal re-render button (▣) that performs fit+refresh without restarting the process.
+- Localize all toolbar button titles via `vscode.l10n`.
+
 ## [2.0.0] - 2026-05-30
 
 ### Changed
