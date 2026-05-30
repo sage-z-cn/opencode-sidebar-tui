@@ -95,14 +95,14 @@ const webviewConfig = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, "src/webview/*.css"),
-          to: path.resolve(__dirname, "dist/[name][ext]"),
-          globOptions: { ignore: [] },
+          context: path.resolve(__dirname, "src/webview").replace(/\\/g, "/"),
+          from: "*.css",
+          to: path.resolve(__dirname, "dist"),
         },
         {
-          from: path.resolve(__dirname, "src/webview/*.html"),
-          to: path.resolve(__dirname, "dist/[name][ext]"),
-          globOptions: { ignore: [] },
+          context: path.resolve(__dirname, "src/webview").replace(/\\/g, "/"),
+          from: "*.html",
+          to: path.resolve(__dirname, "dist"),
         },
       ],
     }),
