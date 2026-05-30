@@ -106,6 +106,13 @@ export function initTerminal(
       return;
     }
 
+    // When a TUI enables mouse tracking (e.g. \x1b[?1002h),
+    // let xterm.js handle the wheel event so it sends the
+    // escape sequence to the PTY for the application to process.
+    if (terminal.modes.mouseTrackingMode !== "none") {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
     terminal.scrollLines(event.deltaY > 0 ? 3 : -3);
