@@ -1,12 +1,9 @@
-import { Terminal } from "@xterm/xterm";
-import { FitAddon } from "@xterm/addon-fit";
 import { postMessage } from "../shared/vscode-api";
 import {
   TerminalBackendAvailability,
   TerminalBackendType,
   TmuxWebviewCommandId,
 } from "../../types";
-import { scheduleRefresh } from "../shared/utils";
 
 import * as TmuxCmd from "../tmux-command-dropdown";
 
@@ -136,18 +133,20 @@ export function setupReloadButton(): void {
   });
 }
 
-export function setupRerenderButton(
-  terminal: Terminal | null,
-  fitAddon: FitAddon | null,
-): void {
+export function setupRerenderButton(): void {
   document.getElementById("btn-rerender")?.addEventListener("click", () => {
-    if (!terminal || !fitAddon) return;
-    try {
-      fitAddon.fit();
-      scheduleRefresh(() => terminal.refresh(0, terminal.rows - 1));
-    } catch {
-      // silently ignore render errors
-    }
+    const container = document.getElementById("terminal-container");
+    if (!container) return;
+
+    const currentHeight = container.offsetHeight;
+
+    // Use maxHeight to actually constrain the flex:1 element,
+    // triggering ResizeObserver → fitAddon.fit() + terminal.refresh()
+    container.style.maxHeight = `${currentHeight - 10}px`;
+
+    setTimeout(() => {
+      container.style.maxHeight = "";
+    }, 500);
   });
 }
 
