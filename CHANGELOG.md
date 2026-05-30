@@ -5,6 +5,17 @@ All notable changes to the "Open Sidebar TUI" extension will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-05-31
+
+### Added
+
+- 工具栏新增设置按钮（⚙），点击直接打开扩展设置面板（已过滤 `ost.` 前缀）。
+
+### Fixed
+
+- 修复后端切换按钮的提示文字从 "Switch to Native Shell" 改为 "Cycle terminal backend"。
+- 修复会话标签居中问题，改用绝对定位确保标签始终居中。
+
 ## [2.1.1] - 2026-05-31
 
 ### Fixed
