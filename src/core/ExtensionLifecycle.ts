@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../i18n";
 import { TerminalProvider } from "../providers/TerminalProvider";
 import { OpenCodeCodeActionProvider } from "../providers/CodeActionProvider";
 import { TerminalManager } from "../terminals/TerminalManager";
@@ -286,7 +287,9 @@ export class ExtensionLifecycle {
         `Failed to activate Open Sidebar TUI: ${error instanceof Error ? error.message : String(error)}`,
       );
       vscode.window.showErrorMessage(
-        `Failed to activate Open Sidebar TUI: ${error instanceof Error ? error.message : String(error)}`,
+        l10n.t("Failed to activate Open Sidebar TUI: {error}", {
+          error: error instanceof Error ? error.message : String(error),
+        }),
       );
     }
   }
@@ -418,14 +421,16 @@ export class ExtensionLifecycle {
   private sendTerminalCwd(): void {
     const activeTerminal = vscode.window.activeTerminal;
     if (!activeTerminal) {
-      vscode.window.showWarningMessage("No active terminal");
+      vscode.window.showWarningMessage(l10n.t("No active terminal"));
       return;
     }
 
     const cwd = activeTerminal.shellIntegration?.cwd?.fsPath;
     if (!cwd) {
       vscode.window.showWarningMessage(
-        "Could not determine terminal working directory. Make sure shell integration is enabled.",
+        l10n.t(
+          "Could not determine terminal working directory. Make sure shell integration is enabled.",
+        ),
       );
       return;
     }
@@ -464,11 +469,21 @@ export class ExtensionLifecycle {
     }
 
     const count = allSessions.length;
+    const message =
+      count === 1
+        ? l10n.t(
+            "{count} tmux session is running. Kill it when closing VS Code?",
+            { count },
+          )
+        : l10n.t(
+            "{count} tmux sessions are running. Kill them when closing VS Code?",
+            { count },
+          );
     const answer = await vscode.window.showWarningMessage(
-      `${count} tmux ${count === 1 ? "session is" : "sessions are"} running. Kill ${count === 1 ? "it" : "them"} when closing VS Code?`,
+      message,
       { modal: true },
-      "Kill Sessions",
-      "Keep Running",
+      l10n.t("Kill Sessions"),
+      l10n.t("Keep Running"),
     );
 
     if (answer === "Kill Sessions") {

@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../i18n";
 import {
   InstanceId,
   InstanceRecord,
@@ -39,8 +40,8 @@ export class InstanceQuickPick {
 
   public async show(): Promise<void> {
     const quickPick = vscode.window.createQuickPick<InstanceQuickPickItem>();
-    quickPick.title = "OpenCode Tmux Sessions";
-    quickPick.placeholder = "Select a tmux session to connect...";
+    quickPick.title = l10n.t("OpenCode Tmux Sessions");
+    quickPick.placeholder = l10n.t("Select a tmux session to connect...");
     quickPick.busy = true;
     quickPick.show();
 
@@ -112,14 +113,14 @@ export class InstanceQuickPick {
     }
 
     items.push({
-      label: "$(add) Spawn New Tmux Session",
-      description: "Start a new OpenCode tmux session for this workspace",
+      label: `$(add) ${l10n.t("Spawn New Tmux Session")}`,
+      description: l10n.t("Start a new OpenCode tmux session for this workspace"),
       action: { type: "spawn" },
     });
 
     items.push({
-      label: "$(refresh) Refresh",
-      description: "Re-scan for running instances",
+      label: `$(refresh) ${l10n.t("Refresh")}`,
+      description: l10n.t("Re-scan for running instances"),
       action: { type: "refresh" },
     });
 
@@ -144,7 +145,7 @@ export class InstanceQuickPick {
       label: `${icon} ${label}${port}${activeMarker}`,
       description: `${record.state}${session}`,
       detail: record.health?.model
-        ? `Model: ${record.health.model}`
+        ? l10n.t("Model: {model}", { model: record.health.model })
         : undefined,
       action: isConnected
         ? { type: "select", instanceId: record.config.id }
@@ -164,11 +165,14 @@ export class InstanceQuickPick {
     const instanceId = `discovered-${instance.port}`;
 
     return {
-      label: `$(circle-large-outline) External :${instance.port}`,
+      label: `$(circle-large-outline) ${l10n.t("External")} :${instance.port}`,
       description: instance.workspacePath
-        ? `PID ${instance.pid} — ${instance.workspacePath}`
+        ? l10n.t("PID {pid} — {workspace}", {
+            pid: instance.pid,
+            workspace: instance.workspacePath,
+          })
         : `PID ${instance.pid}`,
-      detail: "Discovered externally-running tmux session",
+      detail: l10n.t("Discovered externally-running tmux session"),
       action: {
         type: "connect",
         instanceId,
@@ -180,13 +184,13 @@ export class InstanceQuickPick {
   private buildFallbackItems(): InstanceQuickPickItem[] {
     return [
       {
-        label: "$(warning) Failed to discover instances",
-        description: "Try spawning a new tmux session",
+        label: `$(warning) ${l10n.t("Failed to discover instances")}`,
+        description: l10n.t("Try spawning a new tmux session"),
         action: { type: "spawn" },
       },
       {
-        label: "$(refresh) Refresh",
-        description: "Re-scan for running instances",
+        label: `$(refresh) ${l10n.t("Refresh")}`,
+        description: l10n.t("Re-scan for running instances"),
         action: { type: "refresh" },
       },
     ];
@@ -200,11 +204,15 @@ export class InstanceQuickPick {
         try {
           this.instanceStore.setActive(action.instanceId);
           vscode.window.showInformationMessage(
-            `Switched to tmux session: ${action.instanceId}`,
+            l10n.t("Switched to tmux session: {instanceId}", {
+              instanceId: action.instanceId,
+            }),
           );
         } catch (error) {
           vscode.window.showErrorMessage(
-            `Failed to select tmux session: ${error instanceof Error ? error.message : String(error)}`,
+            l10n.t("Failed to select tmux session: {error}", {
+              error: error instanceof Error ? error.message : String(error),
+            }),
           );
         }
         break;
@@ -216,11 +224,15 @@ export class InstanceQuickPick {
             await this.controller.connect(action.instanceId, action.port);
             this.instanceStore.setActive(action.instanceId);
             vscode.window.showInformationMessage(
-              `Connected to tmux session on port ${action.port}`,
+              l10n.t("Connected to tmux session on port {port}", {
+                port: action.port,
+              }),
             );
           } catch (error) {
             vscode.window.showErrorMessage(
-              `Failed to connect: ${error instanceof Error ? error.message : String(error)}`,
+              l10n.t("Failed to connect: {error}", {
+                error: error instanceof Error ? error.message : String(error),
+              }),
             );
           }
         } else {
@@ -236,7 +248,9 @@ export class InstanceQuickPick {
           });
           this.instanceStore.setActive(action.instanceId);
           vscode.window.showInformationMessage(
-            `Connected to tmux session on port ${action.port}`,
+            l10n.t("Connected to tmux session on port {port}", {
+              port: action.port,
+            }),
           );
         }
         break;
@@ -247,11 +261,13 @@ export class InstanceQuickPick {
           try {
             await this.controller.disconnect(action.instanceId);
             vscode.window.showInformationMessage(
-              "Disconnected from tmux session",
+              l10n.t("Disconnected from tmux session"),
             );
           } catch (error) {
             vscode.window.showErrorMessage(
-              `Failed to disconnect: ${error instanceof Error ? error.message : String(error)}`,
+              l10n.t("Failed to disconnect: {error}", {
+                error: error instanceof Error ? error.message : String(error),
+              }),
             );
           }
         }
