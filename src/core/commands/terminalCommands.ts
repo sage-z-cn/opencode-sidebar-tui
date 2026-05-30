@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../../i18n";
 import type { TerminalProvider } from "../../providers/TerminalProvider";
 import type { ContextSharingService } from "../../services/ContextSharingService";
 import type { OutputChannelService } from "../../services/OutputChannelService";
@@ -180,7 +181,7 @@ export function registerTerminalCommands(
         deps.outputChannel?.error(
           `[TerminalProvider] Failed to paste: ${error instanceof Error ? error.message : String(error)}`,
         );
-        vscode.window.showErrorMessage("Failed to paste from clipboard");
+        vscode.window.showErrorMessage(l10n.t("Failed to paste from clipboard"));
       }
     },
   );

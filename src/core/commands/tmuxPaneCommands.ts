@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../../i18n";
 import type {
   TmuxPane,
   TmuxSessionManager,
@@ -45,7 +46,7 @@ function toPaneQuickPickItems(
   includeActiveMarker: boolean = false,
 ): PaneQuickPickItem[] {
   return panes.map((pane) => ({
-    label: `${includeActiveMarker && pane.isActive ? "$(check) " : ""}Pane ${pane.index}${pane.title ? `: ${pane.title}` : ""}`,
+    label: `${includeActiveMarker && pane.isActive ? "$(check) " : ""}${l10n.t("Pane {index}", { index: pane.index })}${pane.title ? `: ${pane.title}` : ""}`,
     description: pane.paneId,
     paneId: pane.paneId,
   }));
@@ -145,8 +146,8 @@ async function promptResizeDirectionAndAmount(): Promise<
   | undefined
 > {
   const direction = await vscode.window.showQuickPick(
-    ["Left", "Right", "Up", "Down"],
-    { placeHolder: "Resize direction" },
+    [l10n.t("Left"), l10n.t("Right"), l10n.t("Up"), l10n.t("Down")],
+    { placeHolder: l10n.t("Resize direction") },
   );
   if (!direction) {
     return undefined;
@@ -166,10 +167,10 @@ async function promptResizeDirectionAndAmount(): Promise<
     }
   })();
   const adjustment = await vscode.window.showInputBox({
-    prompt: `Resize amount (cells) for ${direction.toLowerCase()}`,
+    prompt: l10n.t("Resize amount (cells) for {direction}", { direction: direction.toLowerCase() }),
     value: "5",
     validateInput: (v) =>
-      /^\d+$/.test(v) ? undefined : "Must be a positive number",
+      /^\d+$/.test(v) ? undefined : l10n.t("Must be a positive number"),
   });
   if (!adjustment) {
     return undefined;
@@ -232,14 +233,14 @@ export function registerTmuxPaneCommands(
     if (paneManager.kind === "tmux") {
       const windows = await paneManager.manager.listWindows(sessionId);
       return windows.map((w) => ({
-        label: `${w.isActive ? "$(check) " : ""}Window ${w.index}: ${w.name}`,
+        label: `${w.isActive ? "$(check) " : ""}${l10n.t("Window {index}: {name}", { index: w.index, name: w.name })}`,
         description: w.windowId,
         windowId: w.windowId,
       }));
     }
     const tabs = await paneManager.manager.listTabs();
     return tabs.map((tab: ZellijTab) => ({
-      label: `${tab.isActive ? "$(check) " : ""}Tab ${tab.index}: ${tab.name}`,
+      label: `${tab.isActive ? "$(check) " : ""}${l10n.t("Tab {index}: {name}", { index: tab.index, name: tab.name })}`,
       description: String(tab.index),
       windowId: String(tab.index),
     }));
@@ -282,7 +283,7 @@ export function registerTmuxPaneCommands(
       const selected = await pickPaneFromSession(
         deps,
         sessionId,
-        "Select pane to switch to",
+        l10n.t("Select pane to switch to"),
         true,
       );
       if (selected) {
@@ -349,7 +350,7 @@ export function registerTmuxPaneCommands(
           workingDirectory: cwd,
         });
       } catch {
-        vscode.window.showErrorMessage("Failed to split pane");
+        vscode.window.showErrorMessage(l10n.t("Failed to split pane"));
       }
     },
   );
@@ -372,7 +373,7 @@ export function registerTmuxPaneCommands(
           workingDirectory: cwd,
         });
       } catch {
-        vscode.window.showErrorMessage("Failed to split pane");
+        vscode.window.showErrorMessage(l10n.t("Failed to split pane"));
       }
     },
   );
@@ -384,8 +385,8 @@ export function registerTmuxPaneCommands(
         return;
       }
       const command = await vscode.window.showInputBox({
-        prompt: "Enter command to run in new pane",
-        placeHolder: "e.g., htop, vim, npm run dev",
+        prompt: l10n.t("Enter command to run in new pane"),
+        placeHolder: l10n.t("e.g., htop, vim, npm run dev"),
       });
       if (!command) {
         return;
@@ -402,7 +403,7 @@ export function registerTmuxPaneCommands(
           workingDirectory: deps.resolveWorkspacePath(),
         });
       } catch {
-        vscode.window.showErrorMessage("Failed to split pane");
+        vscode.window.showErrorMessage(l10n.t("Failed to split pane"));
       }
     },
   );
@@ -416,7 +417,7 @@ export function registerTmuxPaneCommands(
       }
       if (item?.paneId) {
         const text = await vscode.window.showInputBox({
-          prompt: "Enter text to send to pane",
+          prompt: l10n.t("Enter text to send to pane"),
         });
         if (text) {
           await sendTextToTmuxPane(paneManager, item.paneId, text);
@@ -426,12 +427,12 @@ export function registerTmuxPaneCommands(
 
       const sessionId = await resolveFocusedSessionId();
       if (!sessionId) return;
-      const selected = await pickPaneFromSession(deps, sessionId, "Select pane");
+      const selected = await pickPaneFromSession(deps, sessionId, l10n.t("Select pane"));
       if (!selected) {
         return;
       }
       const text = await vscode.window.showInputBox({
-        prompt: "Enter text to send",
+        prompt: l10n.t("Enter text to send"),
       });
       if (text) {
         await sendTextToTmuxPane(paneManager, selected.paneId, text);
@@ -452,7 +453,7 @@ export function registerTmuxPaneCommands(
         const selected = await pickPaneFromSession(
           deps,
           sessionId,
-          "Select pane to resize",
+          l10n.t("Select pane to resize"),
         );
         if (!selected) {
           return;
@@ -480,7 +481,7 @@ export function registerTmuxPaneCommands(
           resize.adjustment,
         );
       } catch {
-        vscode.window.showErrorMessage("Failed to resize pane");
+        vscode.window.showErrorMessage(l10n.t("Failed to resize pane"));
       }
     },
   );
@@ -493,7 +494,7 @@ export function registerTmuxPaneCommands(
         return;
       }
       if (paneManager.kind === "zellij") {
-        vscode.window.showInformationMessage("Swap pane is not supported for zellij");
+        vscode.window.showInformationMessage(l10n.t("Swap pane is not supported for zellij"));
         return;
       }
       const sessionId = await resolveFocusedSessionId();
@@ -505,7 +506,7 @@ export function registerTmuxPaneCommands(
       if (!sourcePaneId) {
         const selected = await vscode.window.showQuickPick<PaneQuickPickItem>(
           toPaneQuickPickItems(panes),
-          { placeHolder: "Select source pane" },
+          { placeHolder: l10n.t("Select source pane") },
         );
         if (!selected) {
           return;
@@ -516,7 +517,7 @@ export function registerTmuxPaneCommands(
         }
         const target = await vscode.window.showQuickPick<PaneQuickPickItem>(
           toPaneQuickPickItems(targets),
-          { placeHolder: "Swap with" },
+          { placeHolder: l10n.t("Swap with") },
         );
         if (!target) {
           return;
@@ -524,7 +525,7 @@ export function registerTmuxPaneCommands(
         try {
           await paneManager.manager.swapPanes(selected.paneId, target.paneId);
         } catch {
-          vscode.window.showErrorMessage("Failed to swap panes");
+          vscode.window.showErrorMessage(l10n.t("Failed to swap panes"));
         }
         return;
       }
@@ -534,7 +535,7 @@ export function registerTmuxPaneCommands(
       }
       const target = await vscode.window.showQuickPick<PaneQuickPickItem>(
         toPaneQuickPickItems(targets),
-        { placeHolder: "Swap with" },
+        { placeHolder: l10n.t("Swap with") },
       );
       if (!target) {
         return;
@@ -542,7 +543,7 @@ export function registerTmuxPaneCommands(
       try {
         await paneManager.manager.swapPanes(sourcePaneId, target.paneId);
       } catch {
-        vscode.window.showErrorMessage("Failed to swap panes");
+        vscode.window.showErrorMessage(l10n.t("Failed to swap panes"));
       }
     },
   );
@@ -571,29 +572,29 @@ export function registerTmuxPaneCommands(
       if (!paneId) {
         if (panes.length <= 1) {
           vscode.window.showWarningMessage(
-            "Cannot kill the last pane — use 'Kill Session' instead",
+            l10n.t("Cannot kill the last pane — use 'Kill Session' instead"),
           );
           return;
         }
         const selected = await vscode.window.showQuickPick<PaneQuickPickItem>(
           toPaneQuickPickItems(panes),
-          { placeHolder: "Select pane to kill" },
+          { placeHolder: l10n.t("Select pane to kill") },
         );
         if (!selected) {
           return;
         }
         const confirm = await vscode.window.showWarningMessage(
-          `Kill pane ${selected.paneId}?`,
+          l10n.t("Kill pane {paneId}?", { paneId: selected.paneId }),
           { modal: true },
-          "Kill",
+          l10n.t("Kill"),
         );
-        if (confirm !== "Kill") {
+        if (confirm !== l10n.t("Kill")) {
           return;
         }
         try {
           await killPane(selected.paneId);
         } catch {
-          vscode.window.showErrorMessage("Failed to kill pane");
+          vscode.window.showErrorMessage(l10n.t("Failed to kill pane"));
         }
         return;
       }
@@ -604,17 +605,17 @@ export function registerTmuxPaneCommands(
         return;
       }
       const confirm = await vscode.window.showWarningMessage(
-        `Kill pane ${paneId}?`,
+        l10n.t("Kill pane {paneId}?", { paneId }),
         { modal: true },
-        "Kill",
+        l10n.t("Kill"),
       );
-      if (confirm !== "Kill") {
+      if (confirm !== l10n.t("Kill")) {
         return;
       }
       try {
         await killPane(paneId);
       } catch {
-        vscode.window.showErrorMessage("Failed to kill pane");
+        vscode.window.showErrorMessage(l10n.t("Failed to kill pane"));
       }
     },
   );
@@ -633,7 +634,7 @@ export function registerTmuxPaneCommands(
           await paneManager.manager.nextTab();
         }
       } catch {
-        vscode.window.showErrorMessage("Failed to switch to next window");
+        vscode.window.showErrorMessage(l10n.t("Failed to switch to next window"));
       }
     },
   );
@@ -652,7 +653,7 @@ export function registerTmuxPaneCommands(
           await paneManager.manager.prevTab();
         }
       } catch {
-        vscode.window.showErrorMessage("Failed to switch to previous window");
+        vscode.window.showErrorMessage(l10n.t("Failed to switch to previous window"));
       }
     },
   );
@@ -676,7 +677,7 @@ export function registerTmuxPaneCommands(
           });
         }
       } catch {
-        vscode.window.showErrorMessage("Failed to create window");
+        vscode.window.showErrorMessage(l10n.t("Failed to create window"));
       }
     },
   );
@@ -692,21 +693,21 @@ export function registerTmuxPaneCommands(
         const windows = await listWindows(sessionId);
         const picked = await vscode.window.showQuickPick(
           windows,
-          { placeHolder: "Select window to kill" },
+          { placeHolder: l10n.t("Select window to kill") },
         );
         if (!picked) return;
         windowId = picked.windowId;
       }
       const confirm = await vscode.window.showWarningMessage(
-        `Kill window ${windowId}?`,
+        l10n.t("Kill window {windowId}?", { windowId }),
         { modal: true },
-        "Kill",
+        l10n.t("Kill"),
       );
-      if (confirm !== "Kill") return;
+      if (confirm !== l10n.t("Kill")) return;
       try {
         await killWindow(windowId);
       } catch {
-        vscode.window.showErrorMessage("Failed to kill window");
+        vscode.window.showErrorMessage(l10n.t("Failed to kill window"));
       }
     },
   );
@@ -722,7 +723,7 @@ export function registerTmuxPaneCommands(
         const windows = await listWindows(sessionId);
         const picked = await vscode.window.showQuickPick(
           windows,
-          { placeHolder: "Select window to switch to" },
+          { placeHolder: l10n.t("Select window to switch to") },
         );
         if (!picked) return;
         windowId = picked.windowId;
@@ -730,7 +731,7 @@ export function registerTmuxPaneCommands(
       try {
         await selectWindow(windowId);
       } catch {
-        vscode.window.showErrorMessage("Failed to select window");
+        vscode.window.showErrorMessage(l10n.t("Failed to select window"));
       }
     },
   );
@@ -743,15 +744,15 @@ export function registerTmuxPaneCommands(
       const sessionId = item?.sessionId ?? (await resolveFocusedSessionId());
       if (!sessionId) return;
       const confirm = await vscode.window.showWarningMessage(
-        `Kill ${paneManager.kind} session "${sessionId}"?`,
+        l10n.t('Kill {kind} session "{sessionId}"?', { kind: paneManager.kind, sessionId }),
         { modal: true },
-        "Kill",
+        l10n.t("Kill"),
       );
-      if (confirm !== "Kill") return;
+      if (confirm !== l10n.t("Kill")) return;
       try {
         await paneManager.manager.killSession(sessionId);
       } catch {
-        vscode.window.showErrorMessage("Failed to kill session");
+        vscode.window.showErrorMessage(l10n.t("Failed to kill session"));
       }
     },
   );

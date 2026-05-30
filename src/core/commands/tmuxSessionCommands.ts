@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../../i18n";
 import type { TerminalProvider } from "../../providers/TerminalProvider";
 import type { InstanceController } from "../../services/InstanceController";
 import type { InstanceQuickPick } from "../../services/InstanceQuickPick";
@@ -35,7 +36,7 @@ export function registerTmuxSessionCommands(
     "ost.openInNewWindow",
     async () => {
       if (!deps.instanceStore) {
-        vscode.window.showErrorMessage("Instance store is not initialized");
+        vscode.window.showErrorMessage(l10n.t("Instance store is not initialized"));
         return;
       }
 
@@ -62,14 +63,14 @@ export function registerTmuxSessionCommands(
           );
         }
         vscode.window.showInformationMessage(
-          `Opened in new window: ${newRecord.config.label}`,
+          l10n.t("Opened in new window: {label}", { label: newRecord.config.label }),
         );
       } catch (error) {
         deps.outputChannel?.error(
           `Failed to open in new window: ${error instanceof Error ? error.message : String(error)}`,
         );
         vscode.window.showErrorMessage(
-          `Failed to open in new window: ${error instanceof Error ? error.message : String(error)}`,
+          l10n.t("Failed to open in new window: {error}", { error: error instanceof Error ? error.message : String(error) }),
         );
       }
     },
@@ -79,7 +80,7 @@ export function registerTmuxSessionCommands(
     "ost.spawnForWorkspace",
     async (uri?: vscode.Uri) => {
       if (!deps.instanceStore) {
-        vscode.window.showErrorMessage("Instance store is not initialized");
+        vscode.window.showErrorMessage(l10n.t("Instance store is not initialized"));
         return;
       }
 
@@ -88,7 +89,7 @@ export function registerTmuxSessionCommands(
           uri?.toString() ||
           vscode.workspace.workspaceFolders?.[0]?.uri.toString();
         if (!workspaceUri) {
-          vscode.window.showWarningMessage("No workspace folder available");
+          vscode.window.showWarningMessage(l10n.t("No workspace folder available"));
           return;
         }
 
@@ -110,7 +111,7 @@ export function registerTmuxSessionCommands(
           deps.instanceStore.setActive(existingWorkspaceRecord.config.id);
           await vscode.commands.executeCommand("ost.focus");
           vscode.window.showInformationMessage(
-            `Focused existing OpenCode for workspace: ${existingWorkspaceRecord.config.label || existingWorkspaceRecord.config.id}`,
+            l10n.t("Focused existing OpenCode for workspace: {label}", { label: existingWorkspaceRecord.config.label || existingWorkspaceRecord.config.id }),
           );
           return;
         }
@@ -121,7 +122,7 @@ export function registerTmuxSessionCommands(
             existingWorkspaceRecord.config.id,
           );
           vscode.window.showInformationMessage(
-            `Spawned OpenCode for workspace: ${existingWorkspaceRecord.config.label || existingWorkspaceRecord.config.id}`,
+            l10n.t("Spawned OpenCode for workspace: {label}", { label: existingWorkspaceRecord.config.label || existingWorkspaceRecord.config.id }),
           );
           return;
         }
@@ -141,14 +142,14 @@ export function registerTmuxSessionCommands(
 
         await deps.instanceController?.spawn(newId);
         vscode.window.showInformationMessage(
-          `Spawned OpenCode for workspace: ${newRecord.config.label}`,
+          l10n.t("Spawned OpenCode for workspace: {label}", { label: newRecord.config.label }),
         );
       } catch (error) {
         deps.outputChannel?.error(
           `Failed to spawn for workspace: ${error instanceof Error ? error.message : String(error)}`,
         );
         vscode.window.showErrorMessage(
-          `Failed to spawn for workspace: ${error instanceof Error ? error.message : String(error)}`,
+          l10n.t("Failed to spawn for workspace: {error}", { error: error instanceof Error ? error.message : String(error) }),
         );
       }
     },
@@ -217,7 +218,7 @@ export function registerTmuxSessionCommands(
 
       if (!sessionManager || !deps.provider) {
         vscode.window.showWarningMessage(
-          `${backendLabel} is not available or the terminal provider is not initialized`,
+          l10n.t("{backendLabel} is not available or the terminal provider is not initialized", { backendLabel }),
         );
         return;
       }
@@ -225,7 +226,7 @@ export function registerTmuxSessionCommands(
       try {
         const sessions = await sessionManager.discoverSessions();
         if (sessions.length === 0) {
-          vscode.window.showInformationMessage(`No ${backendLabel} sessions found`);
+          vscode.window.showInformationMessage(l10n.t("No {backendLabel} sessions found", { backendLabel }));
           return;
         }
 
@@ -249,8 +250,8 @@ export function registerTmuxSessionCommands(
 
         const picked = await vscode.window.showQuickPick(items, {
           placeHolder: activeSessionId
-            ? `Current: ${activeSessionId} — select a session to switch`
-            : `Select a ${backendLabel} session to attach`,
+            ? l10n.t("Current: {sessionId} — select a session to switch", { sessionId: activeSessionId })
+            : l10n.t("Select a {backendLabel} session to attach", { backendLabel }),
           matchOnDescription: true,
           matchOnDetail: true,
         });
@@ -261,7 +262,7 @@ export function registerTmuxSessionCommands(
 
         if (picked.session.id === activeSessionId) {
           vscode.window.showInformationMessage(
-            `Already attached to session "${picked.session.name}"`,
+            l10n.t('Already attached to session "{name}"', { name: picked.session.name }),
           );
           return;
         }
@@ -277,7 +278,7 @@ export function registerTmuxSessionCommands(
           `Failed to browse tmux sessions: ${error instanceof Error ? error.message : String(error)}`,
         );
         vscode.window.showErrorMessage(
-          `Failed to browse tmux sessions: ${error instanceof Error ? error.message : String(error)}`,
+          l10n.t("Failed to browse tmux sessions: {error}", { error: error instanceof Error ? error.message : String(error) }),
         );
       }
     },

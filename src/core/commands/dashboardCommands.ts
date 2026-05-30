@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../../i18n";
 import type { TmuxSessionManager } from "../../services/TmuxSessionManager";
 import type { InstanceStore } from "../../services/InstanceStore";
 import type { TerminalProvider } from "../../providers/TerminalProvider";
@@ -45,13 +46,13 @@ async function openDashboardInEditor(
   deps: DashboardCommandDependencies,
 ): Promise<void> {
   if (!deps.tmuxManager) {
-    void vscode.window.showErrorMessage("Tmux session manager not available");
+    void vscode.window.showErrorMessage(l10n.t("Tmux session manager not available"));
     return;
   }
 
   const panel = vscode.window.createWebviewPanel(
     "ost.dashboardEditor",
-    "Terminal Managers",
+    l10n.t("Terminal Managers"),
     vscode.ViewColumn.One,
     {
       enableScripts: true,
@@ -142,7 +143,7 @@ function getDashboardHtml(): string {
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terminal Dashboard</title>
+  <title>${l10n.t("Terminal Dashboard")}</title>
   <style>
     body {
       margin: 0;
@@ -210,12 +211,12 @@ function getDashboardHtml(): string {
 <body>
   <div class="header">
     <div class="header-main">
-      <div class="title">Terminal Dashboard</div>
-      <div class="workspace" id="workspace">Workspace: -</div>
+      <div class="title">${l10n.t("Terminal Dashboard")}</div>
+      <div class="workspace" id="workspace">${l10n.t("Workspace: -")}</div>
     </div>
     <div class="actions">
-      <button id="create" class="primary">New tmux</button>
-      <button id="refresh">Refresh</button>
+      <button id="create" class="primary">${l10n.t("New tmux")}</button>
+      <button id="refresh">${l10n.t("Refresh")}</button>
     </div>
   </div>
   <div id="session-list" class="session-list"></div>
@@ -232,21 +233,21 @@ function getDashboardHtml(): string {
     }
 
     function render(sessions, workspace) {
-      document.getElementById("workspace").textContent = "Workspace: " + (workspace || "-");
+      document.getElementById("workspace").textContent = "${l10n.t("Workspace: ")}" + (workspace || "-");
       const list = document.getElementById("session-list");
 
       if (!sessions || sessions.length === 0) {
-        list.innerHTML = '<div class="empty">No tmux sessions for this workspace.</div>';
+        list.innerHTML = '<div class="empty">${l10n.t("No tmux sessions for this workspace.")}</div>';
         return;
       }
 
       list.innerHTML = sessions.map(s => {
         const activeClass = s.isActive ? " active" : "";
-        const statusText = s.isActive ? "Current" : "Available";
+        const statusText = s.isActive ? "${l10n.t("Current")}" : "${l10n.t("Available")}";
         const previewHtml = s.preview
           ? '<div class="preview">' + s.preview.split(/\\r?\n/).filter(l => l.trim()).slice(-4)
               .map(l => '<div class="preview-line">' + escapeHtml(l) + '</div>').join("") + '</div>'
-          : '<div class="preview empty">No preview available</div>';
+          : '<div class="preview empty">${l10n.t("No preview available")}</div>';
 
         return '<div class="session-card' + activeClass + '" data-session-id="' + escapeHtml(s.id) + '">' +
           '<div class="row">' +
