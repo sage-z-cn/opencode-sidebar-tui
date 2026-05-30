@@ -104,6 +104,11 @@ const webviewConfig = {
           from: "*.html",
           to: path.resolve(__dirname, "dist"),
         },
+        {
+          context: path.resolve(__dirname, "src/webview").replace(/\\/g, "/"),
+          from: "**/*.css",
+          to: path.resolve(__dirname, "dist"),
+        },
       ],
     }),
   ],

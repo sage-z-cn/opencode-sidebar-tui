@@ -1259,8 +1259,7 @@ export class TerminalProvider
       .asWebviewUri(
         vscode.Uri.joinPath(
           this.context.extensionUri,
-          "src",
-          "webview",
+          "dist",
           "layout",
           "layout-engine.css",
         ),
@@ -1270,8 +1269,7 @@ export class TerminalProvider
       .asWebviewUri(
         vscode.Uri.joinPath(
           this.context.extensionUri,
-          "src",
-          "webview",
+          "dist",
           "tab-bar",
           "tab-bar.css",
         ),
@@ -1281,8 +1279,7 @@ export class TerminalProvider
       .asWebviewUri(
         vscode.Uri.joinPath(
           this.context.extensionUri,
-          "src",
-          "webview",
+          "dist",
           "pane-actions",
           "pane-actions.css",
         ),
@@ -1292,8 +1289,7 @@ export class TerminalProvider
       .asWebviewUri(
         vscode.Uri.joinPath(
           this.context.extensionUri,
-          "src",
-          "webview",
+          "dist",
           "focus",
           "focus-manager.css",
         ),
