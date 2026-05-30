@@ -210,6 +210,15 @@ export const env = {
   },
 };
 
+export const l10n = {
+  t: vi.fn((message: string, ...args: any[]) => {
+    if (args.length > 0 && typeof args[0] === "object") {
+      return message.replace(/\{(\w+)\}/g, (_: string, key: string) => (args[0] as Record<string, string>)[key] ?? `{${key}}`);
+    }
+    return message;
+  }),
+};
+
 export class Uri {
   constructor(
     public readonly fsPath: string,
@@ -453,6 +462,7 @@ export default {
   Position,
   TabInputText,
   env,
+  l10n,
   Uri,
   Range,
   EventEmitter,
