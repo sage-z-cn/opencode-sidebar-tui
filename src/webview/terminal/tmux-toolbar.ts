@@ -7,10 +7,11 @@ const titleL10nMap: Record<string, string> = {
   newWindow: l10n.t("New tmux window"),
   nextWindow: l10n.t("Next tmux window"),
   tmuxCommands: l10n.t("Tmux commands"),
-  toggleBackend: l10n.t("Switch to Native Shell"),
+  toggleBackend: l10n.t("Cycle terminal backend"),
   toggleEditor: l10n.t("Toggle editor mode"),
   rerender: l10n.t("Re-render terminal"),
   restart: l10n.t("Restart terminal"),
+  settings: l10n.t("Open extension settings"),
 };
 
 function localizeTitles(input: string): string {

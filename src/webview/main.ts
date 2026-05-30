@@ -21,6 +21,7 @@ import {
   setupEditorAttachmentButton,
   setupReloadButton,
   setupRerenderButton,
+  setupSettingsButton,
   setupTmuxCommandButton,
   setupTmuxWindowButtons,
   setupBackendToggleButton,
@@ -215,6 +216,7 @@ function initApp(): void {
   setupReloadButton();
   setupRerenderButton();
   setupEditorAttachmentButton();
+  setupSettingsButton();
   setupTmuxCommandButton(() => currentSessionId, () => activeBackend);
   setupTmuxWindowButtons();
   setupBackendToggleButton(() => activeBackend);

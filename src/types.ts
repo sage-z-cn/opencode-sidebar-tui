@@ -143,7 +143,8 @@ export type WebviewMessage =
     }
   | { type: "requestRestart"; paneId?: string }
   | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
-  | { type: "paneDelete"; paneId?: string };
+  | { type: "paneDelete"; paneId?: string }
+  | { type: "openSettings"; paneId?: string };
 
 export type AiTool = string;
 

@@ -113,6 +113,7 @@ export class TerminalProvider
       toggleDashboard: () => this.toggleDashboard(),
       toggleEditorAttachment: () => this.toggleEditorAttachment(),
       restart: () => this.restart(),
+      openSettings: () => this.openSettings(),
       switchToNativeShell: () => this.switchToNativeShell(),
       selectTerminalBackend: (backend) => this.selectTerminalBackend(backend),
       cycleTerminalBackend: () => this.cycleTerminalBackend(),
@@ -380,6 +381,10 @@ export class TerminalProvider
 
   public restart(): void {
     this.sessionRuntime.restart();
+  }
+
+  public openSettings(): void {
+    vscode.commands.executeCommand("workbench.action.openSettings", "ost.");
   }
 
   public async switchToInstance(

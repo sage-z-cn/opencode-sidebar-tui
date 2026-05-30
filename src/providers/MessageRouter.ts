@@ -34,6 +34,7 @@ export interface MessageRouterProviderBridge {
   toggleDashboard(): void;
   toggleEditorAttachment(): Promise<void>;
   restart(): void;
+  openSettings(): void;
   switchToNativeShell(): Promise<void>;
   selectTerminalBackend(backend: TerminalBackendType): Promise<void>;
   cycleTerminalBackend(): Promise<void>;
@@ -232,6 +233,9 @@ export class MessageRouter {
         break;
       case "requestRestart":
         this.provider.restart();
+        break;
+      case "openSettings":
+        this.provider.openSettings();
         break;
       default:
         break;

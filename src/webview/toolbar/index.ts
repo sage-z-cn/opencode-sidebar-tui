@@ -158,3 +158,9 @@ export function setupEditorAttachmentButton(): void {
     });
 }
 
+export function setupSettingsButton(): void {
+  document.getElementById("btn-settings")?.addEventListener("click", () => {
+    postMessage({ type: "openSettings" });
+  });
+}
+
