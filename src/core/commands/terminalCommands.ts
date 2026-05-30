@@ -20,9 +20,9 @@ export interface TerminalCommandDependencies {
 function focusSidebarIfConfigured(
   provider: TerminalProvider | undefined,
 ): void {
-  const config = vscode.workspace.getConfiguration("opencodeTui");
+  const config = vscode.workspace.getConfiguration("ost");
   if (config.get<boolean>("autoFocusOnSend", true)) {
-    vscode.commands.executeCommand("opencodeTui.focus");
+    vscode.commands.executeCommand("ost.focus");
     setTimeout(() => {
       provider?.focus();
     }, 100);
@@ -33,14 +33,14 @@ export function registerTerminalCommands(
   deps: TerminalCommandDependencies,
 ): vscode.Disposable[] {
   const startCommand = vscode.commands.registerCommand(
-    "opencodeTui.start",
+    "ost.start",
     () => {
       deps.provider?.startOpenCode();
     },
   );
 
   const sendToTerminalCommand = vscode.commands.registerCommand(
-    "opencodeTui.sendToTerminal",
+    "ost.sendToTerminal",
     () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.selection.isEmpty) {
@@ -58,7 +58,7 @@ export function registerTerminalCommands(
   );
 
   const sendAtMentionCommand = vscode.commands.registerCommand(
-    "opencodeTui.sendAtMention",
+    "ost.sendAtMention",
     () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
@@ -86,7 +86,7 @@ export function registerTerminalCommands(
   );
 
   const sendAllOpenFilesCommand = vscode.commands.registerCommand(
-    "opencodeTui.sendAllOpenFiles",
+    "ost.sendAllOpenFiles",
     () => {
       const fileRefs: string[] = [];
 
@@ -114,7 +114,7 @@ export function registerTerminalCommands(
   );
 
   const sendFileToTerminalCommand = vscode.commands.registerCommand(
-    "opencodeTui.sendFileToTerminal",
+    "ost.sendFileToTerminal",
     (...args: unknown[]) => {
       if (!deps.contextSharingService) {
         return;
@@ -170,7 +170,7 @@ export function registerTerminalCommands(
   );
 
   const pasteCommand = vscode.commands.registerCommand(
-    "opencodeTui.paste",
+    "ost.paste",
     async () => {
       try {
         if (deps.provider) {
@@ -186,24 +186,24 @@ export function registerTerminalCommands(
   );
 
   const focusCommand = vscode.commands.registerCommand(
-    "opencodeTui.focus",
+    "ost.focus",
     () => {
       return vscode.commands.executeCommand(
         "workbench.view.focus",
-        "opencodeTui",
+        "ost",
       );
     },
   );
 
   const openInEditorCommand = vscode.commands.registerCommand(
-    "opencodeTui.openTerminalInEditor",
+    "ost.openTerminalInEditor",
     () => {
       void deps.provider?.openInEditorTab();
     },
   );
 
   const restoreToSidebarCommand = vscode.commands.registerCommand(
-    "opencodeTui.restoreTerminalToSidebar",
+    "ost.restoreTerminalToSidebar",
     () => {
       void deps.provider?.toggleEditorAttachment();
     },
@@ -221,3 +221,4 @@ export function registerTerminalCommands(
     restoreToSidebarCommand,
   ];
 }
+

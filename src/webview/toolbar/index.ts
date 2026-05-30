@@ -31,11 +31,11 @@ export function setupBackendToggleButton(
 export function setupTmuxWindowButtons(): void {
   bindTmuxCommandButton(
     "btn-tmux-new-session",
-    "opencodeTui.createTmuxSession",
+    "ost.createTmuxSession",
   );
-  bindTmuxCommandButton("btn-tmux-prev-window", "opencodeTui.tmuxPrevWindow");
-  bindTmuxCommandButton("btn-tmux-new-window", "opencodeTui.tmuxCreateWindow");
-  bindTmuxCommandButton("btn-tmux-next-window", "opencodeTui.tmuxNextWindow");
+  bindTmuxCommandButton("btn-tmux-prev-window", "ost.tmuxPrevWindow");
+  bindTmuxCommandButton("btn-tmux-new-window", "ost.tmuxCreateWindow");
+  bindTmuxCommandButton("btn-tmux-next-window", "ost.tmuxNextWindow");
 }
 
 function bindTmuxCommandButton(
@@ -140,3 +140,4 @@ export function setupEditorAttachmentButton(): void {
       postMessage({ type: "toggleEditorAttachment" });
     });
 }
+

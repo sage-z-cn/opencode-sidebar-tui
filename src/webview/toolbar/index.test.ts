@@ -92,19 +92,19 @@ describe("toolbar backend toggle", () => {
 
     expect(postMessageMock).toHaveBeenNthCalledWith(1, {
       type: "executeTmuxCommand",
-      commandId: "opencodeTui.createTmuxSession",
+      commandId: "ost.createTmuxSession",
     });
     expect(postMessageMock).toHaveBeenNthCalledWith(2, {
       type: "executeTmuxCommand",
-      commandId: "opencodeTui.tmuxPrevWindow",
+      commandId: "ost.tmuxPrevWindow",
     });
     expect(postMessageMock).toHaveBeenNthCalledWith(3, {
       type: "executeTmuxCommand",
-      commandId: "opencodeTui.tmuxCreateWindow",
+      commandId: "ost.tmuxCreateWindow",
     });
     expect(postMessageMock).toHaveBeenNthCalledWith(4, {
       type: "executeTmuxCommand",
-      commandId: "opencodeTui.tmuxNextWindow",
+      commandId: "ost.tmuxNextWindow",
     });
   });
 
@@ -140,3 +140,4 @@ describe("toolbar backend toggle", () => {
     ).toBe(true);
   });
 });
+

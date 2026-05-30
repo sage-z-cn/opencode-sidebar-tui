@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "islee23520.opencode-sidebar-tui",
+    "sagez.opencode-sidebar-tui-sage",
   );
 
   assert.ok(extension, "Extension should be available in the test host");
@@ -13,53 +13,53 @@ async function activateExtension(): Promise<vscode.Extension<unknown>> {
 
 const commandCategories = {
   core: [
-    "opencodeTui.start",
-    "opencodeTui.focus",
-    "opencodeTui.paste",
-    "opencodeTui.openTerminalInEditor",
-    "opencodeTui.restoreTerminalToSidebar",
+    "ost.start",
+    "ost.focus",
+    "ost.paste",
+    "ost.openTerminalInEditor",
+    "ost.restoreTerminalToSidebar",
   ],
   "file-reference": [
-    "opencodeTui.sendToTerminal",
-    "opencodeTui.sendAtMention",
-    "opencodeTui.sendAllOpenFiles",
-    "opencodeTui.sendFileToTerminal",
+    "ost.sendToTerminal",
+    "ost.sendAtMention",
+    "ost.sendAllOpenFiles",
+    "ost.sendFileToTerminal",
   ],
   "tmux-session": [
-    "opencode.openInNewWindow",
-    "opencode.spawnForWorkspace",
-    "opencodeTui.selectInstance",
-    "opencodeTui.switchTmuxSession",
-    "opencodeTui.createTmuxSession",
-    "opencodeTui.browseTmuxSessions",
-    "opencodeTui.switchNativeShell",
-    "opencodeTui.killNativeShell",
-    "opencodeTui.tmuxKillSession",
-    "opencodeTui.killTmuxSession",
+    "ost.openInNewWindow",
+    "ost.spawnForWorkspace",
+    "ost.selectInstance",
+    "ost.switchTmuxSession",
+    "ost.createTmuxSession",
+    "ost.browseTmuxSessions",
+    "ost.switchNativeShell",
+    "ost.killNativeShell",
+    "ost.tmuxKillSession",
+    "ost.killTmuxSession",
   ],
   "tmux-pane": [
-    "opencodeTui.tmuxSwitchPane",
-    "opencodeTui.tmuxSplitPaneH",
-    "opencodeTui.tmuxSplitPaneV",
-    "opencodeTui.tmuxSplitPaneWithCommand",
-    "opencodeTui.tmuxSendTextToPane",
-    "opencodeTui.tmuxResizePane",
-    "opencodeTui.tmuxSwapPane",
-    "opencodeTui.tmuxKillPane",
+    "ost.tmuxSwitchPane",
+    "ost.tmuxSplitPaneH",
+    "ost.tmuxSplitPaneV",
+    "ost.tmuxSplitPaneWithCommand",
+    "ost.tmuxSendTextToPane",
+    "ost.tmuxResizePane",
+    "ost.tmuxSwapPane",
+    "ost.tmuxKillPane",
   ],
   "tmux-window": [
-    "opencodeTui.tmuxNextWindow",
-    "opencodeTui.tmuxPrevWindow",
-    "opencodeTui.tmuxCreateWindow",
-    "opencodeTui.tmuxKillWindow",
-    "opencodeTui.tmuxSelectWindow",
+    "ost.tmuxNextWindow",
+    "ost.tmuxPrevWindow",
+    "ost.tmuxCreateWindow",
+    "ost.tmuxKillWindow",
+    "ost.tmuxSelectWindow",
   ],
   dashboard: [
-    "opencodeTui.openTerminalManager",
-    "opencodeTui.toggleDashboard",
-    "opencodeTui.toggleTmuxCommandToolbar",
-    "opencodeTui.openDashboardInEditor",
-    "opencodeTui.tmuxRefresh",
+    "ost.openTerminalManager",
+    "ost.toggleDashboard",
+    "ost.toggleTmuxCommandToolbar",
+    "ost.openDashboardInEditor",
+    "ost.tmuxRefresh",
   ],
 } as const satisfies Record<string, readonly string[]>;
 
@@ -99,3 +99,5 @@ suite("Comprehensive command registration", () => {
     assert.deepStrictEqual(contributedCommands.sort(), expectedCommands.sort());
   });
 });
+
+

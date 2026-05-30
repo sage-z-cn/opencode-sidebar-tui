@@ -82,7 +82,7 @@ For rapid testing during development:
 **Terminal not starting?**
 
 - Check if your configured AI tool command is in PATH
-- Try configuring the tool path under `opencodeTui.aiTools`
+- Try configuring the tool path under `ost.aiTools`
 
 **Rendering issues?**
 

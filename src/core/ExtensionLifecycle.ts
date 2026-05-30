@@ -56,7 +56,7 @@ export class ExtensionLifecycle {
   private tuiProviderRegistration: vscode.Disposable | undefined;
   private context?: vscode.ExtensionContext;
 
-  private static readonly TERMINAL_ID = "opencode-main";
+  private static readonly TERMINAL_ID = "ost-main";
 
   /** Returns the terminal ID for the active instance, falling back to the static default. */
   private getActiveTerminalId(): string {
@@ -248,7 +248,7 @@ export class ExtensionLifecycle {
 
         context.subscriptions.push(
           vscode.commands.registerCommand(
-            "opencodeTui.openTerminalManager",
+            "ost.openTerminalManager",
             () => {
               this.terminalDashboardProvider?.show();
             },
@@ -278,7 +278,7 @@ export class ExtensionLifecycle {
       // Expose that the extension is fully active so editor/title buttons
       // (openTerminalInEditor, openTerminalManager, etc.) only appear after
       // commands are registered. This prevents "command not found" errors.
-      await vscode.commands.executeCommand("setContext", "opencodeTui.active", true);
+      await vscode.commands.executeCommand("setContext", "ost.active", true);
 
       logger.info("Open Sidebar TUI activated successfully");
     } catch (error) {
@@ -375,9 +375,9 @@ export class ExtensionLifecycle {
       );
     }
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     if (config.get<boolean>("autoFocusOnSend", true)) {
-      vscode.commands.executeCommand("opencodeTui.focus");
+      vscode.commands.executeCommand("ost.focus");
       setTimeout(() => {
         if (typeof this.tuiProvider?.focus === "function") {
           this.tuiProvider.focus();
@@ -441,9 +441,9 @@ export class ExtensionLifecycle {
       reference + " ",
     );
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     if (config.get<boolean>("autoFocusOnSend", true)) {
-      vscode.commands.executeCommand("opencodeTui.focus");
+      vscode.commands.executeCommand("ost.focus");
       setTimeout(() => {
         if (typeof this.tuiProvider?.focus === "function") {
           this.tuiProvider.focus();
@@ -566,7 +566,7 @@ export class ExtensionLifecycle {
 
     // Clear the context key so editor/title buttons disappear cleanly
     try {
-      await vscode.commands.executeCommand("setContext", "opencodeTui.active", false);
+      await vscode.commands.executeCommand("setContext", "ost.active", false);
     } catch {
       // intentionally empty: setContext during deactivation is best-effort
     }
@@ -586,7 +586,7 @@ export class ExtensionLifecycle {
   private async ensureSendKeybindingsToShellDefault(): Promise<void> {
     if (!this.context) return;
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const inspect = config.inspect<boolean>("sendKeybindingsToShell");
 
     const userHasExplicitValue =
@@ -599,7 +599,7 @@ export class ExtensionLifecycle {
     }
 
     const alreadyAutoEnabled = this.context.globalState.get<boolean>(
-      "opencodeTui.hasAutoEnabledKeybindings",
+      "ost.hasAutoEnabledKeybindings",
       false,
     );
 
@@ -614,7 +614,7 @@ export class ExtensionLifecycle {
         vscode.ConfigurationTarget.Global,
       );
       await this.context.globalState.update(
-        "opencodeTui.hasAutoEnabledKeybindings",
+        "ost.hasAutoEnabledKeybindings",
         true,
       );
 
@@ -628,3 +628,4 @@ export class ExtensionLifecycle {
     }
   }
 }
+

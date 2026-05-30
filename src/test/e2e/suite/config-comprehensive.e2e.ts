@@ -23,7 +23,7 @@ interface ConfigurationSpec {
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "islee23520.opencode-sidebar-tui",
+    "sagez.opencode-sidebar-tui-sage",
   );
 
   assert.ok(extension, "Extension should be available in the test host");
@@ -51,87 +51,87 @@ const nerdFontStack =
   "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace";
 
 const configurationSpecs: Record<string, ConfigurationSpec> = {
-  "opencodeTui.fontSize": {
+  "ost.fontSize": {
     type: "number",
     defaultValue: 14,
     minimum: 6,
     maximum: 25,
   },
-  "opencodeTui.fontFamily": {
+  "ost.fontFamily": {
     type: "string",
     defaultValue: nerdFontStack,
   },
-  "opencodeTui.cursorBlink": { type: "boolean", defaultValue: true },
-  "opencodeTui.cursorStyle": {
+  "ost.cursorBlink": { type: "boolean", defaultValue: true },
+  "ost.cursorStyle": {
     type: "string",
     defaultValue: "block",
     enumValues: ["block", "underline", "bar"],
   },
-  "opencodeTui.scrollback": {
+  "ost.scrollback": {
     type: "number",
     defaultValue: 10000,
     minimum: 0,
     maximum: 100000,
   },
-  "opencodeTui.autoFocusOnSend": { type: "boolean", defaultValue: true },
-  "opencodeTui.autoStartOnOpen": { type: "boolean", defaultValue: true },
-  "opencodeTui.shellPath": { type: "string", defaultValue: "" },
-  "opencodeTui.shellArgs": {
+  "ost.autoFocusOnSend": { type: "boolean", defaultValue: true },
+  "ost.autoStartOnOpen": { type: "boolean", defaultValue: true },
+  "ost.shellPath": { type: "string", defaultValue: "" },
+  "ost.shellArgs": {
     type: "array",
     defaultValue: [],
     itemType: "string",
   },
-  "opencodeTui.sendKeybindingsToShell": {
+  "ost.sendKeybindingsToShell": {
     type: "boolean",
     defaultValue: true,
   },
-  "opencodeTui.showTmuxWindowControls": {
+  "ost.showTmuxWindowControls": {
     type: "boolean",
     defaultValue: true,
   },
-  "opencodeTui.autoShareContext": { type: "boolean", defaultValue: true },
-  "opencodeTui.httpTimeout": {
+  "ost.autoShareContext": { type: "boolean", defaultValue: true },
+  "ost.httpTimeout": {
     type: "number",
     defaultValue: 5000,
     minimum: 1000,
     maximum: 30000,
   },
-  "opencodeTui.enableHttpApi": { type: "boolean", defaultValue: true },
-  "opencodeTui.logLevel": {
+  "ost.enableHttpApi": { type: "boolean", defaultValue: true },
+  "ost.logLevel": {
     type: "string",
     defaultValue: "info",
     enumValues: ["debug", "info", "warn", "error"],
   },
-  "opencodeTui.contextDebounceMs": {
+  "ost.contextDebounceMs": {
     type: "number",
     defaultValue: 500,
     minimum: 100,
     maximum: 5000,
   },
-  "opencodeTui.maxDiagnosticLength": {
+  "ost.maxDiagnosticLength": {
     type: "number",
     defaultValue: 500,
     minimum: 100,
     maximum: 2000,
   },
-  "opencodeTui.enableAutoSpawn": { type: "boolean", defaultValue: true },
-  "opencodeTui.terminalBackend": {
+  "ost.enableAutoSpawn": { type: "boolean", defaultValue: true },
+  "ost.terminalBackend": {
     type: "string",
     defaultValue: "tmux",
     enumValues: ["native", "tmux", "zellij"],
   },
-  "opencodeTui.collapseSecondaryBarOnEditorOpen": {
+  "ost.collapseSecondaryBarOnEditorOpen": {
     type: "boolean",
     defaultValue: true,
   },
-  "opencodeTui.codeActionSeverities": {
+  "ost.codeActionSeverities": {
     type: "array",
     defaultValue: ["error", "warning"],
     itemType: "string",
   },
-  "opencodeTui.aiTools": { type: "array", defaultValue: undefined },
-  "opencodeTui.defaultAiTool": { type: "string", defaultValue: "opencode" },
-  "opencodeTui.promptAiToolOnSession": {
+  "ost.aiTools": { type: "array", defaultValue: undefined },
+  "ost.defaultAiTool": { type: "string", defaultValue: "opencode" },
+  "ost.promptAiToolOnSession": {
     type: "boolean",
     defaultValue: true,
   },
@@ -145,7 +145,7 @@ function assertConfigurationProperty(
   assert.ok(property, `${id} should be contributed`);
   assert.strictEqual(property.type, spec.type, `${id} should have expected type`);
 
-  if (id !== "opencodeTui.aiTools") {
+  if (id !== "ost.aiTools") {
     assert.deepStrictEqual(
       property.default,
       spec.defaultValue,
@@ -192,7 +192,7 @@ suite("Comprehensive configuration contributions", () => {
   test("defines aiTools object schema and default tools", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const aiTools = properties["opencodeTui.aiTools"];
+    const aiTools = properties["ost.aiTools"];
 
     assert.strictEqual(aiTools?.type, "array");
     assert.strictEqual(aiTools?.items?.type, "object");
@@ -234,7 +234,7 @@ suite("Runtime configuration defaults", () => {
   test("reads key defaults from vscode.workspace.getConfiguration", async () => {
     await activateExtension();
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const defaultValue = (key: string): unknown =>
       config.inspect(key)?.defaultValue;
 
@@ -270,3 +270,5 @@ suite("Runtime configuration defaults", () => {
     assert.strictEqual(defaultValue("fontSize"), 14);
   });
 });
+
+

@@ -5,18 +5,32 @@ All notable changes to the "Open Sidebar TUI" extension will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-05-30
+
+### Changed
+
+- Fork from [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui) as independent extension `sagez.opencode-sidebar-tui-sage`.
+- Rename all command and configuration IDs from `opencodeTui`/`opencode` prefix to `ost` to avoid conflicts with the original extension.
+- Rename display name to "Opencode Sidebar TUI".
+
+### Fixed
+
+- Fix Shift+Enter sending CRLF instead of LF in the sidebar terminal.
+- Fix CopyPlugin glob mismatch on Windows preventing dashboard/terminal assets from being copied to `dist/`.
+- Fix sidebar xterm height stuck at 360px after packaging due to missing CSS files.
+
 ## [1.8.0] - 2026-05-18
 
 ### Added
 
 - Add multi-backend terminal support with `native`, `tmux`, and `zellij` backend selection.
 - Add native terminal backend support with ask-first AI tool selection.
-- Add `opencodeTui.terminalBackend` setting for choosing the terminal backend.
-- Add `opencodeTui.sendKeybindingsToShell` so terminal-focused Ctrl/Cmd shortcuts can be passed through to the TUI.
+- Add `ost.terminalBackend` setting for choosing the terminal backend.
+- Add `ost.sendKeybindingsToShell` so terminal-focused Ctrl/Cmd shortcuts can be passed through to the TUI.
 
 ### Changed
 
-- Change `opencodeTui.autoStartOnOpen` default to `false` so users can choose which AI tool to launch when opening the sidebar.
+- Change `ost.autoStartOnOpen` default to `false` so users can choose which AI tool to launch when opening the sidebar.
 - Rename dashboard command labels to `Open Terminal Managers` for clearer VS Code command palette and menu wording.
 - Improve Windows compatibility and terminal UX around shell handling, paths, clipboard behavior, and terminal focus.
 - Expand automated test coverage across core commands, providers, services, terminals, webview keyboard handling, and VS Code mocks.
@@ -74,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Shares all open files on terminal startup
   - Includes line numbers for active selections
   - Format: `@path/to/file#L10-L20`
-  - Configurable via `opencodeTui.autoShareContext` setting
+  - Configurable via `ost.autoShareContext` setting
 
 - **Port Management Service**: Ephemeral port allocation for HTTP communication
   - Port range: 16384-65535 (standard ephemeral range)
@@ -88,9 +102,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Supports `@file`, `@file#L10`, `@file#L10-L20` formats
 
 - **New Configuration Options**:
-  - `opencodeTui.enableHttpApi`: Enable/disable HTTP API (default: `true`)
-  - `opencodeTui.httpTimeout`: HTTP request timeout in milliseconds (default: `5000`, range: 1000-30000)
-  - `opencodeTui.autoShareContext`: Auto-share editor context on terminal open (default: `true`)
+  - `ost.enableHttpApi`: Enable/disable HTTP API (default: `true`)
+  - `ost.httpTimeout`: HTTP request timeout in milliseconds (default: `5000`, range: 1000-30000)
+  - `ost.autoShareContext`: Auto-share editor context on terminal open (default: `true`)
 
 ### Changed
 
@@ -135,6 +149,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Drag & Drop**: Shift-drag files to send as references
 - **Configuration**: Customizable command, font, and terminal settings
 
-[1.3.2]: https://github.com/islee23520/opencode-sidebar-tui/compare/v1.1.0...v1.3.2
-[1.1.0]: https://github.com/islee23520/opencode-sidebar-tui/compare/v1.0.4...v1.1.0
-[1.0.4]: https://github.com/islee23520/opencode-sidebar-tui/releases/tag/v1.0.4
+[2.0.0]: https://github.com/sage-z-cn/opencode-sidebar-tui/compare/v1.8.0...v2.0.0
+[1.8.0]: https://github.com/sage-z-cn/opencode-sidebar-tui/compare/v1.3.2...v1.8.0
+[1.1.0]: https://github.com/sage-z-cn/opencode-sidebar-tui/compare/v1.0.4...v1.1.0
+[1.0.4]: https://github.com/sage-z-cn/opencode-sidebar-tui/releases/tag/v1.0.4
+

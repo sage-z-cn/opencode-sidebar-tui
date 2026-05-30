@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 suite("Extension activation", () => {
   test("activates the extension", async () => {
     const extension = vscode.extensions.getExtension(
-      "islee23520.opencode-sidebar-tui",
+      "sagez.opencode-sidebar-tui-sage",
     );
 
     assert.ok(extension, "Extension should be available in the test host");
@@ -14,3 +14,4 @@ suite("Extension activation", () => {
     assert.strictEqual(extension?.isActive, true);
   });
 });
+

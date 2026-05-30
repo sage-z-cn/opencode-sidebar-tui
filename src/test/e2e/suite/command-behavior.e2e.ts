@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "islee23520.opencode-sidebar-tui",
+    "sagez.opencode-sidebar-tui-sage",
   );
 
   assert.ok(extension, "Extension should be available in the test host");
@@ -13,7 +13,7 @@ async function activateExtension(): Promise<vscode.Extension<unknown>> {
 
 async function executeCommandWithoutUserInput(commandId: string): Promise<void> {
   const closeQuickPick =
-    commandId === "opencodeTui.browseTmuxSessions"
+    commandId === "ost.browseTmuxSessions"
       ? setTimeout(() => {
           void vscode.commands.executeCommand("workbench.action.closeQuickOpen");
         }, 250)
@@ -30,12 +30,12 @@ async function executeCommandWithoutUserInput(commandId: string): Promise<void> 
 
 suite("Command behavior", () => {
   const safeCommands = [
-    "opencodeTui.start",
-    "opencodeTui.toggleDashboard",
-    "opencodeTui.openTerminalManager",
-    "opencodeTui.browseTmuxSessions",
-    "opencodeTui.switchTmuxSession",
-    "opencodeTui.switchNativeShell",
+    "ost.start",
+    "ost.toggleDashboard",
+    "ost.openTerminalManager",
+    "ost.browseTmuxSessions",
+    "ost.switchTmuxSession",
+    "ost.switchNativeShell",
   ];
 
   for (const commandId of safeCommands) {
@@ -48,3 +48,5 @@ suite("Command behavior", () => {
     });
   }
 });
+
+

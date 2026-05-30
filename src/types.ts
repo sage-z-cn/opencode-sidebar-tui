@@ -1,21 +1,21 @@
 export const TMUX_WEBVIEW_COMMAND_IDS = [
-  "opencodeTui.browseTmuxSessions",
-  "opencodeTui.createTmuxSession",
-  "opencodeTui.tmuxSwitchPane",
-  "opencodeTui.tmuxCreateWindow",
-  "opencodeTui.tmuxNextWindow",
-  "opencodeTui.tmuxPrevWindow",
-  "opencodeTui.tmuxSelectWindow",
-  "opencodeTui.tmuxKillWindow",
-  "opencodeTui.tmuxSplitPaneH",
-  "opencodeTui.tmuxSplitPaneV",
-  "opencodeTui.tmuxSplitPaneWithCommand",
-  "opencodeTui.tmuxSendTextToPane",
-  "opencodeTui.tmuxResizePane",
-  "opencodeTui.tmuxSwapPane",
-  "opencodeTui.tmuxKillPane",
-  "opencodeTui.tmuxKillSession",
-  "opencodeTui.tmuxRefresh",
+  "ost.browseTmuxSessions",
+  "ost.createTmuxSession",
+  "ost.tmuxSwitchPane",
+  "ost.tmuxCreateWindow",
+  "ost.tmuxNextWindow",
+  "ost.tmuxPrevWindow",
+  "ost.tmuxSelectWindow",
+  "ost.tmuxKillWindow",
+  "ost.tmuxSplitPaneH",
+  "ost.tmuxSplitPaneV",
+  "ost.tmuxSplitPaneWithCommand",
+  "ost.tmuxSendTextToPane",
+  "ost.tmuxResizePane",
+  "ost.tmuxSwapPane",
+  "ost.tmuxKillPane",
+  "ost.tmuxKillSession",
+  "ost.tmuxRefresh",
 ] as const;
 
 export type TmuxWebviewCommandId = (typeof TMUX_WEBVIEW_COMMAND_IDS)[number];
@@ -510,3 +510,4 @@ export interface ExtensionConfig {
   'pane.showPaneActions': boolean;
   'pane.renderer': "webgl" | "canvas" | "auto";
 }
+

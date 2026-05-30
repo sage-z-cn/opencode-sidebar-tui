@@ -35,7 +35,7 @@ describe("tmux command dropdown", () => {
     expect(handled).toBe(true);
     expect(postMessageMock).toHaveBeenCalledWith({
       type: "executeTmuxCommand",
-      commandId: "opencodeTui.browseTmuxSessions",
+      commandId: "ost.browseTmuxSessions",
     });
   });
 
@@ -82,3 +82,4 @@ describe("tmux command dropdown", () => {
     expect(listText).not.toContain("Rename Window");
   });
 });
+

@@ -33,7 +33,7 @@ export class InstanceDiscoveryService {
   private readonly logger = OutputChannelService.getInstance();
 
   constructor(instanceStore?: InstanceStore) {
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     this.autoSpawn = config.get<boolean>("enableAutoSpawn", true);
     this.enableProcessScan = config.get<boolean>("enableProcessScan", true);
     this.instanceStore = instanceStore;
@@ -218,7 +218,7 @@ export class InstanceDiscoveryService {
   }
 
   private async spawnOpenCode(): Promise<OpenCodeInstance | undefined> {
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const defaultToolName = config.get<string>("defaultAiTool", "opencode");
     const toolConfigs = resolveAiToolConfigs(config.get("aiTools", []));
     const tool =
@@ -564,3 +564,4 @@ export class InstanceDiscoveryService {
     return Number.isInteger(port) && port >= MIN_PORT && port <= MAX_PORT;
   }
 }
+

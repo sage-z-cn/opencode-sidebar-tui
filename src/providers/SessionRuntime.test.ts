@@ -672,7 +672,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
 
       expect(
         runtimeWithoutStore.resolveInstanceIdFromSessionId("anything"),
-      ).toBe("opencode-main");
+      ).toBe("ost-main");
 
       runtimeWithoutStore.dispose();
     });
@@ -2708,7 +2708,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         runtimeWithoutManagers.createTmuxSession(),
       ).resolves.toBeUndefined();
       expect(runtimeWithoutManagers.getActiveTerminalId()).toBe(
-        "opencode-main",
+        "ost-main",
       );
       runtimeWithoutManagers.dispose();
     });
@@ -4611,3 +4611,4 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
   });
 });
 });
+

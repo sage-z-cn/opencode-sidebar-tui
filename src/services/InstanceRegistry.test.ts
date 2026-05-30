@@ -12,9 +12,9 @@ vi.mock("vscode", async () => {
   return actual;
 });
 
-const GLOBAL_INSTANCES_KEY = "opencodeTui.instances.global";
-const WORKSPACE_INSTANCES_KEY = "opencodeTui.instances.workspace";
-const LEGACY_INSTANCE_KEY = "opencodeTui.instanceConfig";
+const GLOBAL_INSTANCES_KEY = "ost.instances.global";
+const WORKSPACE_INSTANCES_KEY = "ost.instances.workspace";
+const LEGACY_INSTANCE_KEY = "ost.instanceConfig";
 
 function createContext(options?: {
   globalValues?: Record<string, unknown>;
@@ -138,7 +138,7 @@ describe("InstanceRegistry", () => {
       },
       workspaceValues: {
         [WORKSPACE_INSTANCES_KEY]: "not-an-object",
-        opencodeTui: {},
+        ost: {},
       },
     });
     const registry = new InstanceRegistry(
@@ -164,13 +164,13 @@ describe("InstanceRegistry", () => {
   it("migrates the first workspace legacy config before global legacy fallback", () => {
     const { context } = createContext({
       globalValues: {
-        "opencodeTui.instance": {
+        "ost.instance": {
           label: "Global Legacy",
           preferredPort: 4100,
         },
       },
       workspaceValues: {
-        "opencodeTui.instance": {
+        "ost.instance": {
           workspaceUri: "file:///workspace-legacy",
           label: "Workspace Legacy",
           args: ["--ok", false, "--still-ok"],
@@ -200,7 +200,7 @@ describe("InstanceRegistry", () => {
   it("ignores malformed workspace active ids and empty legacy configs", () => {
     const { context } = createContext({
       globalValues: {
-        "opencodeTui.instance": {
+        "ost.instance": {
           workspaceUri: 123,
           label: null,
           args: "--bad",
@@ -229,7 +229,7 @@ describe("InstanceRegistry", () => {
   it("does not migrate legacy configs when every legacy field is malformed", () => {
     const { context } = createContext({
       globalValues: {
-        "opencodeTui.instance": {
+        "ost.instance": {
           workspaceUri: 123,
           label: null,
           args: "--bad",
@@ -266,7 +266,7 @@ describe("InstanceRegistry", () => {
 
     for (const { legacy, expected } of legacyCases) {
       const { context } = createContext({
-        globalValues: { "opencodeTui.instance": legacy },
+        globalValues: { "ost.instance": legacy },
       });
       const registry = new InstanceRegistry(
         context as unknown as ConstructorParameters<typeof InstanceRegistry>[0],
@@ -761,3 +761,4 @@ describe("InstanceRegistry", () => {
     expect(persistSpy).not.toHaveBeenCalled();
   });
 });
+

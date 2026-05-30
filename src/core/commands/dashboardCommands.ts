@@ -18,14 +18,14 @@ export function registerDashboardCommands(
   const disposables: vscode.Disposable[] = [];
 
   disposables.push(
-    vscode.commands.registerCommand("opencodeTui.toggleDashboard", () => {
+    vscode.commands.registerCommand("ost.toggleDashboard", () => {
       deps.provider?.toggleDashboard();
     }),
   );
 
   disposables.push(
     vscode.commands.registerCommand(
-      "opencodeTui.toggleTmuxCommandToolbar",
+      "ost.toggleTmuxCommandToolbar",
       () => {
         deps.provider?.toggleTmuxCommandToolbar();
       },
@@ -33,7 +33,7 @@ export function registerDashboardCommands(
   );
 
   disposables.push(
-    vscode.commands.registerCommand("opencodeTui.openDashboardInEditor", () => {
+    vscode.commands.registerCommand("ost.openDashboardInEditor", () => {
       void openDashboardInEditor(deps);
     }),
   );
@@ -50,7 +50,7 @@ async function openDashboardInEditor(
   }
 
   const panel = vscode.window.createWebviewPanel(
-    "opencodeTui.dashboardEditor",
+    "ost.dashboardEditor",
     "Terminal Managers",
     vscode.ViewColumn.One,
     {
@@ -70,7 +70,7 @@ async function openDashboardInEditor(
       case "activate":
         if (message.sessionId) {
           await vscode.commands.executeCommand(
-            "opencodeTui.switchTmuxSession",
+            "ost.switchTmuxSession",
             message.sessionId,
           );
         }
@@ -78,14 +78,14 @@ async function openDashboardInEditor(
       case "killSession":
         if (message.sessionId) {
           await vscode.commands.executeCommand(
-            "opencodeTui.killTmuxSession",
+            "ost.killTmuxSession",
             message.sessionId,
           );
           await updateDashboardWebview(panel.webview, deps);
         }
         break;
       case "create":
-        await vscode.commands.executeCommand("opencodeTui.createTmuxSession");
+        await vscode.commands.executeCommand("ost.createTmuxSession");
         await updateDashboardWebview(panel.webview, deps);
         break;
     }
@@ -297,3 +297,4 @@ function getNonce(): string {
   }
   return text;
 }
+

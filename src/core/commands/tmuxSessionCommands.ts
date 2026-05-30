@@ -32,7 +32,7 @@ export function registerTmuxSessionCommands(
   deps: TmuxSessionCommandDependencies,
 ): vscode.Disposable[] {
   const openInNewWindowCommand = vscode.commands.registerCommand(
-    "opencode.openInNewWindow",
+    "ost.openInNewWindow",
     async () => {
       if (!deps.instanceStore) {
         vscode.window.showErrorMessage("Instance store is not initialized");
@@ -76,7 +76,7 @@ export function registerTmuxSessionCommands(
   );
 
   const spawnForWorkspaceCommand = vscode.commands.registerCommand(
-    "opencode.spawnForWorkspace",
+    "ost.spawnForWorkspace",
     async (uri?: vscode.Uri) => {
       if (!deps.instanceStore) {
         vscode.window.showErrorMessage("Instance store is not initialized");
@@ -108,7 +108,7 @@ export function registerTmuxSessionCommands(
           reusableStates.has(existingWorkspaceRecord.state)
         ) {
           deps.instanceStore.setActive(existingWorkspaceRecord.config.id);
-          await vscode.commands.executeCommand("opencodeTui.focus");
+          await vscode.commands.executeCommand("ost.focus");
           vscode.window.showInformationMessage(
             `Focused existing OpenCode for workspace: ${existingWorkspaceRecord.config.label || existingWorkspaceRecord.config.id}`,
           );
@@ -155,38 +155,38 @@ export function registerTmuxSessionCommands(
   );
 
   const selectInstanceCommand = vscode.commands.registerCommand(
-    "opencodeTui.selectInstance",
+    "ost.selectInstance",
     () => {
       deps.instanceQuickPick?.show();
     },
   );
 
   const switchTmuxSessionCommand = vscode.commands.registerCommand(
-    "opencodeTui.switchTmuxSession",
+    "ost.switchTmuxSession",
     async (sessionId?: string) => {
       if (!sessionId || !deps.provider) {
         return;
       }
 
-      await vscode.commands.executeCommand("opencodeTui.focus");
+      await vscode.commands.executeCommand("ost.focus");
       await deps.provider.switchToTmuxSession(sessionId);
     },
   );
 
   const createTmuxSessionCommand = vscode.commands.registerCommand(
-    "opencodeTui.createTmuxSession",
+    "ost.createTmuxSession",
     async () => {
       if (!deps.provider) {
         return;
       }
 
-      await vscode.commands.executeCommand("opencodeTui.focus");
+      await vscode.commands.executeCommand("ost.focus");
       return deps.provider.createTmuxSession();
     },
   );
 
   const killTmuxSessionCommand = vscode.commands.registerCommand(
-    "opencodeTui.killTmuxSession",
+    "ost.killTmuxSession",
     async (sessionId?: string) => {
       if (!sessionId || !deps.provider) {
         return;
@@ -197,7 +197,7 @@ export function registerTmuxSessionCommands(
   );
 
   const switchNativeShellCommand = vscode.commands.registerCommand(
-    "opencodeTui.switchNativeShell",
+    "ost.switchNativeShell",
     async () => {
       if (!deps.provider) {
         return;
@@ -208,7 +208,7 @@ export function registerTmuxSessionCommands(
   );
 
   const browseTmuxSessionsCommand = vscode.commands.registerCommand(
-    "opencodeTui.browseTmuxSessions",
+    "ost.browseTmuxSessions",
     async () => {
       const activeBackend = getActiveBackend(deps.instanceStore);
       const sessionManager =
@@ -266,7 +266,7 @@ export function registerTmuxSessionCommands(
           return;
         }
 
-        await vscode.commands.executeCommand("opencodeTui.focus");
+        await vscode.commands.executeCommand("ost.focus");
         if (activeBackend === "zellij") {
           await deps.provider.switchToZellijSession(picked.session.id);
         } else {
@@ -284,7 +284,7 @@ export function registerTmuxSessionCommands(
   );
 
   const killNativeShellCommand = vscode.commands.registerCommand(
-    "opencodeTui.killNativeShell",
+    "ost.killNativeShell",
     async (instanceId?: string) => {
       if (!instanceId || !deps.instanceController || !deps.instanceStore) {
         return;
@@ -323,3 +323,4 @@ export function registerTmuxSessionCommands(
     browseTmuxSessionsCommand,
   ];
 }
+

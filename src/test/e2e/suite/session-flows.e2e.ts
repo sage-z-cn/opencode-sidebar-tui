@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "islee23520.opencode-sidebar-tui",
+    "sagez.opencode-sidebar-tui-sage",
   );
 
   assert.ok(extension, "Extension should be available in the test host");
@@ -24,9 +24,9 @@ suite("Session flows", () => {
   test("registers tmux-related commands", async () => {
     const commands = await getRegisteredCommands();
 
-    assertCommandRegistered(commands, "opencodeTui.switchTmuxSession");
-    assertCommandRegistered(commands, "opencode.spawnForWorkspace");
-    assertCommandRegistered(commands, "opencodeTui.browseTmuxSessions");
+    assertCommandRegistered(commands, "ost.switchTmuxSession");
+    assertCommandRegistered(commands, "ost.spawnForWorkspace");
+    assertCommandRegistered(commands, "ost.browseTmuxSessions");
   });
 
   test("registers zellij-capable session controls", async () => {
@@ -46,15 +46,15 @@ suite("Session flows", () => {
     };
     const terminalBackend =
       packageJSON.contributes?.configuration?.properties?.[
-        "opencodeTui.terminalBackend"
+        "ost.terminalBackend"
       ];
 
     assert.ok(
       terminalBackend?.enum?.includes("zellij"),
       "terminalBackend should support zellij",
     );
-    assertCommandRegistered(commands, "opencodeTui.browseTmuxSessions");
-    assertCommandRegistered(commands, "opencodeTui.switchTmuxSession");
+    assertCommandRegistered(commands, "ost.browseTmuxSessions");
+    assertCommandRegistered(commands, "ost.switchTmuxSession");
   });
 
   test("executes switchTmuxSession command without requiring tmux", async () => {
@@ -62,17 +62,19 @@ suite("Session flows", () => {
 
     await assert.doesNotReject(
       async () =>
-        vscode.commands.executeCommand("opencodeTui.switchTmuxSession"),
+        vscode.commands.executeCommand("ost.switchTmuxSession"),
     );
   });
 
   test("executes switchNativeShell command", async () => {
     const commands = await getRegisteredCommands();
-    assertCommandRegistered(commands, "opencodeTui.switchNativeShell");
+    assertCommandRegistered(commands, "ost.switchNativeShell");
 
     await assert.doesNotReject(
       async () =>
-        vscode.commands.executeCommand("opencodeTui.switchNativeShell"),
+        vscode.commands.executeCommand("ost.switchNativeShell"),
     );
   });
 });
+
+

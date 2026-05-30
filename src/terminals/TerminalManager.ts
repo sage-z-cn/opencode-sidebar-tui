@@ -210,7 +210,7 @@ export class TerminalManager {
   private getShellConfig(
     runCommand = false,
   ): { shell: string; args: string[] } {
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const overrideShell = config.get<string>("shellPath");
     const overrideArgs = config.get<string[]>("shellArgs");
 
@@ -240,3 +240,4 @@ export class TerminalManager {
     return { shell, args: ["-c"] };
   }
 }
+

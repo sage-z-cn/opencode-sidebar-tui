@@ -677,7 +677,7 @@ export class MessageRouter {
     terminal: vscode.Terminal,
     command: string,
   ): Promise<void> {
-    const configKey = "opencodeTui.allowTerminalCommands";
+    const configKey = "ost.allowTerminalCommands";
     const allowed = this.context.globalState.get<boolean>(configKey);
 
     if (allowed) {
@@ -816,3 +816,4 @@ export class MessageRouter {
     }
   }
 }
+

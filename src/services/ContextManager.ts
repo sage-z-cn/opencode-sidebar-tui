@@ -18,7 +18,7 @@ export class ContextManager implements vscode.Disposable {
   ) {
     this.outputChannel = outputChannel;
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     this.debounceMs = config.get<number>("contextDebounceMs", 500);
 
     this.activeEditor = vscode.window.activeTextEditor;
@@ -140,3 +140,4 @@ export class ContextManager implements vscode.Disposable {
     return uri.fsPath || uri.path || uri.toString();
   }
 }
+

@@ -32,8 +32,8 @@ import { TerminalBackendRegistry } from "../services/terminalBackends";
 export class TerminalProvider
   implements vscode.WebviewViewProvider, vscode.WebviewPanelSerializer
 {
-  public static readonly viewType = "opencodeTui";
-  public static readonly panelViewType = "opencodeTui.terminalEditor";
+  public static readonly viewType = "ost";
+  public static readonly panelViewType = "ost.terminalEditor";
 
   private _view?: vscode.WebviewView;
   private _panel?: vscode.WebviewPanel;
@@ -224,7 +224,7 @@ export class TerminalProvider
     this.postCurrentSessionState(webviewView.webview);
     this.flushPendingWebviewMessages(webviewView.webview);
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const autoStartOnOpen = config.get<boolean>("autoStartOnOpen", true);
     const visibilityListener = webviewView.onDidChangeVisibility(() => {
       if (!webviewView.visible) {
@@ -302,7 +302,7 @@ export class TerminalProvider
       return;
     }
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
 
     if (config.get<boolean>("collapseSecondaryBarOnEditorOpen", true)) {
       await vscode.commands.executeCommand(
@@ -491,7 +491,7 @@ export class TerminalProvider
     backendHint?: TerminalBackendType,
   ): Promise<void> {
     if (savePreference) {
-      const config = vscode.workspace.getConfiguration("opencodeTui");
+      const config = vscode.workspace.getConfiguration("ost");
       await config.update(
         "defaultAiTool",
         toolName,
@@ -661,7 +661,7 @@ export class TerminalProvider
     forceShow = false,
     targetPaneId?: string,
   ): void {
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     if (forceShow && !config.get<boolean>("promptAiToolOnSession", true)) {
       return;
     }
@@ -727,7 +727,7 @@ export class TerminalProvider
       return false;
     }
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const selectedAiTool = record.config.selectedAiTool;
     const items = resolveAiToolConfigs(config.get("aiTools", [])).map((tool) => ({
       label:
@@ -1194,7 +1194,7 @@ export class TerminalProvider
   private async revealSidebarView(): Promise<void> {
     try {
       await vscode.commands.executeCommand(
-        "workbench.view.extension.opencodeTuiContainer",
+        "workbench.view.extension.ostContainer",
       );
     } catch {
       // intentionally empty: sidebar reveal is best-effort
@@ -1219,7 +1219,7 @@ export class TerminalProvider
     Extract<HostMessage, { type: "terminalConfig" }>,
     "type"
   > {
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     return {
       fontSize: config.get<number>("fontSize", 14),
       fontFamily: config.get<string>(
@@ -1406,7 +1406,7 @@ export class TerminalProvider
   }
 
   public toggleDashboard(): void {
-    void vscode.commands.executeCommand("opencodeTui.openTerminalManager");
+    void vscode.commands.executeCommand("ost.openTerminalManager");
   }
 
   public toggleTmuxCommandToolbar(): void {
@@ -1440,3 +1440,4 @@ export class TerminalProvider
     this.sessionRuntime.dispose();
   }
 }
+

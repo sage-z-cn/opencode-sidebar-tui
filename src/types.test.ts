@@ -88,7 +88,7 @@ describe("Types", () => {
         { type: "requestAiToolSelector", paneId: "pane-1" },
         {
           type: "executeTmuxCommand",
-          commandId: "opencodeTui.tmuxCreateWindow",
+          commandId: "ost.tmuxCreateWindow",
           paneId: "pane-1",
         },
         {
@@ -139,7 +139,7 @@ describe("Types", () => {
         { type: "requestAiToolSelector" },
         {
           type: "executeTmuxCommand",
-          commandId: "opencodeTui.tmuxCreateWindow",
+          commandId: "ost.tmuxCreateWindow",
         },
         {
           type: "executeTmuxRawCommand",
@@ -303,11 +303,11 @@ describe("Types", () => {
     it("should accept executeTmuxCommand messages for supported toolbar commands", () => {
       const message: WebviewMessage = {
         type: "executeTmuxCommand",
-        commandId: "opencodeTui.tmuxCreateWindow",
+        commandId: "ost.tmuxCreateWindow",
       };
 
       expect(message.type).toBe("executeTmuxCommand");
-      expect(message.commandId).toBe("opencodeTui.tmuxCreateWindow");
+      expect(message.commandId).toBe("ost.tmuxCreateWindow");
     });
 
     it("should accept executeTmuxRawCommand messages for supported native tmux commands", () => {
@@ -587,3 +587,4 @@ describe("Types", () => {
     });
   });
 });
+

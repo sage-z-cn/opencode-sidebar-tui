@@ -50,7 +50,7 @@ export class OutputChannelService implements ILogger {
   }
 
   private getConfiguredLogLevel(): keyof typeof OutputChannelService.LOG_LEVEL_ORDER {
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const value = config.get<string>("logLevel", "info");
 
     if (
@@ -123,3 +123,4 @@ export class OutputChannelService implements ILogger {
     OutputChannelService.instance = undefined;
   }
 }
+

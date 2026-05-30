@@ -1,5 +1,5 @@
 {
-  "opencodeTui.autoStartOnOpen": false,
-  "opencodeTui.enableAutoSpawn": false,
-  "opencodeTui.enableTmux": false
+  "ost.autoStartOnOpen": false,
+  "ost.enableAutoSpawn": false,
+  "ost.enableTmux": false
 }

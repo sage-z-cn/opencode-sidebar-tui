@@ -13,7 +13,7 @@ Thanks for helping improve Open Sidebar TUI. This project is a VS Code extension
 ## Local Setup
 
 ```bash
-git clone https://github.com/islee23520/opencode-sidebar-tui.git
+git clone https://github.com/sage-z-cn/opencode-sidebar-tui.git
 cd opencode-sidebar-tui
 npm install
 npm run compile

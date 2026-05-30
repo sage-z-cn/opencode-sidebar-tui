@@ -11,7 +11,7 @@ interface ConfigurationProperty {
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "islee23520.opencode-sidebar-tui",
+    "sagez.opencode-sidebar-tui-sage",
   );
 
   assert.ok(extension, "Extension should be available in the test host");
@@ -41,7 +41,7 @@ suite("AI tool settings", () => {
     const properties = getConfigurationProperties(extension);
 
     assert.strictEqual(
-      properties["opencodeTui.promptAiToolOnSession"]?.default,
+      properties["ost.promptAiToolOnSession"]?.default,
       true,
     );
   });
@@ -51,7 +51,7 @@ suite("AI tool settings", () => {
     const properties = getConfigurationProperties(extension);
 
     assert.strictEqual(
-      properties["opencodeTui.defaultAiTool"]?.default,
+      properties["ost.defaultAiTool"]?.default,
       "opencode",
     );
   });
@@ -59,13 +59,13 @@ suite("AI tool settings", () => {
   test("aiTools config structure is correct", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const aiTools = properties["opencodeTui.aiTools"];
+    const aiTools = properties["ost.aiTools"];
 
-    assert.ok(aiTools, "opencodeTui.aiTools should be contributed");
+    assert.ok(aiTools, "ost.aiTools should be contributed");
     assert.strictEqual(aiTools.type, "array");
 
     const items = aiTools.items as ConfigurationProperty | undefined;
-    assert.ok(items, "opencodeTui.aiTools should define array item schema");
+    assert.ok(items, "ost.aiTools should define array item schema");
     assert.strictEqual(items.type, "object");
     assert.deepStrictEqual(items.required, ["name", "label"]);
 
@@ -104,3 +104,5 @@ suite("AI tool settings", () => {
     ]);
   });
 });
+
+

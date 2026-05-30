@@ -37,7 +37,7 @@ interface ExtensionPackageJSON {
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "islee23520.opencode-sidebar-tui",
+    "sagez.opencode-sidebar-tui-sage",
   );
 
   assert.ok(extension, "Extension should be available in the test host");
@@ -56,20 +56,20 @@ suite("Package contribution metadata", () => {
     const secondarySidebar =
       packageJSON.contributes?.viewsContainers?.secondarySidebar ?? [];
     const container = secondarySidebar.find(
-      ({ id }) => id === "opencodeTuiContainer",
+      ({ id }) => id === "ostContainer",
     );
 
-    assert.ok(container, "opencodeTuiContainer should be contributed");
+    assert.ok(container, "ostContainer should be contributed");
     assert.strictEqual(container.title, "Open Sidebar Terminal");
     assert.strictEqual(container.icon, "resources/opencode-activity-bar.svg");
   });
 
   test("contributes terminal view metadata", async () => {
     const packageJSON = await getPackageJSON();
-    const views = packageJSON.contributes?.views?.opencodeTuiContainer ?? [];
-    const terminalView = views.find(({ id }) => id === "opencodeTui");
+    const views = packageJSON.contributes?.views?.ostContainer ?? [];
+    const terminalView = views.find(({ id }) => id === "ost");
 
-    assert.ok(terminalView, "opencodeTui webview should be contributed");
+    assert.ok(terminalView, "ost webview should be contributed");
     assert.strictEqual(terminalView.type, "webview");
   });
 
@@ -82,14 +82,14 @@ suite("Package contribution metadata", () => {
     assert.ok(
       editorContext.some(
         ({ command, group }) =>
-          command === "opencodeTui.sendAtMention" && group === "navigation",
+          command === "ost.sendAtMention" && group === "navigation",
       ),
       "editor/context should include sendAtMention",
     );
     assert.ok(
       explorerContext.some(
         ({ command, group, when }) =>
-          command === "opencodeTui.sendFileToTerminal" &&
+          command === "ost.sendFileToTerminal" &&
           group === "2_workspace" &&
           when === "!explorerResourceIsFolder",
       ),
@@ -98,7 +98,7 @@ suite("Package contribution metadata", () => {
     assert.ok(
       explorerContext.some(
         ({ command, group, when }) =>
-          command === "opencodeTui.sendFileToTerminal" &&
+          command === "ost.sendFileToTerminal" &&
           group === "2_workspace" &&
           when === "explorerResourceIsFolder",
       ),
@@ -111,17 +111,17 @@ suite("Package contribution metadata", () => {
     const keybindings = packageJSON.contributes?.keybindings ?? [];
     const expectedKeybindings = [
       {
-        command: "opencodeTui.sendAtMention",
+        command: "ost.sendAtMention",
         key: "ctrl+alt+l",
         mac: "cmd+alt+l",
       },
       {
-        command: "opencodeTui.sendAllOpenFiles",
+        command: "ost.sendAllOpenFiles",
         key: "ctrl+alt+a",
         mac: "cmd+alt+a",
       },
       {
-        command: "opencodeTui.browseTmuxSessions",
+        command: "ost.browseTmuxSessions",
         key: "ctrl+alt+t",
         mac: "cmd+alt+t",
       },
@@ -140,3 +140,5 @@ suite("Package contribution metadata", () => {
     }
   });
 });
+
+

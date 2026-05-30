@@ -103,28 +103,28 @@ function getCommandHandlers(): CommandHandlers {
 
   return {
     openInNewWindow: getHandler(
-      "opencode.openInNewWindow",
+      "ost.openInNewWindow",
     ) as () => Promise<void>,
-    spawnForWorkspace: getHandler("opencode.spawnForWorkspace") as (uri?: {
+    spawnForWorkspace: getHandler("ost.spawnForWorkspace") as (uri?: {
       toString(): string;
     }) => Promise<void>,
-    selectInstance: getHandler("opencodeTui.selectInstance") as () => void,
-    switchTmuxSession: getHandler("opencodeTui.switchTmuxSession") as (
+    selectInstance: getHandler("ost.selectInstance") as () => void,
+    switchTmuxSession: getHandler("ost.switchTmuxSession") as (
       sessionId?: string,
     ) => Promise<void>,
     createTmuxSession: getHandler(
-      "opencodeTui.createTmuxSession",
+      "ost.createTmuxSession",
     ) as () => Promise<void>,
-    killTmuxSession: getHandler("opencodeTui.killTmuxSession") as (
+    killTmuxSession: getHandler("ost.killTmuxSession") as (
       sessionId?: string,
     ) => Promise<void>,
     switchNativeShell: getHandler(
-      "opencodeTui.switchNativeShell",
+      "ost.switchNativeShell",
     ) as () => Promise<void>,
     browseTmuxSessions: getHandler(
-      "opencodeTui.browseTmuxSessions",
+      "ost.browseTmuxSessions",
     ) as () => Promise<void>,
-    killNativeShell: getHandler("opencodeTui.killNativeShell") as (
+    killNativeShell: getHandler("ost.killNativeShell") as (
       instanceId?: string,
     ) => Promise<void>,
   };
@@ -376,7 +376,7 @@ describe("registerTmuxSessionCommands", () => {
     expect(instanceController.spawn).not.toHaveBeenCalled();
     expect(instanceStore.getActive().config.id).toBe("existing");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "opencodeTui.focus",
+      "ost.focus",
     );
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
       "Focused existing OpenCode for workspace: Reusable Workspace",
@@ -630,7 +630,7 @@ describe("registerTmuxSessionCommands", () => {
 
     expect(provider.switchToTmuxSession).toHaveBeenCalledWith("tmux-1");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "opencodeTui.focus",
+      "ost.focus",
     );
     expect(
       vi.mocked(vscode.commands.executeCommand).mock.invocationCallOrder[0],
@@ -696,7 +696,7 @@ describe("registerTmuxSessionCommands", () => {
 
     expect(provider.createTmuxSession).toHaveBeenCalledTimes(1);
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "opencodeTui.focus",
+      "ost.focus",
     );
     expect(
       vi.mocked(vscode.commands.executeCommand).mock.invocationCallOrder[0],
@@ -929,7 +929,7 @@ describe("registerTmuxSessionCommands", () => {
 
     expect(provider.switchToTmuxSession).toHaveBeenCalledWith("tmux-b");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "opencodeTui.focus",
+      "ost.focus",
     );
     expect(
       vi.mocked(vscode.commands.executeCommand).mock.invocationCallOrder[0],
@@ -1201,3 +1201,4 @@ describe("registerTmuxSessionCommands", () => {
     );
   });
 });
+

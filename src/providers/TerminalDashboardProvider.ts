@@ -31,7 +31,7 @@ interface DashboardSessionSource {
 export class TerminalDashboardProvider
   implements vscode.WebviewViewProvider, vscode.Disposable
 {
-  public static readonly viewType = "opencodeTui.terminalDashboard";
+  public static readonly viewType = "ost.terminalDashboard";
 
   private view?: vscode.WebviewView;
   private panel?: vscode.WebviewPanel;
@@ -161,7 +161,7 @@ export class TerminalDashboardProvider
 
       const panesMap: Record<string, TmuxDashboardPaneDto[]> = {};
       const windowsMap: Record<string, TmuxDashboardWindowDto[]> = {};
-      const config = vscode.workspace.getConfiguration("opencodeTui");
+      const config = vscode.workspace.getConfiguration("ost");
       const tools: AiToolConfig[] = resolveAiToolConfigs(
         config.get("aiTools", []),
       );
@@ -389,18 +389,18 @@ export class TerminalDashboardProvider
           await this.terminalProvider?.switchToZellijSession(message.sessionId);
         } else {
           await vscode.commands.executeCommand(
-            "opencodeTui.switchTmuxSession",
+            "ost.switchTmuxSession",
             message.sessionId,
           );
         }
         await this.postSessionsToWebview();
         return;
       case "create":
-        await vscode.commands.executeCommand("opencodeTui.createTmuxSession");
+        await vscode.commands.executeCommand("ost.createTmuxSession");
         await this.postSessionsToWebview();
         return;
       case "switchNativeShell":
-        await vscode.commands.executeCommand("opencodeTui.switchNativeShell");
+        await vscode.commands.executeCommand("ost.switchNativeShell");
         await this.postSessionsToWebview();
         return;
       case "createNativeShell":
@@ -428,7 +428,7 @@ export class TerminalDashboardProvider
             this.instanceStore.setActive(newId);
           }
 
-          await vscode.commands.executeCommand("opencodeTui.switchNativeShell");
+          await vscode.commands.executeCommand("ost.switchNativeShell");
           await this.postSessionsToWebview();
         }
         return;
@@ -437,7 +437,7 @@ export class TerminalDashboardProvider
           try {
             this.instanceStore.setActive(message.instanceId);
           await vscode.commands.executeCommand(
-            "opencodeTui.switchNativeShell",
+            "ost.switchNativeShell",
           );
         } catch {
           }
@@ -673,7 +673,7 @@ export class TerminalDashboardProvider
         return;
       case "killNativeShell": {
         await vscode.commands.executeCommand(
-          "opencodeTui.killNativeShell",
+          "ost.killNativeShell",
           message.instanceId,
         );
         await this.postSessionsToWebview();
@@ -692,7 +692,7 @@ export class TerminalDashboardProvider
           await this.terminalProvider.killTmuxSession(message.sessionId);
         } else {
           await vscode.commands.executeCommand(
-            "opencodeTui.killTmuxSession",
+            "ost.killTmuxSession",
             message.sessionId,
           );
         }
@@ -707,7 +707,7 @@ export class TerminalDashboardProvider
               await this.terminalProvider?.switchToZellijSession(nextSession.id);
             } else {
               await vscode.commands.executeCommand(
-                "opencodeTui.switchTmuxSession",
+                "ost.switchTmuxSession",
                 nextSession.id,
               );
             }
@@ -767,7 +767,7 @@ export class TerminalDashboardProvider
   ): Promise<void> {
     const webview = this.getActiveWebview();
     if (webview) {
-      const config = vscode.workspace.getConfiguration("opencodeTui");
+      const config = vscode.workspace.getConfiguration("ost");
       const tools: AiToolConfig[] = resolveAiToolConfigs(
         config.get("aiTools", []),
       );
@@ -946,3 +946,4 @@ export class TerminalDashboardProvider
     return this.panel?.webview ?? this.view?.webview;
   }
 }
+

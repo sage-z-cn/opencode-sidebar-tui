@@ -267,7 +267,7 @@ export function registerTmuxPaneCommands(
   }
 
   const tmuxSwitchPaneCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxSwitchPane",
+    "ost.tmuxSwitchPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -332,7 +332,7 @@ export function registerTmuxPaneCommands(
   }
 
   const tmuxSplitPaneHCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxSplitPaneH",
+    "ost.tmuxSplitPaneH",
     async (item?: { paneId?: string; sessionId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -355,7 +355,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSplitPaneVCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxSplitPaneV",
+    "ost.tmuxSplitPaneV",
     async (item?: { paneId?: string; sessionId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -378,7 +378,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSplitPaneWithCommandCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxSplitPaneWithCommand",
+    "ost.tmuxSplitPaneWithCommand",
     async (item?: { paneId?: string; sessionId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -408,7 +408,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSendTextToPaneCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxSendTextToPane",
+    "ost.tmuxSendTextToPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -440,7 +440,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxResizePaneCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxResizePane",
+    "ost.tmuxResizePane",
     async (item?: { paneId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -486,7 +486,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSwapPaneCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxSwapPane",
+    "ost.tmuxSwapPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -548,7 +548,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxKillPaneCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxKillPane",
+    "ost.tmuxKillPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -620,7 +620,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxNextWindowCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxNextWindow",
+    "ost.tmuxNextWindow",
     async () => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -639,7 +639,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxPrevWindowCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxPrevWindow",
+    "ost.tmuxPrevWindow",
     async () => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -658,7 +658,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxCreateWindowCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxCreateWindow",
+    "ost.tmuxCreateWindow",
     async () => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -682,7 +682,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxKillWindowCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxKillWindow",
+    "ost.tmuxKillWindow",
     async (item?: { windowId: string }) => {
       if (!resolvePaneManager()) return;
       const sessionId = await resolveFocusedSessionId();
@@ -712,7 +712,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSelectWindowCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxSelectWindow",
+    "ost.tmuxSelectWindow",
     async (item?: { windowId: string }) => {
       if (!resolvePaneManager()) return;
       const sessionId = await resolveFocusedSessionId();
@@ -736,7 +736,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxKillSessionCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxKillSession",
+    "ost.tmuxKillSession",
     async (item?: { sessionId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -757,9 +757,9 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxRefreshCommand = vscode.commands.registerCommand(
-    "opencodeTui.tmuxRefresh",
+    "ost.tmuxRefresh",
     async () => {
-      await vscode.commands.executeCommand("opencodeTui.openTerminalManager");
+      await vscode.commands.executeCommand("ost.openTerminalManager");
     },
   );
 
@@ -781,3 +781,4 @@ export function registerTmuxPaneCommands(
     tmuxRefreshCommand,
   ];
 }
+

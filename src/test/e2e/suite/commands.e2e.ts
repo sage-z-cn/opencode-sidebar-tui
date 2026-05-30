@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "islee23520.opencode-sidebar-tui",
+    "sagez.opencode-sidebar-tui-sage",
   );
 
   assert.ok(extension, "Extension should be available in the test host");
@@ -17,10 +17,10 @@ suite("Command registration", () => {
 
     const commands = await vscode.commands.getCommands(true);
 
-    assert.ok(commands.includes("opencodeTui.start"));
-    assert.ok(commands.includes("opencodeTui.focus"));
-    assert.ok(commands.includes("opencodeTui.openTerminalInEditor"));
-    assert.ok(commands.includes("opencodeTui.toggleDashboard"));
+    assert.ok(commands.includes("ost.start"));
+    assert.ok(commands.includes("ost.focus"));
+    assert.ok(commands.includes("ost.openTerminalInEditor"));
+    assert.ok(commands.includes("ost.toggleDashboard"));
   });
 
   test("registers focus command without relying on internal workbench commands", async () => {
@@ -28,8 +28,8 @@ suite("Command registration", () => {
 
     const commands = await vscode.commands.getCommands(true);
     assert.ok(
-      commands.includes("opencodeTui.focus"),
-      "opencodeTui.focus should be registered",
+      commands.includes("ost.focus"),
+      "ost.focus should be registered",
     );
   });
 
@@ -39,10 +39,12 @@ suite("Command registration", () => {
     const properties = extension.packageJSON.contributes.configuration
       .properties as Record<string, { default: unknown }>;
 
-    assert.strictEqual(properties["opencodeTui.autoStartOnOpen"].default, true);
+    assert.strictEqual(properties["ost.autoStartOnOpen"].default, true);
     assert.strictEqual(
-      properties["opencodeTui.defaultAiTool"].default,
+      properties["ost.defaultAiTool"].default,
       "opencode",
     );
   });
 });
+
+

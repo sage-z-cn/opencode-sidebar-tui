@@ -56,7 +56,7 @@ export interface SessionState {
 }
 
 export class SessionRuntime {
-  private static readonly LEGACY_TERMINAL_ID: InstanceId = "opencode-main";
+  private static readonly LEGACY_TERMINAL_ID: InstanceId = "ost-main";
   private static readonly DEFAULT_PANE_ID = "default";
 
   private activeInstanceId: InstanceId = "default";
@@ -255,7 +255,7 @@ export class SessionRuntime {
     const requestedBackend = config.backend ?? "native";
     const backend = this.backendRegistry.resolveAvailable(requestedBackend);
 
-    const workspaceConfig = vscode.workspace.getConfiguration("opencodeTui");
+    const workspaceConfig = vscode.workspace.getConfiguration("ost");
     const enableHttpApi = workspaceConfig.get<boolean>("enableHttpApi", true);
     const workspacePath =
       config.cwd ?? this.resolveStartupWorkspacePath().workspacePath;
@@ -472,7 +472,7 @@ export class SessionRuntime {
       this.reconnectListeners();
       this.syncActiveInstance(instanceId);
 
-      const config = vscode.workspace.getConfiguration("opencodeTui");
+      const config = vscode.workspace.getConfiguration("ost");
       const enableHttpApi = config.get<boolean>("enableHttpApi", true);
       const operator = this.activeTool
         ? this.aiToolRegistry.getForConfig(this.activeTool)
@@ -538,7 +538,7 @@ export class SessionRuntime {
     try {
       this.disposeListeners();
 
-      const config = vscode.workspace.getConfiguration("opencodeTui");
+      const config = vscode.workspace.getConfiguration("ost");
       const enableHttpApi = config.get<boolean>("enableHttpApi", true);
       const httpTimeout = config.get<number>("httpTimeout", 5000);
 
@@ -852,7 +852,7 @@ export class SessionRuntime {
     if (wasManualSessionSelection) {
       return;
     }
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     if (!config.get<boolean>("promptAiToolOnSession", true)) {
       return;
     }
@@ -1400,7 +1400,7 @@ export class SessionRuntime {
     const shouldShowSelector =
       options.forceToolPrompt && !preferredToolName;
     if (shouldShowSelector) {
-      const config = vscode.workspace.getConfiguration("opencodeTui");
+      const config = vscode.workspace.getConfiguration("ost");
       if (
         !options.respectPromptAiToolOnSession ||
         config.get<boolean>("promptAiToolOnSession", true)
@@ -1443,7 +1443,7 @@ export class SessionRuntime {
       }
     }
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     if (config.get<boolean>("promptAiToolOnSession", true)) {
       this.callbacks.showAiToolSelector(sessionId, sessionId, true);
     }
@@ -1868,7 +1868,7 @@ export class SessionRuntime {
   ): void {
     void vscode.commands.executeCommand(
       "setContext",
-      "opencodeTui.tmuxAttached",
+      "ost.tmuxAttached",
       backend === "tmux" && Boolean(sessionId),
     );
 
@@ -2237,7 +2237,7 @@ export class SessionRuntime {
       return;
     }
 
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const enableHttpApi = config.get<boolean>("enableHttpApi", true);
     const autoShareContext = config.get<boolean>("autoShareContext", true);
     const operator = this.activeTool
@@ -2301,7 +2301,7 @@ export class SessionRuntime {
   }
 
   private getConfiguredTools(
-    config = vscode.workspace.getConfiguration("opencodeTui"),
+    config = vscode.workspace.getConfiguration("ost"),
   ): AiToolConfig[] {
     return resolveAiToolConfigs(config.get("aiTools", []));
   }
@@ -2309,7 +2309,7 @@ export class SessionRuntime {
   private resolveStoredTool(
     instanceId = this.activeInstanceId,
   ): AiToolConfig | undefined {
-    const config = vscode.workspace.getConfiguration("opencodeTui");
+    const config = vscode.workspace.getConfiguration("ost");
     const storedToolName =
       this.instanceStore?.get(instanceId)?.config.selectedAiTool;
     return this.resolveToolConfig(
@@ -2320,7 +2320,7 @@ export class SessionRuntime {
 
   private resolveToolConfig(
     toolName: string | undefined,
-    config = vscode.workspace.getConfiguration("opencodeTui"),
+    config = vscode.workspace.getConfiguration("ost"),
   ): AiToolConfig | undefined {
     if (!toolName) {
       return undefined;
@@ -2394,3 +2394,4 @@ export class SessionRuntime {
     return tool;
   }
 }
+

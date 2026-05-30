@@ -227,8 +227,8 @@ describe("TerminalProvider", () => {
     await Promise.resolve();
 
     expect(showSpy).toHaveBeenCalledWith(
-      "opencode-main",
-      "opencode-main",
+      "ost-main",
+      "ost-main",
       true,
       undefined,
     );
@@ -622,7 +622,7 @@ describe("TerminalProvider", () => {
     await provider.openInEditorTab();
 
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
-      "opencodeTui.terminalEditor",
+      "ost.terminalEditor",
       "Open Sidebar Terminal",
       vscode.ViewColumn.Beside,
       expect.objectContaining({
@@ -703,7 +703,7 @@ describe("TerminalProvider", () => {
 
     expect(panel.dispose).toHaveBeenCalledTimes(1);
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "workbench.view.extension.opencodeTuiContainer",
+      "workbench.view.extension.ostContainer",
     );
     expect(view.show).toHaveBeenCalledWith(true);
   });
@@ -718,13 +718,13 @@ describe("TerminalProvider", () => {
     await flushAsyncStartup();
 
     expect(createTerminalSpy).toHaveBeenCalledWith(
-      "opencode-main",
+      "ost-main",
       "opencode -c",
       {},
       undefined,
       120,
       40,
-      "opencode-main",
+      "ost-main",
       os.homedir(),
     );
   });
@@ -843,13 +843,13 @@ describe("TerminalProvider", () => {
     await flushAsyncStartup();
 
     expect(createTerminalSpy).toHaveBeenCalledWith(
-      "opencode-main",
+      "ost-main",
       "codex",
       {},
       undefined,
       120,
       40,
-      "opencode-main",
+      "ost-main",
       expect.any(String),
     );
   });
@@ -1138,13 +1138,13 @@ describe("TerminalProvider", () => {
     expect(ensureSession).not.toHaveBeenCalled();
     expect(discoverSessions).toHaveBeenCalledTimes(1);
     expect(createTerminalSpy).toHaveBeenCalledWith(
-      "opencode-main",
+      "ost-main",
       "tmux attach-session -t shared-session \\; set-option -u status off",
       {},
       undefined,
       96,
       28,
-      "opencode-main",
+      "ost-main",
       os.homedir(),
     );
   });
@@ -2286,7 +2286,7 @@ describe("TerminalProvider", () => {
         "HTTP API send failed, falling back to terminal write: network down",
       ),
     );
-    expect(writeSpy).toHaveBeenCalledWith("opencode-main", "hello fallback");
+    expect(writeSpy).toHaveBeenCalledWith("ost-main", "hello fallback");
   });
 
   it("resets stale runtime state and starts immediately when a visible webview opens", () => {
@@ -2348,7 +2348,7 @@ describe("TerminalProvider", () => {
     await provider.openInEditorTab();
 
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
-      "opencodeTui.terminalEditor",
+      "ost.terminalEditor",
       "Open Sidebar Terminal",
       vscode.ViewColumn.Beside,
       expect.any(Object),
@@ -2460,7 +2460,7 @@ describe("TerminalProvider", () => {
     provider.toggleDashboard();
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "opencodeTui.openTerminalManager",
+      "ost.openTerminalManager",
     );
   });
 
@@ -2686,7 +2686,7 @@ describe("TerminalProvider", () => {
     expect(selectBackendSpy).toHaveBeenCalledWith("native");
     expect(cycleBackendSpy).toHaveBeenCalledTimes(2);
     expect(switchZellijSpy).toHaveBeenCalledWith("zellij-a");
-    expect(resizeSpy).toHaveBeenCalledWith("opencode-main", 120, 33);
+    expect(resizeSpy).toHaveBeenCalledWith("ost-main", 120, 33);
     expect(view.webview.postMessage).toHaveBeenCalledWith({
       type: "clipboardContent",
       text: "from bridge",
@@ -3150,7 +3150,7 @@ describe("TerminalProvider", () => {
     expect(provider.formatEditorReference(editor)).toBe("@src/empty.ts");
     await provider.sendPrompt("fallback prompt");
 
-    expect(writeSpy).toHaveBeenCalledWith("opencode-main", "fallback prompt");
+    expect(writeSpy).toHaveBeenCalledWith("ost-main", "fallback prompt");
   });
 
   it("covers remaining TerminalProvider error and fallback branches", async () => {
@@ -3345,3 +3345,4 @@ describe("TerminalProvider", () => {
     });
   });
 });
+
