@@ -7,7 +7,7 @@
         id="btn-tmux-new-session"
         class="tmux-btn tmux-btn--primary"
         aria-label="Create tmux session"
-        title="New tmux session"
+        title="{{t:newSession}}"
       >
         +S
       </button>
@@ -16,7 +16,7 @@
         id="btn-tmux-prev-window"
         class="tmux-btn"
         aria-label="Previous tmux window"
-        title="Previous tmux window"
+        title="{{t:prevWindow}}"
       >
         ‹
       </button>
@@ -25,7 +25,7 @@
         id="btn-tmux-new-window"
         class="tmux-btn tmux-btn--primary"
         aria-label="Create tmux window"
-        title="New tmux window"
+        title="{{t:newWindow}}"
       >
         +W
       </button>
@@ -34,7 +34,7 @@
         id="btn-tmux-next-window"
         class="tmux-btn"
         aria-label="Next tmux window"
-        title="Next tmux window"
+        title="{{t:nextWindow}}"
       >
         ›
       </button>
@@ -45,6 +45,7 @@
         id="btn-tmux-commands"
         class="pane-btn"
         aria-label="Tmux commands"
+        title="{{t:tmuxCommands}}"
       >
         <svg
           width="14"
@@ -86,7 +87,7 @@
       id="btn-toggle-backend"
       class="tmux-btn"
       aria-label="Toggle backend mode"
-      title="Switch to Native Shell"
+      title="{{t:toggleBackend}}"
     >
       &#x21C4;
     </button>
@@ -95,14 +96,25 @@
       id="btn-toggle-editor-attachment"
       class="tmux-btn"
       aria-label="Toggle editor mode"
+      title="{{t:toggleEditor}}"
     >
       ↗
+    </button>
+    <button
+      type="button"
+      id="btn-rerender"
+      class="tmux-btn"
+      aria-label="Re-render terminal"
+      title="{{t:rerender}}"
+    >
+      &#x25A3;
     </button>
     <button
       type="button"
       id="btn-restart"
       class="tmux-btn"
       aria-label="Restart terminal"
+      title="{{t:restart}}"
     >
       &#x21BB;
     </button>

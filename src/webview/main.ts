@@ -1,3 +1,5 @@
+import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import * as TmuxPrompt from "./tmux-prompt";
 import * as AiSelector from "./ai-tool-selector";
@@ -20,6 +22,7 @@ import { createMessageHandler, type MessageHandlerCallbacks } from "./messages";
 import {
   setupEditorAttachmentButton,
   setupReloadButton,
+  setupRerenderButton,
   setupTmuxCommandButton,
   setupTmuxWindowButtons,
   setupBackendToggleButton,
@@ -149,9 +152,13 @@ function initApp(): void {
     },
   });
 
+  let terminal: Terminal | null = null;
+  let fitAddon: FitAddon | null = null;
   if (instance) {
-    messageHandler.terminal = instance.terminal;
-    messageHandler.fitAddon = instance.fitAddon;
+    terminal = instance.terminal;
+    fitAddon = instance.fitAddon;
+    messageHandler.terminal = terminal;
+    messageHandler.fitAddon = fitAddon;
   }
 
   const multiPaneContainer = document.getElementById("terminal-layout-root") ?? container;
@@ -212,6 +219,7 @@ function initApp(): void {
   );
 
   setupReloadButton();
+  setupRerenderButton(terminal, fitAddon);
   setupEditorAttachmentButton();
   setupTmuxCommandButton(() => currentSessionId, () => activeBackend);
   setupTmuxWindowButtons();

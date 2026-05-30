@@ -1,9 +1,12 @@
+import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
 import { postMessage } from "../shared/vscode-api";
 import {
   TerminalBackendAvailability,
   TerminalBackendType,
   TmuxWebviewCommandId,
 } from "../../types";
+import { scheduleRefresh } from "../shared/utils";
 
 import * as TmuxCmd from "../tmux-command-dropdown";
 
@@ -130,6 +133,21 @@ function backendGlyph(backend: TerminalBackendType): string {
 export function setupReloadButton(): void {
   document.getElementById("btn-restart")?.addEventListener("click", () => {
     postMessage({ type: "requestRestart" });
+  });
+}
+
+export function setupRerenderButton(
+  terminal: Terminal | null,
+  fitAddon: FitAddon | null,
+): void {
+  document.getElementById("btn-rerender")?.addEventListener("click", () => {
+    if (!terminal || !fitAddon) return;
+    try {
+      fitAddon.fit();
+      scheduleRefresh(() => terminal.refresh(0, terminal.rows - 1));
+    } catch {
+      // silently ignore render errors
+    }
   });
 }
 
