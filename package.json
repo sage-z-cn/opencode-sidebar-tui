@@ -350,7 +350,7 @@
           "description": "Terminal font size in pixels"
         },
         "ost.fontFamily": {
-          "type": "string",、
+          "type": "string",
           "default": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace",
           "description": "Terminal font family (Nerd Font recommended for Powerline/glyph support)"
         },
