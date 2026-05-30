@@ -340,17 +340,17 @@
       }
     ],
     "configuration": {
-      "title": "Open Sidebar TUI",
+      "title": "Opencode Sidebar TUI",
       "properties": {
         "ost.fontSize": {
           "type": "number",
-          "default": 14,
+          "default": 12,
           "minimum": 6,
           "maximum": 25,
           "description": "Terminal font size in pixels"
         },
         "ost.fontFamily": {
-          "type": "string",
+          "type": "string",、
           "default": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace",
           "description": "Terminal font family (Nerd Font recommended for Powerline/glyph support)"
         },
@@ -621,7 +621,8 @@
     "test:all": "npm run test && npm run test:e2e",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "build-and-install": "npx @vscode/vsce package -o build/extension.vsix && code --install-extension build/extension.vsix --force"
+    "prebuild-and-install": "node -e \"require('fs').mkdirSync('build', { recursive: true })\"",
+"build-and-install": "npx @vscode/vsce package -o build/extension.vsix && code --install-extension build/extension.vsix --force"
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",

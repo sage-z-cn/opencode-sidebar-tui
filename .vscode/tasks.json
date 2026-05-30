@@ -44,6 +44,16 @@
       "type": "npm",
       "script": "test",
       "problemMatcher": []
+    },
+    {
+      "label": "build and install",
+      "type": "npm",
+      "script": "build-and-install",
+      "problemMatcher": ["$tsc"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always"
+      }
     }
   ]
 }
