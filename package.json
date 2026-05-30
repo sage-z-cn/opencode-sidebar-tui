@@ -1,7 +1,7 @@
 {
   "name": "opencode-sidebar-tui-sage",
-  "displayName": "Opencode Sidebar TUI",
-  "description": "Automatically render Opencode Sidebar Terminal in VS Code sidebar with full terminal support (fork of islee23520/opencode-sidebar-tui, with Windows compatibility improvements)",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
   "version": "2.0.0",
   "publisher": "sagez",
   "icon": "icon.png",
@@ -36,7 +36,7 @@
       "secondarySidebar": [
         {
           "id": "ostContainer",
-          "title": "Opencode Sidebar TUI",
+          "title": "%views.container.title%",
           "icon": "resources/opencode-activity-bar.svg"
         }
       ]
@@ -45,7 +45,7 @@
       "ostContainer": [
         {
           "id": "ost",
-          "name": "Terminal",
+          "name": "%views.terminal.name%",
           "type": "webview",
           "icon": "resources/opencode-activity-bar.svg",
           "initialOrder": 1
@@ -55,109 +55,109 @@
     "commands": [
       {
         "command": "ost.start",
-        "title": "Start OpenCode",
-        "category": "Opencode Sidebar TUI"
+          "title": "%command.ost.start.title%",
+          "category": "%command.category.ost%"
       },
       {
         "command": "ost.focus",
-        "title": "Opencode Sidebar TUI: Focus Terminal"
+          "title": "%command.ost.focus.title%"
       },
       {
         "command": "ost.sendToTerminal",
-        "title": "Send to Active Terminal",
-        "category": "Opencode Sidebar TUI"
+          "title": "%command.ost.sendToTerminal.title%",
+          "category": "%command.category.ost%"
       },
       {
         "command": "ost.sendAtMention",
-        "title": "Send File Reference (@file)",
-        "category": "Opencode Sidebar TUI"
+          "title": "%command.ost.sendAtMention.title%",
+          "category": "%command.category.ost%"
       },
       {
         "command": "ost.sendAllOpenFiles",
-        "title": "Send All Open File References",
-        "category": "Opencode Sidebar TUI"
+          "title": "%command.ost.sendAllOpenFiles.title%",
+          "category": "%command.category.ost%"
       },
       {
         "command": "ost.sendFileToTerminal",
-        "title": "Send to OpenCode",
-        "category": "Opencode Sidebar TUI"
+          "title": "%command.ost.sendFileToTerminal.title%",
+          "category": "%command.category.ost%"
       },
       {
         "command": "ost.paste",
-        "title": "Paste",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.paste.title%",
+          "category": "%command.category.ost%",
         "icon": "$(clippy)"
       },
       {
         "command": "ost.openInNewWindow",
-        "title": "Open Tmux Session in New Window",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.openInNewWindow.title%",
+          "category": "%command.category.ost%",
         "icon": "$(empty-window)"
       },
       {
         "command": "ost.spawnForWorkspace",
-        "title": "Spawn Tmux Session for Workspace",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.spawnForWorkspace.title%",
+          "category": "%command.category.ost%",
         "icon": "$(add)"
       },
       {
         "command": "ost.selectInstance",
-        "title": "Select OpenCode Tmux Session",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.selectInstance.title%",
+          "category": "%command.category.ost%",
         "icon": "$(server-environment)"
       },
       {
         "command": "ost.switchTmuxSession",
-        "title": "Switch Tmux Session",
-        "category": "Opencode Sidebar TUI"
+          "title": "%command.ost.switchTmuxSession.title%",
+          "category": "%command.category.ost%"
       },
       {
         "command": "ost.createTmuxSession",
-        "title": "Opencode Sidebar TUI: Create Tmux Session"
+          "title": "%command.ost.createTmuxSession.title%"
       },
       {
         "command": "ost.browseTmuxSessions",
-        "title": "Browse Tmux Sessions",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.browseTmuxSessions.title%",
+          "category": "%command.category.ost%",
         "icon": "$(server-environment)"
       },
       {
         "command": "ost.switchNativeShell",
-        "title": "Switch to Native Shell",
-        "category": "Opencode Sidebar TUI"
+          "title": "%command.ost.switchNativeShell.title%",
+          "category": "%command.category.ost%"
       },
       {
         "command": "ost.killNativeShell",
-        "title": "Opencode Sidebar TUI: Kill Native Shell"
+          "title": "%command.ost.killNativeShell.title%"
       },
       {
         "command": "ost.openTerminalManager",
-        "title": "Opencode Sidebar TUI: Open Terminal Managers",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.openTerminalManager.title%",
+          "category": "%command.category.ost%",
         "icon": "$(server)"
       },
       {
         "command": "ost.toggleDashboard",
-        "title": "Open Terminal Managers",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.toggleDashboard.title%",
+          "category": "%command.category.ost%",
         "icon": "$(dashboard)"
       },
       {
         "command": "ost.toggleTmuxCommandToolbar",
-        "title": "Toggle Tmux Command Toolbar",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.toggleTmuxCommandToolbar.title%",
+          "category": "%command.category.ost%",
         "icon": "$(list-tree)"
       },
       {
         "command": "ost.openDashboardInEditor",
-        "title": "Open Terminal Managers in Editor",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.openDashboardInEditor.title%",
+          "category": "%command.category.ost%",
         "icon": "$(editor-layout)"
       },
       {
         "command": "ost.openTerminalInEditor",
-        "title": "Open Terminal in Editor",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.openTerminalInEditor.title%",
+          "category": "%command.category.ost%",
         "icon": {
           "light": "resources/opencode-activity-bar.svg",
           "dark": "resources/opencode-activity-bar-dark.svg"
@@ -165,102 +165,102 @@
       },
       {
         "command": "ost.restoreTerminalToSidebar",
-        "title": "Restore Terminal to Sidebar",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.restoreTerminalToSidebar.title%",
+          "category": "%command.category.ost%",
         "icon": "$(layout-sidebar-left)"
       },
       {
         "command": "ost.tmuxSwitchPane",
-        "title": "Switch to Pane",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxSwitchPane.title%",
+          "category": "%command.category.ost%",
         "icon": "$(check)"
       },
       {
         "command": "ost.tmuxSplitPaneH",
-        "title": "Split Pane Horizontal",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxSplitPaneH.title%",
+          "category": "%command.category.ost%",
         "icon": "$(split-horizontal)"
       },
       {
         "command": "ost.tmuxSplitPaneV",
-        "title": "Split Pane Vertical",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxSplitPaneV.title%",
+          "category": "%command.category.ost%",
         "icon": "$(split-vertical)"
       },
       {
         "command": "ost.tmuxSplitPaneWithCommand",
-        "title": "Split Pane with Command",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxSplitPaneWithCommand.title%",
+          "category": "%command.category.ost%",
         "icon": "$(terminal)"
       },
       {
         "command": "ost.tmuxSendTextToPane",
-        "title": "Send Text to Pane",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxSendTextToPane.title%",
+          "category": "%command.category.ost%",
         "icon": "$(file-symlink-file)"
       },
       {
         "command": "ost.tmuxResizePane",
-        "title": "Resize Pane",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxResizePane.title%",
+          "category": "%command.category.ost%",
         "icon": "$(move)"
       },
       {
         "command": "ost.tmuxSwapPane",
-        "title": "Swap Panes",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxSwapPane.title%",
+          "category": "%command.category.ost%",
         "icon": "$(arrow-swap)"
       },
       {
         "command": "ost.tmuxKillPane",
-        "title": "Kill Pane",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxKillPane.title%",
+          "category": "%command.category.ost%",
         "icon": "$(trash)"
       },
       {
         "command": "ost.tmuxNextWindow",
-        "title": "Next Window",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxNextWindow.title%",
+          "category": "%command.category.ost%",
         "icon": "$(chevron-right)"
       },
       {
         "command": "ost.tmuxPrevWindow",
-        "title": "Previous Window",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxPrevWindow.title%",
+          "category": "%command.category.ost%",
         "icon": "$(chevron-left)"
       },
       {
         "command": "ost.tmuxCreateWindow",
-        "title": "Create Window",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxCreateWindow.title%",
+          "category": "%command.category.ost%",
         "icon": "$(add)"
       },
       {
         "command": "ost.tmuxKillWindow",
-        "title": "Kill Window",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxKillWindow.title%",
+          "category": "%command.category.ost%",
         "icon": "$(trash)"
       },
       {
         "command": "ost.tmuxSelectWindow",
-        "title": "Select Window",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxSelectWindow.title%",
+          "category": "%command.category.ost%",
         "icon": "$(list-selection)"
       },
       {
         "command": "ost.tmuxKillSession",
-        "title": "Kill Session",
-        "category": "Opencode Sidebar TUI",
+          "title": "%command.ost.tmuxKillSession.title%",
+          "category": "%command.category.ost%",
         "icon": "$(trash)"
       },
       {
         "command": "ost.killTmuxSession",
-        "title": "Opencode Sidebar TUI: Kill Tmux Session"
+          "title": "%command.ost.killTmuxSession.title%"
       },
       {
         "command": "ost.tmuxRefresh",
-        "title": "Refresh Terminal Manager",
-        "category": "Opencode Sidebar TUI",
+        "title": "%command.ost.tmuxRefresh.title%",
+        "category": "%command.category.ost%",
         "icon": "$(refresh)"
       }
     ],
@@ -340,24 +340,24 @@
       }
     ],
     "configuration": {
-      "title": "Opencode Sidebar TUI",
+      "title": "%configuration.title%",
       "properties": {
         "ost.fontSize": {
           "type": "number",
           "default": 12,
           "minimum": 6,
           "maximum": 25,
-          "description": "Terminal font size in pixels"
+          "description": "%configuration.ost.fontSize.description%"
         },
         "ost.fontFamily": {
           "type": "string",
           "default": "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace",
-          "description": "Terminal font family (Nerd Font recommended for Powerline/glyph support)"
+          "description": "%configuration.ost.fontFamily.description%"
         },
         "ost.cursorBlink": {
           "type": "boolean",
           "default": true,
-          "description": "Enable cursor blinking"
+          "description": "%configuration.ost.cursorBlink.description%"
         },
         "ost.cursorStyle": {
           "type": "string",
@@ -367,29 +367,29 @@
             "underline",
             "bar"
           ],
-          "description": "Cursor style"
+          "description": "%configuration.ost.cursorStyle.description%"
         },
         "ost.scrollback": {
           "type": "number",
           "default": 10000,
           "minimum": 0,
           "maximum": 100000,
-          "description": "Maximum number of lines in scrollback buffer"
+          "description": "%configuration.ost.scrollback.description%"
         },
         "ost.autoFocusOnSend": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically focus the Open Sidebar after sending file references or text"
+          "description": "%configuration.ost.autoFocusOnSend.description%"
         },
         "ost.autoStartOnOpen": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically start the AI tool when the sidebar is opened. When false, shows a tool selector each time."
+          "description": "%configuration.ost.autoStartOnOpen.description%"
         },
         "ost.shellPath": {
           "type": "string",
           "default": "",
-          "description": "Custom shell path to use for the terminal. Leave empty to use VS Code's default shell. Useful for specifying PowerShell, Git Bash, or other shells on Windows."
+          "description": "%configuration.ost.shellPath.description%"
         },
         "ost.shellArgs": {
           "type": "array",
@@ -397,34 +397,34 @@
             "type": "string"
           },
           "default": [],
-          "description": "Custom arguments to pass to the shell. Leave empty for automatic detection. Example: [\"/c\"] for cmd.exe or [\"-Command\"] for PowerShell."
+          "description": "%configuration.ost.shellArgs.description%"
         },
         "ost.sendKeybindingsToShell": {
           "type": "boolean",
           "default": true,
-          "description": "Send Ctrl/Cmd + letter shortcuts (including Ctrl+P) directly to the sidebar terminal instead of letting VS Code intercept them. This extension's main purpose is running opencode (a TUI with its own keybindings), so the default is ON. You can turn it off if you prefer normal IDE shortcuts even when the sidebar terminal is focused. Control keys like Ctrl+C are always sent to the terminal."
+          "description": "%configuration.ost.sendKeybindingsToShell.description%"
         },
         "ost.showTmuxWindowControls": {
           "type": "boolean",
           "default": true,
-          "description": "Show direct tmux session and window controls (+S, previous window, +W, next window) in the terminal toolbar. Turn this off to keep only the tmux command menu."
+          "description": "%configuration.ost.showTmuxWindowControls.description%"
         },
         "ost.autoShareContext": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically share editor context (open files, selections) with OpenCode"
+          "description": "%configuration.ost.autoShareContext.description%"
         },
         "ost.httpTimeout": {
           "type": "number",
           "default": 5000,
           "minimum": 1000,
           "maximum": 30000,
-          "description": "HTTP API request timeout in milliseconds for communication with OpenCode"
+          "description": "%configuration.ost.httpTimeout.description%"
         },
         "ost.enableHttpApi": {
           "type": "boolean",
           "default": true,
-          "description": "Enable HTTP API for bidirectional communication between VS Code and OpenCode"
+          "description": "%configuration.ost.enableHttpApi.description%"
         },
         "ost.logLevel": {
           "type": "string",
@@ -435,26 +435,26 @@
             "error"
           ],
           "default": "info",
-          "description": "Log output level for Opencode Sidebar TUI"
+          "description": "%configuration.ost.logLevel.description%"
         },
         "ost.contextDebounceMs": {
           "type": "number",
           "default": 500,
           "minimum": 100,
           "maximum": 5000,
-          "description": "Debounce delay for context updates (ms)"
+          "description": "%configuration.ost.contextDebounceMs.description%"
         },
         "ost.maxDiagnosticLength": {
           "type": "number",
           "default": 500,
           "minimum": 100,
           "maximum": 2000,
-          "description": "Maximum length of diagnostic messages"
+          "description": "%configuration.ost.maxDiagnosticLength.description%"
         },
         "ost.enableAutoSpawn": {
           "type": "boolean",
           "default": true,
-          "description": "Auto-spawn OpenCode if not running"
+          "description": "%configuration.ost.enableAutoSpawn.description%"
         },
         "ost.terminalBackend": {
           "type": "string",
@@ -465,17 +465,17 @@
             "zellij"
           ],
           "enumDescriptions": [
-            "Native terminal — basic shell only, no multiplexer features (panes, tabs, sessions)",
-            "Tmux — full session, pane, and window management via tmux",
-            "Zellij — full session, pane, and tab management via zellij"
+            "%configuration.ost.terminalBackend.enumDescription.native%",
+            "%configuration.ost.terminalBackend.enumDescription.tmux%",
+            "%configuration.ost.terminalBackend.enumDescription.zellij%"
           ],
-          "description": "Select the terminal backend. Unavailable backends safely fall back to native.",
+          "description": "%configuration.ost.terminalBackend.description%",
           "order": 1
         },
         "ost.collapseSecondaryBarOnEditorOpen": {
           "type": "boolean",
           "default": true,
-          "description": "Close the secondary sidebar before moving the terminal into an editor group so the new editor tab gets the full workspace width."
+          "description": "%configuration.ost.collapseSecondaryBarOnEditorOpen.description%"
         },
         "ost.codeActionSeverities": {
           "type": "array",
@@ -492,7 +492,7 @@
             "error",
             "warning"
           ],
-          "description": "Diagnostic severities that trigger code actions"
+          "description": "%configuration.ost.codeActionSeverities.description%"
         },
         "ost.aiTools": {
           "type": "array",
@@ -514,33 +514,33 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "Unique identifier (e.g. 'opencode', 'claude')"
+                "description": "%configuration.ost.aiTools.items.name.description%"
               },
               "label": {
                 "type": "string",
-                "description": "Display name shown in the tool selector"
+                "description": "%configuration.ost.aiTools.items.label.description%"
               },
               "path": {
                 "type": "string",
-                "description": "Path to the executable. Empty = resolve from PATH"
+                "description": "%configuration.ost.aiTools.items.path.description%"
               },
               "args": {
                 "type": "array",
                 "items": {
                   "type": "string"
                 },
-                "description": "Arguments to pass when launching"
+                "description": "%configuration.ost.aiTools.items.args.description%"
               },
               "aliases": {
                 "type": "array",
                 "items": {
                   "type": "string"
                 },
-                "description": "Alternative names that resolve to this tool"
+                "description": "%configuration.ost.aiTools.items.aliases.description%"
               },
               "operator": {
                 "type": "string",
-                "description": "Operator ID for tool-specific launch and routing behavior"
+                "description": "%configuration.ost.aiTools.items.operator.description%"
               }
             }
           },
@@ -570,39 +570,39 @@
               "operator": "codex"
             }
           ],
-          "description": "Configure AI coding tools. Use Add Item to add new tools, Edit to modify, Delete to remove."
+          "description": "%configuration.ost.aiTools.description%"
         },
         "ost.defaultAiTool": {
           "type": "string",
           "default": "opencode",
-          "description": "Name of the default AI tool to launch when creating a new terminal session"
+          "description": "%configuration.ost.defaultAiTool.description%"
         },
         "ost.promptAiToolOnSession": {
           "type": "boolean",
           "default": true,
-          "description": "Show the AI tool selector popup when attaching to or creating a tmux/zellij session"
+          "description": "%configuration.ost.promptAiToolOnSession.description%"
         },
         "ost.pane.defaultSplitDirection": {
           "type": "string",
           "default": "horizontal",
           "enum": ["horizontal", "vertical"],
-          "description": "Default direction when splitting a terminal pane"
+          "description": "%configuration.ost.pane.defaultSplitDirection.description%"
         },
         "ost.pane.focusOnClick": {
           "type": "boolean",
           "default": true,
-          "description": "Focus a pane when clicking on it"
+          "description": "%configuration.ost.pane.focusOnClick.description%"
         },
         "ost.pane.showPaneActions": {
           "type": "boolean",
           "default": true,
-          "description": "Show pane action buttons (split, close) in the terminal"
+          "description": "%configuration.ost.pane.showPaneActions.description%"
         },
         "ost.pane.renderer": {
           "type": "string",
           "default": "auto",
           "enum": ["webgl", "canvas", "auto"],
-          "description": "Terminal renderer: webgl (fast), canvas (fallback), or auto (webgl up to 4 panes, then canvas)"
+          "description": "%configuration.ost.pane.renderer.description%"
         }
       }
     }
