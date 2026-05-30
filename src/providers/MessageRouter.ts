@@ -3,6 +3,7 @@ import * as os from "os";
 import * as path from "path";
 import { randomUUID } from "crypto";
 import * as vscode from "vscode";
+import { l10n } from "../i18n";
 import { ContextSharingService } from "../services/ContextSharingService";
 import { InstanceId, InstanceStore } from "../services/InstanceStore";
 import { OpenCodeApiClient } from "../services/OpenCodeApiClient";
@@ -369,7 +370,7 @@ export class MessageRouter {
       filePath.includes("~")
     ) {
       void vscode.window.showErrorMessage(
-        "Invalid file path: Path traversal detected",
+        l10n.t("Invalid file path: Path traversal detected"),
       );
       return;
     }
@@ -413,12 +414,12 @@ export class MessageRouter {
           });
         } else {
           void vscode.window.showErrorMessage(
-            `Failed to open file: ${filePath}`,
+            l10n.t("Failed to open file: {filePath}", { filePath }),
           );
         }
       }
     } catch {
-      void vscode.window.showErrorMessage(`Failed to open file: ${filePath}`);
+      void vscode.window.showErrorMessage(l10n.t("Failed to open file: {filePath}", { filePath }));
     }
   }
 
@@ -686,18 +687,18 @@ export class MessageRouter {
     }
 
     const result = await vscode.window.showInformationMessage(
-      "Allow OpenCode to send commands to external terminals?",
-      "Yes",
-      "Yes, don't ask again",
-      "No",
+      l10n.t("Allow OpenCode to send commands to external terminals?"),
+      l10n.t("Yes"),
+      l10n.t("Yes, don't ask again"),
+      l10n.t("No"),
     );
 
-    if (result === "Yes") {
+    if (result === l10n.t("Yes")) {
       terminal.sendText(command);
       return;
     }
 
-    if (result === "Yes, don't ask again") {
+    if (result === l10n.t("Yes, don't ask again")) {
       await this.context.globalState.update(configKey, true);
       terminal.sendText(command);
     }
@@ -710,13 +711,13 @@ export class MessageRouter {
     const result = this.captureManager.startCapture(terminal);
     if (result.success) {
       void vscode.window.showInformationMessage(
-        `Started capturing terminal: ${terminalName}`,
+        l10n.t("Started capturing terminal: {terminalName}", { terminalName }),
       );
       return;
     }
 
     void vscode.window.showErrorMessage(
-      `Failed to start capture: ${result.error ?? "Unknown error"}`,
+      l10n.t("Failed to start capture: {error}", { error: result.error ?? "Unknown error" }),
     );
   }
 

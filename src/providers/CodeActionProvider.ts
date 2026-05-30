@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../i18n";
 import { ContextManager } from "../services/ContextManager";
 import { formatDiagnostic, formatDiagnostics } from "../utils/PromptFormatter";
 
@@ -32,7 +33,7 @@ export class OpenCodeCodeActionProvider implements vscode.CodeActionProvider {
       async (args?: ExplainAndFixCommandArgs) => {
         if (!args?.diagnostic || !args.documentUri) {
           vscode.window.showWarningMessage(
-            "Explain and Fix could not read the selected diagnostic context.",
+            l10n.t("Explain and Fix could not read the selected diagnostic context."),
           );
           return;
         }
@@ -44,11 +45,11 @@ export class OpenCodeCodeActionProvider implements vscode.CodeActionProvider {
           const prompt = this.buildPrompt(args.diagnostic, document);
           await this.sendPrompt(prompt);
           vscode.window.showInformationMessage(
-            "Sent diagnostic to OpenCode terminal",
+            l10n.t("Sent diagnostic to OpenCode terminal"),
           );
         } catch (error) {
           vscode.window.showErrorMessage(
-            `Failed to send diagnostic prompt: ${error instanceof Error ? error.message : String(error)}`,
+            l10n.t("Failed to send diagnostic prompt: {error}", { error: error instanceof Error ? error.message : String(error) }),
           );
         }
       },
@@ -88,12 +89,12 @@ export class OpenCodeCodeActionProvider implements vscode.CodeActionProvider {
     document: vscode.TextDocument,
   ): vscode.CodeAction {
     const action = {
-      title: "Explain and Fix (Terminal)",
+      title: l10n.t("Explain and Fix (Terminal)"),
       kind: vscode.CodeActionKind.QuickFix,
       diagnostics: [diagnostic],
       isPreferred: true,
       command: {
-        title: "Explain and Fix (Terminal)",
+        title: l10n.t("Explain and Fix (Terminal)"),
         command: "ost.explainAndFix",
         arguments: [
           {
@@ -147,7 +148,7 @@ export class OpenCodeCodeActionProvider implements vscode.CodeActionProvider {
         : "";
 
     const instruction =
-      "Explain this diagnostic and provide a concrete fix with code changes.";
+      l10n.t("Explain this diagnostic and provide a concrete fix with code changes.");
 
     return [instruction, primaryDiagnostic, relatedSection]
       .filter((value) => value.length > 0)

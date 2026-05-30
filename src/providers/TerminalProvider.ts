@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { l10n } from "../i18n";
 import { TerminalManager } from "../terminals/TerminalManager";
 import { OutputCaptureManager } from "../services/OutputCaptureManager";
 import { OpenCodeApiClient } from "../services/OpenCodeApiClient";
@@ -613,20 +614,20 @@ export class TerminalProvider
     switch (subcommand) {
       case "rename-session":
         return this.promptForTmuxValue(
-          "Rename tmux session",
-          "Enter the new tmux session name",
+          l10n.t("Rename tmux session"),
+          l10n.t("Enter the new tmux session name"),
           args[0],
         );
       case "rename-window":
         return this.promptForTmuxValue(
-          "Rename tmux window",
-          "Enter the new tmux window name",
+          l10n.t("Rename tmux window"),
+          l10n.t("Enter the new tmux window name"),
           args[0],
         );
       case "select-layout":
         return this.promptForTmuxValue(
-          "Select tmux layout",
-          "Enter a tmux layout name (e.g. even-horizontal, tiled, main-vertical)",
+          l10n.t("Select tmux layout"),
+          l10n.t("Enter a tmux layout name (e.g. even-horizontal, tiled, main-vertical)"),
           args[0],
         );
       default:
@@ -645,7 +646,7 @@ export class TerminalProvider
       value,
       ignoreFocusOut: true,
       validateInput: (currentValue) =>
-        currentValue.trim().length === 0 ? "A value is required" : undefined,
+        currentValue.trim().length === 0 ? l10n.t("A value is required") : undefined,
     });
 
     if (input === undefined) {
@@ -732,7 +733,7 @@ export class TerminalProvider
     const items = resolveAiToolConfigs(config.get("aiTools", [])).map((tool) => ({
       label:
         tool.name === selectedAiTool
-          ? `${tool.label} (previously used)`
+          ? l10n.t("{label} (previously used)", { label: tool.label })
           : tool.label,
       description: tool.name,
       toolName: tool.name,
@@ -742,7 +743,7 @@ export class TerminalProvider
       `[TerminalProvider] Prompting to restore native terminal for ${record.config.id}`,
     );
     const selection = await vscode.window.showQuickPick(items, {
-      placeHolder: "Select AI tool to restore terminal",
+      placeHolder: l10n.t("Select AI tool to restore terminal"),
     });
 
     if (!selection) {

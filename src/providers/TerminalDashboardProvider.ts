@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { l10n } from "../i18n";
 import type { ILogger } from "../services/ILogger";
 import { TmuxSessionManager } from "../services/TmuxSessionManager";
 import { ZellijSessionManager } from "../services/ZellijSessionManager";
@@ -92,7 +93,7 @@ export class TerminalDashboardProvider
 
     const panel = vscode.window.createWebviewPanel(
       TerminalDashboardProvider.viewType,
-      "Terminal Manager",
+      l10n.t("Terminal Manager"),
       {
         preserveFocus: true,
         viewColumn: vscode.ViewColumn.Beside,
@@ -203,7 +204,7 @@ export class TerminalDashboardProvider
 
       const payload: TmuxDashboardSessionDto[] = filtered.map((session) => ({
         id: session.id,
-        name: session.backend === "zellij" ? `Zellij: ${session.name}` : session.name,
+        name: session.backend === "zellij" ? l10n.t("Zellij: ") + session.name : session.name,
         workspace: session.workspace,
         isActive: session.isActive,
         paneCount: panesMap[session.id]?.length ?? 0,
@@ -217,7 +218,7 @@ export class TerminalDashboardProvider
         type: "updateTmuxSessions",
         sessions: payload,
         nativeShells,
-        workspace: workspaceName ?? "No workspace",
+        workspace: workspaceName ?? l10n.t("No workspace"),
         panes: panesMap,
         windows: windowsMap,
         showingAll: this.showAllSessions || undefined,
@@ -316,7 +317,7 @@ export class TerminalDashboardProvider
     const windows = tabs.map((tab) => ({
       windowId: this.zellijTabWindowId(tab.index),
       index: tab.index,
-      name: `Tab: ${tab.name}`,
+      name: l10n.t("Tab: {name}", { name: tab.name }),
       isActive: tab.isActive,
       panes: tab.index === activeTab?.index ? panes : [],
     }));
@@ -326,7 +327,7 @@ export class TerminalDashboardProvider
       windows: windows.length > 0 ? windows : [{
         windowId: activeWindowId,
         index: 1,
-        name: "Tab 1",
+        name: l10n.t("Tab 1"),
         isActive: true,
         panes,
       }],
@@ -420,7 +421,7 @@ export class TerminalDashboardProvider
               config: {
                 id: newId,
                 workspaceUri,
-                label: `Shell ${shellCount + 1}`,
+                label: l10n.t("Shell {n}", { n: shellCount + 1 }),
               },
               runtime: {},
               state: "disconnected",

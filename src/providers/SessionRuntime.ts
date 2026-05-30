@@ -1,6 +1,7 @@
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
+import { l10n } from "../i18n";
 import { OutputCaptureManager } from "../services/OutputCaptureManager";
 import { OpenCodeApiClient } from "../services/OpenCodeApiClient";
 import { PortManager } from "../services/PortManager";
@@ -192,7 +193,7 @@ export class SessionRuntime {
         return;
       }
       void vscode.window.showWarningMessage(
-        "Tmux session could not be created. Falling back to native shell.",
+        l10n.t("Tmux session could not be created. Falling back to native shell."),
       );
       await this.switchToNativeShell();
       return;
@@ -203,7 +204,7 @@ export class SessionRuntime {
       return;
     }
     void vscode.window.showWarningMessage(
-      "Zellij session could not be created. Falling back to native shell.",
+      l10n.t("Zellij session could not be created. Falling back to native shell."),
     );
     await this.switchToNativeShell();
   }
@@ -707,7 +708,7 @@ export class SessionRuntime {
             `[TerminalProvider] Failed to assign port: ${error instanceof Error ? error.message : String(error)}`,
           );
           vscode.window.showWarningMessage(
-            "Failed to assign port for OpenCode HTTP API. Running without HTTP features.",
+            l10n.t("Failed to assign port for OpenCode HTTP API. Running without HTTP features."),
           );
         }
       }
@@ -1517,7 +1518,7 @@ export class SessionRuntime {
       this.logger.error(
         `[TerminalProvider] Failed to create tmux session: ${error instanceof Error ? error.message : String(error)}`,
       );
-      vscode.window.showErrorMessage("Failed to create tmux session");
+      vscode.window.showErrorMessage(l10n.t("Failed to create tmux session"));
       return undefined;
     }
   }
@@ -1629,7 +1630,7 @@ export class SessionRuntime {
       this.logger.error(
         `[TerminalProvider] Failed to kill tmux session: ${error instanceof Error ? error.message : String(error)}`,
       );
-      vscode.window.showErrorMessage("Failed to kill tmux session");
+      vscode.window.showErrorMessage(l10n.t("Failed to kill tmux session"));
     }
   }
 
@@ -1761,7 +1762,7 @@ export class SessionRuntime {
       this.logger.error(
         `[TerminalProvider] Failed to kill zellij session: ${error instanceof Error ? error.message : String(error)}`,
       );
-      vscode.window.showErrorMessage("Failed to kill zellij session");
+      vscode.window.showErrorMessage(l10n.t("Failed to kill zellij session"));
     }
   }
 
@@ -2365,23 +2366,23 @@ export class SessionRuntime {
     if (!tool) {
       const toolItems = this.getConfiguredTools(config).map((candidate) => ({
         label: candidate.label,
-        description: `Launch ${candidate.label} in the terminal`,
+        description: l10n.t("Launch {label} in the terminal", { label: candidate.label }),
         tool: candidate,
       }));
       const picked = await vscode.window.showQuickPick(toolItems, {
-        placeHolder: "Select AI tool to launch",
+        placeHolder: l10n.t("Select AI tool to launch"),
       });
       if (!picked) {
         return undefined;
       }
       tool = picked.tool;
       const saveDefault = await vscode.window.showInformationMessage(
-        `Save ${picked.tool.label} as default tool?`,
+        l10n.t("Save {tool} as default tool?", { tool: picked.tool.label }),
         { modal: false },
-        "Yes",
-        "No",
+        l10n.t("Yes"),
+        l10n.t("No"),
       );
-      if (saveDefault === "Yes") {
+      if (saveDefault === l10n.t("Yes")) {
         await config.update(
           "defaultAiTool",
           picked.tool.name,
