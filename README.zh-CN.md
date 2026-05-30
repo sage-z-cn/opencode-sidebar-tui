@@ -1,6 +1,8 @@
 # Opencode Sidebar TUI
 
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/sagez.opencode-sidebar-tui-sage?logo=visual-studio-code&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=sagez.opencode-sidebar-tui-sage)
 [English](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/README.md)
+
 
 Automatically render Opencode Sidebar Terminal in VS Code sidebar with full terminal support.
 
@@ -8,9 +10,7 @@ Automatically render Opencode Sidebar Terminal in VS Code sidebar with full term
 
 ## Fork 修改记录
 
-- **修复 Shift+Enter 换行符** [e820362]: Shift+Enter 多行输入现在发送 LF (`\n`) 而非 CRLF (`\r\n`)，与终端换行行为保持一致。
-- **修复 Windows 构建** [bb7f6f0]: 修复了 CopyPlugin 在 Windows 上对绝对路径（含反斜杠）的 glob 解析错误，确保 `dashboard.html`、`dashboard.css`、`terminal.css` 正确复制到 `dist/`。
-- **修复 xterm 高度** [026be92]: 打包后 sidebar xterm 高度固定为 360px——原因是子目录中的 CSS 文件未被复制。修复了 CopyPlugin 使 `**/*.css` 被包含，并更正了 CSS 引用路径。
+详见 [CHANGELOG.md](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/CHANGELOG.md) 中 v2.0.0 及之后的更新日志。
 
 ## 功能特性
 

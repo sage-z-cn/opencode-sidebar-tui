@@ -1,6 +1,8 @@
 # Opencode Sidebar TUI
 
 [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/sagez.opencode-sidebar-tui-sage?logo=visual-studio-code&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=sagez.opencode-sidebar-tui-sage)
+
+
 [中文文档](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/README.zh-CN.md)
 
 Automatically render Opencode Sidebar Terminal in VS Code sidebar with full terminal support.
@@ -9,9 +11,7 @@ Automatically render Opencode Sidebar Terminal in VS Code sidebar with full term
 
 ## Changes in this Fork
 
-- **Fix Shift+Enter line ending** [e820362]: Shift+Enter now sends LF (`\n`) instead of CRLF (`\r\n`) for consistent terminal behavior.
-- **Fix Windows build** [bb7f6f0]: CopyPlugin glob resolution fixed for absolute paths with backslashes on Windows, ensuring `dashboard.html`, `dashboard.css`, and `terminal.css` are properly copied to `dist/`.
-- **Fix xterm height** [026be92]: Sidebar xterm was fixed at 360px after packaging because CSS files in subdirectories were not copied. Fixed CopyPlugin to include `**/*.css` and corrected CSS reference paths.
+See [CHANGELOG.md](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/CHANGELOG.md) for modifications starting from v2.0.0.
 
 ## Features
 
