@@ -2,7 +2,7 @@
   "name": "opencode-sidebar-tui-sage",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "publisher": "sagez",
   "icon": "icon.png",
   "engines": {
