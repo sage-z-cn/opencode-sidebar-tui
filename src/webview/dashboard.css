@@ -282,7 +282,7 @@ button[disabled] {
 
 .pane-tool-badge.opencode {
   background: #4ec9b0;
-  color: #1e1e1e;
+  color: #0a0a0a;
 }
 .pane-tool-badge.claude {
   background: #d97706;
@@ -406,7 +406,7 @@ button[disabled] {
 
 .ai-tool-icon.opencode {
   background: #4ec9b0;
-  color: #1e1e1e;
+  color: #0a0a0a;
 }
 .ai-tool-icon.claude {
   background: #d97706;

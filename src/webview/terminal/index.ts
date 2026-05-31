@@ -41,13 +41,16 @@ export function initTerminal(
     event.preventDefault();
   });
 
+  document.documentElement.style.setProperty("--terminal-background", "#0a0a0a");
+  document.documentElement.style.setProperty("--terminal-foreground", "#cccccc");
+
   const terminal = new Terminal({
     cursorBlink: config.cursorBlink,
     cursorStyle: config.cursorStyle,
     fontSize: config.fontSize,
     fontFamily: config.fontFamily,
     theme: {
-      background: "#1e1e1e",
+      background: "#0a0a0a",
       foreground: "#cccccc",
     },
     scrollback: config.scrollback,

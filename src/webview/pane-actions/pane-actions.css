@@ -11,7 +11,7 @@
   align-items: center;
   gap: 2px;
   padding: 2px 4px;
-  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+  background: #141414;
   border-bottom: 1px solid var(--vscode-panel-border, #474747);
   font-family: var(--vscode-font-family);
   font-size: 12px;

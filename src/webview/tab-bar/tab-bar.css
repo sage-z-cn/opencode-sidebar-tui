@@ -55,7 +55,7 @@
 }
 
 .tab.active {
-  background: var(--vscode-editor-background, #1e1e1e);
+  background: var(--vscode-editor-background, #0a0a0a);
   color: var(--vscode-foreground, #cccccc);
   border-bottom: 2px solid var(--vscode-focusBorder, #007fd4);
   margin-bottom: -1px; /* visually merge with content below */

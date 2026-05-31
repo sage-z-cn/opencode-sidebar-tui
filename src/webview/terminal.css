@@ -4,7 +4,7 @@ html {
   padding: 0;
   height: 100%;
   overflow: hidden;
-  background-color: #1e1e1e;
+  background-color: #0a0a0a;
   display: flex;
   flex-direction: column;
 }
@@ -18,6 +18,11 @@ html {
   touch-action: none;
 }
 
+/* Hide xterm.js built-in scrollbar overlay — not needed in fullscreen TUI mode */
+.xterm-viewport::-webkit-scrollbar {
+  display: none;
+}
+
 .tmux-toolbar {
   display: flex;
   align-items: center;
@@ -25,7 +30,7 @@ html {
   padding: 2px 6px;
   position: relative;
   z-index: 600;
-  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+  background: #141414;
   border-bottom: 1px solid var(--vscode-panel-border, #474747);
   font-family: var(--vscode-font-family);
   user-select: none;
@@ -166,7 +171,7 @@ html {
 }
 
 .ai-selector-card {
-  background: var(--vscode-editor-background, #1e1e1e);
+  background: var(--vscode-editor-background, #0a0a0a);
   border: 1px solid var(--vscode-panel-border, #474747);
   border-radius: 8px;
   padding: 12px;
@@ -235,7 +240,7 @@ html {
 
 .ai-tool-icon.opencode {
   background: #4ec9b0;
-  color: #1e1e1e;
+  color: #0a0a0a;
 }
 .ai-tool-icon.claude {
   background: #d97706;
@@ -292,7 +297,7 @@ html {
   left: 50%;
   transform: translateX(-50%);
   z-index: 1001;
-  background: var(--vscode-editor-background, #1e1e1e);
+  background: var(--vscode-editor-background, #0a0a0a);
   border: 1px solid var(--vscode-panel-border, #474747);
   border-radius: 6px;
   padding: 4px;

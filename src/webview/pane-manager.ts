@@ -19,7 +19,7 @@ const DEFAULT_TERMINAL_OPTIONS: ITerminalOptions = {
   fontFamily: "monospace",
   scrollback: 10000,
   theme: {
-    background: "#1e1e1e",
+    background: "#0a0a0a",
     foreground: "#cccccc",
   },
 };
