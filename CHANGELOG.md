@@ -5,6 +5,23 @@ All notable changes to the "Open Sidebar TUI" extension will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-06-01
+
+### Added
+
+- **l10n 翻译注入机制**：通过 `window.__TOOLBAR_L10N__` 将 extension host 端翻译字符串注入 webview，解决 webview 无法直接调用 `vscode.l10n` 的问题。
+- **l10n 构建集成**：webpack CopyPlugin 自动将 `l10n/` 复制到 `dist/`，支持 F5 开发模式下的翻译加载。
+- **l10n 覆盖率审计工具**：新增 `scripts/check-l10n.js`，可检测 bundle 中缺失或多余的翻译 key。
+- **独立构建安装脚本**：新增 `scripts/build-and-install.js`，输出的 VSIX 文件名使用 `{name}-{version}.vsix` 格式。
+
+### Fixed
+
+- 修复 `bundle.l10n.zh-cn.json` 中 16 个缺失的翻译 key（toolbar 按钮标题及动态状态提示）。
+- 修复 `bundle.l10n.zh-cn.json` 中 3 处引号嵌套问题（内部双引号改为单引号）。
+- 修复 `toolbar/index.ts` 中硬编码英文字符串覆盖已翻译 title 的问题。
+- 修复 `package.json` 缺少 `l10n` 字段导致 `vscode.l10n` API 无法加载翻译 bundle 的问题。
+- 修复 `package.nls.zh-cn.json` 中智能引号导致显示异常的问题。
+
 ## [2.2.1] - 2026-05-31
 
 ### Changed
