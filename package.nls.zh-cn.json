@@ -66,7 +66,7 @@
   "configuration.ost.terminalBackend.enumDescription.zellij": "Zellij — 通过 zellij 实现完整的会话、窗格和标签页管理",
   "configuration.ost.collapseSecondaryBarOnEditorOpen.description": "将终端移入编辑器组之前关闭辅助侧边栏，以便新的编辑器标签页获得完整的工作区宽度。",
   "configuration.ost.codeActionSeverities.description": "触发代码操作的诊断严重级别",
-  "configuration.ost.aiTools.description": "配置 AI 编码工具。使用"添加项"添加新工具，"编辑"修改，"删除"移除。",
+  "configuration.ost.aiTools.description": "配置 AI 编码工具。使用'添加项'添加新工具，'编辑'修改，'删除'移除。",
   "configuration.ost.aiTools.items.name.description": "唯一标识符（例如 'opencode'、'claude'）",
   "configuration.ost.aiTools.items.label.description": "工具选择器中显示的显示名称",
   "configuration.ost.aiTools.items.path.description": "可执行文件的路径。留空 = 从 PATH 解析",
