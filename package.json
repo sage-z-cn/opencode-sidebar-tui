@@ -5,6 +5,7 @@
   "version": "2.2.1",
   "publisher": "sagez",
   "icon": "icon.png",
+  "l10n": "./l10n",
   "engines": {
     "vscode": "^1.106.0",
     "node": ">=20.0.0"

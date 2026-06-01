@@ -40,6 +40,17 @@ const extensionConfig = {
       },
     ],
   },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, "l10n").replace(/\\/g, "/"),
+          to: path.resolve(__dirname, "dist/l10n"),
+          noErrorOnMissing: true,
+        },
+      ],
+    }),
+  ],
   devtool: "nosources-source-map",
   infrastructureLogging: {
     level: "log",

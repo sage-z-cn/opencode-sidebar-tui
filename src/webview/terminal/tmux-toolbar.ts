@@ -12,6 +12,11 @@ const titleL10nMap: Record<string, string> = {
   rerender: l10n.t("Re-render terminal"),
   restart: l10n.t("Restart terminal"),
   settings: l10n.t("Open extension settings"),
+  noOtherBackend: l10n.t("No other terminal backend is available"),
+  switchToBackend: l10n.t("Switch to {backend}"),
+  tmuxNotAvailable: l10n.t("tmux is not available"),
+  useTabControlsFromCommands: l10n.t("Use tab controls from commands"),
+  switchToTmuxToManageWindows: l10n.t("Switch to tmux to manage windows"),
 };
 
 function localizeTitles(input: string): string {
@@ -19,6 +24,19 @@ function localizeTitles(input: string): string {
     return titleL10nMap[key] ?? `{{t:${key}}}`;
   });
 }
+
+/** Strings the webview runtime needs for dynamic title updates. */
+export const toolbarL10nStrings: Record<string, string> = {
+  noOtherBackend: titleL10nMap.noOtherBackend,
+  switchToBackend: titleL10nMap.switchToBackend,
+  tmuxNotAvailable: titleL10nMap.tmuxNotAvailable,
+  useTabControlsFromCommands: titleL10nMap.useTabControlsFromCommands,
+  switchToTmuxToManageWindows: titleL10nMap.switchToTmuxToManageWindows,
+  newSession: titleL10nMap.newSession,
+  prevWindow: titleL10nMap.prevWindow,
+  newWindow: titleL10nMap.newWindow,
+  nextWindow: titleL10nMap.nextWindow,
+};
 
 export function renderTmuxToolbar(showTmuxWindowControls = true): string {
   let result = html;

@@ -60,9 +60,10 @@ export function updateBackendToggleButtonState(
 
   const next = nextAvailableBackend(activeBackend, availability);
   btn.disabled = next === activeBackend;
+  const L = (window as any).__TOOLBAR_L10N__ as Record<string, string> | undefined;
   btn.title = btn.disabled
-    ? "No other terminal backend is available"
-    : `Switch to ${backendLabel(next)}`;
+    ? L?.noOtherBackend ?? "No other terminal backend is available"
+    : (L?.switchToBackend ?? "Switch to {backend}").replace("{backend}", backendLabel(next));
   btn.textContent = backendGlyph(activeBackend);
 }
 
@@ -70,32 +71,34 @@ function updateTmuxWindowButtonState(
   activeBackend: TerminalBackendType,
   availability: TerminalBackendAvailability,
 ): void {
+  const L = (window as any).__TOOLBAR_L10N__ as Record<string, string> | undefined;
+
   const sessionButton = document.getElementById(
     "btn-tmux-new-session",
   ) as HTMLButtonElement | null;
   if (sessionButton) {
     sessionButton.disabled = !availability.tmux;
     sessionButton.title = availability.tmux
-      ? "New tmux session"
-      : "tmux is not available";
+      ? L?.newSession ?? "New tmux session"
+      : L?.tmuxNotAvailable ?? "tmux is not available";
   }
 
   const windowButtons = [
-    ["btn-tmux-prev-window", "Previous tmux window"],
-    ["btn-tmux-new-window", "New tmux window"],
-    ["btn-tmux-next-window", "Next tmux window"],
+    ["btn-tmux-prev-window", "prevWindow", "Previous tmux window"],
+    ["btn-tmux-new-window", "newWindow", "New tmux window"],
+    ["btn-tmux-next-window", "nextWindow", "Next tmux window"],
   ] as const;
 
   const isTmuxActive = activeBackend === "tmux" && availability.tmux;
-  windowButtons.forEach(([id, activeTitle]) => {
+  windowButtons.forEach(([id, l10nKey, fallbackTitle]) => {
     const button = document.getElementById(id) as HTMLButtonElement | null;
     if (!button) return;
     button.disabled = !isTmuxActive;
     button.title = isTmuxActive
-      ? activeTitle
+      ? L?.[l10nKey] ?? fallbackTitle
       : activeBackend === "zellij"
-        ? "Use tab controls from commands"
-        : "Switch to tmux to manage windows";
+        ? L?.useTabControlsFromCommands ?? "Use tab controls from commands"
+        : L?.switchToTmuxToManageWindows ?? "Switch to tmux to manage windows";
   });
 }
 

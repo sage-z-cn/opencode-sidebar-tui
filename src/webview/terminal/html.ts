@@ -4,7 +4,7 @@ import {
   type TerminalContainerParams,
 } from "./terminal-container";
 import { renderTmuxPrompt } from "./tmux-prompt-template";
-import { renderTmuxToolbar } from "./tmux-toolbar";
+import { renderTmuxToolbar, toolbarL10nStrings } from "./tmux-toolbar";
 
 export interface TerminalHtmlParams extends TerminalContainerParams {
   cspSource: string;
@@ -26,6 +26,7 @@ export function renderTerminalHtml({
   sendKeybindingsToShell,
   showTmuxWindowControls,
 }: TerminalHtmlParams): string {
+  const toolbarL10nScript = `<script nonce="${nonce}">window.__TOOLBAR_L10N__=${JSON.stringify(toolbarL10nStrings)};</script>`;
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -37,6 +38,7 @@ export function renderTerminalHtml({
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Open Sidebar Terminal</title>
     <link rel="stylesheet" href="${cssUri}" />
+    ${toolbarL10nScript}
   </head>
   <body>
     ${renderTmuxToolbar(showTmuxWindowControls !== "false")}
