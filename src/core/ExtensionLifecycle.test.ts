@@ -189,7 +189,7 @@ describe("ExtensionLifecycle", () => {
       await lifecycle.activate(mockContext);
 
       expect(vscode.window.createOutputChannel).toHaveBeenCalledWith(
-        "Open Sidebar TUI",
+        "AI Sidebar Terminal",
         { log: true },
       );
     });
@@ -400,7 +400,7 @@ describe("ExtensionLifecycle", () => {
       expect(Reflect.get(lifecycle, "tmuxPaneSyncService")).toBeUndefined();
       expect(Reflect.get(lifecycle, "zellijPaneSyncService")).toBeUndefined();
       expect(logger.info).toHaveBeenLastCalledWith(
-        "Open Sidebar TUI deactivated",
+        "AI Sidebar Terminal deactivated",
       );
     });
   });

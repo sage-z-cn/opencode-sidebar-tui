@@ -19,6 +19,9 @@ const vsixPath = path.join(buildDir, vsixName);
 
 fs.mkdirSync(buildDir, { recursive: true });
 
+console.log("Compiling ...");
+execSync("npm run compile", { cwd: root, stdio: "inherit" });
+
 console.log(`Packaging ${vsixName} ...`);
 execSync(`npx @vscode/vsce package -o "${vsixPath}"`, { cwd: root, stdio: "inherit" });
 

@@ -22,7 +22,7 @@ export class OutputChannelService implements ILogger {
    * Creates a LogOutputChannel named 'Open Sidebar Terminal'.
    */
   private constructor() {
-    this.channel = vscode.window.createOutputChannel("Open Sidebar TUI", {
+    this.channel = vscode.window.createOutputChannel("AI Sidebar Terminal", {
       log: true,
     });
   }

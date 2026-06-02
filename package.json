@@ -465,7 +465,7 @@
         },
         "ai-sidebar-terminal.terminalBackend": {
           "type": "string",
-          "default": "tmux",
+          "default": "native",
           "enum": [
             "native",
             "tmux",
@@ -625,7 +625,7 @@
     "compile": "webpack",
     "compile:e2e": "tsc -p tsconfig.e2e.json",
     "watch": "webpack --watch",
-    "package": "npx @vscode/vsce package -o build/extension.vsix",
+    "package": "npm run compile && npx @vscode/vsce package -o build/extension.vsix",
     "lint": "eslint src --ext ts",
     "format": "prettier --write \"src/**/*.{ts,js,json,css,md}\"",
     "test": "vitest run",

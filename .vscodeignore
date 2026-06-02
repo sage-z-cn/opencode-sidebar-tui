@@ -29,9 +29,11 @@ webpack.config.js
 
 # Scripts
 dev-install.sh
+scripts/**
 
 # Documentation
 *.md
+!CHANGELOG.md
 !README.md
 
 # Git

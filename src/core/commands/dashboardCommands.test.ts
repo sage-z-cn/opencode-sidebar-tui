@@ -284,8 +284,8 @@ describe("dashboardCommands", () => {
     ]);
     vscode.workspace.workspaceFolders = [
       {
-        uri: { fsPath: "/Users/ilseoblee/workspace/tool/opencode-sidebar-tui" },
-        name: "opencode-sidebar-tui",
+        uri: { fsPath: "/Users/ilseoblee/workspace/tool/ai-sidebar-terminal" },
+        name: "ai-sidebar-terminal",
         index: 0,
       },
     ] as typeof vscode.workspace.workspaceFolders;
@@ -299,7 +299,7 @@ describe("dashboardCommands", () => {
     expect(deps.tmuxManager?.discoverSessions).toHaveBeenCalledTimes(1);
     expect(webview.postMessage).toHaveBeenCalledWith({
       type: "updateDashboard",
-      workspace: "opencode-sidebar-tui",
+      workspace: "ai-sidebar-terminal",
       sessions: [
         {
           id: "tmux-1",

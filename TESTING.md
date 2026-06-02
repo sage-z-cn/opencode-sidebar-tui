@@ -5,7 +5,7 @@
 ### 1. Build the Extension
 
 ```bash
-cd ~/workspace/tool/opencode-sidebar-tui
+cd ~/workspace/tool/ai-sidebar-terminal
 npm install
 npm run compile
 ```
@@ -16,14 +16,14 @@ npm run compile
 npx @vscode/vsce package
 ```
 
-This will create a `.vsix` file (e.g., `opencode-sidebar-tui-0.1.0.vsix`)
+This will create a `.vsix` file (e.g., `ai-sidebar-terminal-0.1.0.vsix`)
 
 ### 3. Install in VS Code
 
 Option A: Via Command Line
 
 ```bash
-code --install-extension opencode-sidebar-tui-0.1.0.vsix
+code --install-extension ai-sidebar-terminal-0.1.0.vsix
 ```
 
 Option B: Via VS Code UI

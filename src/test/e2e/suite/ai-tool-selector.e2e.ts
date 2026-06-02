@@ -22,7 +22,7 @@ interface AiToolDefault {
 
 async function activateExtension(): Promise<vscode.Extension<unknown>> {
   const extension = vscode.extensions.getExtension(
-    "sagez.opencode-sidebar-tui-sage",
+    "sagez.ai-sidebar-terminal",
   );
 
   assert.ok(extension, "Extension should be available in the test host");

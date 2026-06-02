@@ -15,7 +15,7 @@
 
 ```bash
 git clone https://github.com/sage-z-cn/ai-sidebar-terminal.git
-cd opencode-sidebar-tui
+cd ai-sidebar-terminal
 git remote add upstream https://github.com/islee23520/open-sidebar-terminal.git
 ```
 

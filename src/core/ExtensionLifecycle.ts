@@ -105,7 +105,7 @@ export class ExtensionLifecycle {
       return;
     }
     this.activated = true;
-    logger.info("Initializing Open Sidebar TUI...");
+    logger.info("Initializing AI Sidebar Terminal...");
 
     // One-time setup on fresh install: auto-enable sendKeybindingsToShell
     // so Ctrl+P / Ctrl+other keys go to the sidebar opencode terminal immediately.
@@ -281,13 +281,13 @@ export class ExtensionLifecycle {
       // commands are registered. This prevents "command not found" errors.
       await vscode.commands.executeCommand("setContext", "ai-sidebar-terminal.active", true);
 
-      logger.info("Open Sidebar TUI activated successfully");
+      logger.info("AI Sidebar Terminal activated successfully");
     } catch (error) {
       logger.error(
-        `Failed to activate Open Sidebar TUI: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to activate AI Sidebar Terminal: ${error instanceof Error ? error.message : String(error)}`,
       );
       vscode.window.showErrorMessage(
-        l10n.t("Failed to activate Open Sidebar TUI: {error}", {
+        l10n.t("Failed to activate AI Sidebar Terminal: {error}", {
           error: error instanceof Error ? error.message : String(error),
         }),
       );
@@ -510,7 +510,7 @@ export class ExtensionLifecycle {
   }
 
   async deactivate(): Promise<void> {
-    this.outputChannelService?.info("Deactivating Open Sidebar TUI...");
+    this.outputChannelService?.info("Deactivating AI Sidebar Terminal...");
     this.activated = false;
 
     await this.promptKillTmuxSessions();
@@ -586,7 +586,7 @@ export class ExtensionLifecycle {
       // intentionally empty: setContext during deactivation is best-effort
     }
 
-    logger?.info("Open Sidebar TUI deactivated");
+    logger?.info("AI Sidebar Terminal deactivated");
   }
 
   /**
