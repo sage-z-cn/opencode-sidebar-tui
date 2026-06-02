@@ -546,6 +546,10 @@ export class SessionRuntime {
         this.resolveStartupWorkspacePath();
 
       const forceNativeShell = this.forceNativeShellNextStart;
+      const activeInstanceBackend =
+        this.activeInstanceId !== "default"
+          ? this.instanceStore?.get(this.activeInstanceId)?.runtime.terminalBackend
+          : undefined;
       const requestedBackend = forceNativeShell
         ? "native"
         : (this.pendingBackendOverride ??
@@ -553,7 +557,7 @@ export class SessionRuntime {
             ? "tmux"
             : this.selectedZellijSessionId
               ? "zellij"
-              : this.resolveConfiguredBackend(config)));
+              : activeInstanceBackend ?? this.resolveConfiguredBackend(config)));
       const backend = this.backendRegistry.resolveAvailable(requestedBackend);
       this.activeBackend = backend;
 
@@ -619,10 +623,10 @@ export class SessionRuntime {
 
       if (tmuxSessionId && this.tmuxSessionManager) {
         try {
-          await this.tmuxSessionManager.setMouseOn(tmuxSessionId);
+          await this.tmuxSessionManager.configureMouseAndClipboard(tmuxSessionId);
         } catch (error) {
           this.logger.debug(
-            `[SessionRuntime] Failed to enable tmux mouse mode: ${error instanceof Error ? error.message : String(error)}`,
+            `[SessionRuntime] Failed to enable tmux mouse and clipboard integration: ${error instanceof Error ? error.message : String(error)}`,
           );
         }
 

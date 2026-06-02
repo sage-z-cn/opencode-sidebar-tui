@@ -1,4 +1,3 @@
-import type { Terminal } from "@xterm/xterm";
 import { postMessage } from "../shared/vscode-api";
 
 interface Link {
@@ -10,65 +9,25 @@ interface Link {
   activate: () => void;
 }
 
+interface LinkTerminal {
+  buffer: {
+    active: {
+      getLine: (lineNumber: number) =>
+        | {
+            translateToString: (trimRight?: boolean) => string;
+          }
+        | undefined;
+    };
+  };
+}
+
 const MAX_LINE_LENGTH = 10000;
-
-type ParsedFileReference = {
-  readonly path: string;
-  readonly line?: number;
-  readonly endLine?: number;
-  readonly column?: number;
-};
-
-type CandidateReference = {
-  readonly text: string;
-  readonly startIndex: number;
-};
-
-const isTokenBoundary = (char: string): boolean =>
-  /\s/.test(char) || char === "\"" || char === "'";
-
-const collectCandidateReferences = (
-  lineText: string,
-): ReadonlyArray<CandidateReference> => {
-  const candidates: CandidateReference[] = [];
-  let index = 0;
-
-  while (index < lineText.length) {
-    while (index < lineText.length && isTokenBoundary(lineText[index] ?? "")) {
-      index++;
-    }
-
-    const startIndex = index;
-    while (index < lineText.length && !isTokenBoundary(lineText[index] ?? "")) {
-      index++;
-    }
-
-    if (index > startIndex) {
-      candidates.push({
-        text: lineText.slice(startIndex, index),
-        startIndex,
-      });
-    }
-  }
-
-  return candidates;
-};
-
-const isLikelyFileReference = (candidate: string): boolean => {
-  const withoutAtPrefix = candidate.startsWith("@")
-    ? candidate.slice(1)
-    : candidate;
-
-  return (
-    withoutAtPrefix.startsWith("file://") ||
-    withoutAtPrefix.startsWith("/") ||
-    withoutAtPrefix.startsWith("./") ||
-    withoutAtPrefix.startsWith("../") ||
-    /^[A-Za-z]:\\/.test(withoutAtPrefix) ||
-    (!/^[a-z][a-z0-9+\-.]*:\/\//i.test(withoutAtPrefix) &&
-      withoutAtPrefix.includes("/"))
-  );
-};
+const FILE_NAME_PATTERN =
+  "[A-Za-z0-9_.-]+\\.(?:c|cc|cpp|cs|css|cts|env|fish|go|h|hpp|html|java|js|json|jsx|kt|lock|lua|md|mjs|mts|php|py|rb|rs|scss|sh|swift|toml|ts|tsx|txt|yaml|yml|zsh)";
+const PATH_REGEX = new RegExp(
+  `(^|[\\s"'\\\`([{<])(@?((?:(?:file:\\/\\/|\\/|[A-Za-z]:\\\\|\\.?\\.?\\/)[^\\s"'#:]+|[^\\s":\\/]+(?:\\/[^\\s":\\/]+)+|${FILE_NAME_PATTERN}))(?::(\\d+)(?::(\\d+))?)?(?:#L(\\d+)(?:-L?(\\d+))?)?)(?=[\\s"'\\\`\\])}>]|$)`,
+  "gi",
+);
 
 const parsePositiveInteger = (value: string | undefined): number | undefined => {
   if (!value) {
@@ -79,75 +38,29 @@ const parsePositiveInteger = (value: string | undefined): number | undefined => 
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 };
 
-const extractHashLineSuffix = (
-  reference: string,
-): { readonly reference: string; readonly line?: number; readonly endLine?: number } => {
-  const match = /^(.*)#L(\d+)(?:-L?(\d+))?$/.exec(reference);
-  if (!match) {
-    return { reference };
+const decodeFileUrlPath = (path: string): string | undefined => {
+  if (!path.startsWith("file://")) {
+    return path;
   }
 
-  return {
-    reference: match[1] ?? reference,
-    line: parsePositiveInteger(match[2]),
-    endLine: parsePositiveInteger(match[3]),
-  };
+  try {
+    const url = new URL(path);
+    const decodedPath = decodeURIComponent(url.pathname);
+    return url.hostname && !url.pathname.startsWith("/")
+      ? `${url.hostname}:${decodedPath}`
+      : decodedPath;
+  } catch {
+    return undefined;
+  }
 };
 
-const extractColonSuffix = (
-  reference: string,
-): { readonly reference: string; readonly line?: number; readonly column?: number } => {
-  const match = /^(.*?):(\d+)(?::(\d+))?$/.exec(reference);
-  if (!match) {
-    return { reference };
-  }
-
-  return {
-    reference: match[1] ?? reference,
-    line: parsePositiveInteger(match[2]),
-    column: parsePositiveInteger(match[3]),
-  };
-};
-
-const parseFileReference = (candidate: string): ParsedFileReference | null => {
-  const withoutAtPrefix = candidate.startsWith("@")
-    ? candidate.slice(1)
-    : candidate;
-  const hashSuffix = extractHashLineSuffix(withoutAtPrefix);
-  const colonSuffix = extractColonSuffix(hashSuffix.reference);
-  let path = colonSuffix.reference;
-
-  if (!path) {
-    return null;
-  }
-
-  if (path.startsWith("file://")) {
-    try {
-      const url = new URL(path);
-      path = decodeURIComponent(url.pathname);
-      if (url.hostname && !url.pathname.startsWith("/")) {
-        path = `${url.hostname}:${path}`;
-      }
-    } catch {
-      return null;
-    }
-  }
-
-  return {
-    path,
-    line: hashSuffix.line ?? colonSuffix.line,
-    endLine: hashSuffix.endLine,
-    column: colonSuffix.column,
-  };
-};
-
-export function createLinkProvider(terminal: Terminal) {
+export function createLinkProvider(terminal: LinkTerminal) {
   return {
     provideLinks(
       bufferLineNumber: number,
       callback: (links: Link[] | undefined) => void,
     ) {
-      const line = terminal.buffer.active.getLine(bufferLineNumber);
+      const line = terminal.buffer.active.getLine(bufferLineNumber - 1);
       if (!line) {
         callback(undefined);
         return;
@@ -161,32 +74,57 @@ export function createLinkProvider(terminal: Terminal) {
       }
 
       const links: Link[] = [];
+      PATH_REGEX.lastIndex = 0;
+      let match: RegExpExecArray | null = PATH_REGEX.exec(lineText);
+      let lastIndex = -1;
 
-      for (const candidate of collectCandidateReferences(lineText)) {
-        if (!isLikelyFileReference(candidate.text)) continue;
+      while (match) {
+        if (match.index === lastIndex) {
+          PATH_REGEX.lastIndex++;
+          match = PATH_REGEX.exec(lineText);
+          continue;
+        }
+        lastIndex = match.index;
 
-        const parsedReference = parseFileReference(candidate.text);
-        if (!parsedReference) continue;
+        const fullMatch = match[2];
+        const pathWithPrefix = match[3];
+        if (!fullMatch || !pathWithPrefix) {
+          match = PATH_REGEX.exec(lineText);
+          continue;
+        }
+
+        const hasAtPrefix = fullMatch.startsWith("@");
+        const decodedPath = decodeFileUrlPath(pathWithPrefix);
+        if (!decodedPath) {
+          match = PATH_REGEX.exec(lineText);
+          continue;
+        }
+
+        const lineNumber =
+          parsePositiveInteger(match[6]) ?? parsePositiveInteger(match[4]);
+        const columnNumber = parsePositiveInteger(match[5]);
+        const endLineNumber = parsePositiveInteger(match[7]);
+        const index = match.index + (match[1]?.length ?? 0);
+        const linkText = hasAtPrefix ? `@${pathWithPrefix}` : pathWithPrefix;
 
         links.push({
-          text: candidate.text,
+          text: linkText,
           range: {
-            start: { x: candidate.startIndex + 1, y: bufferLineNumber },
-            end: {
-              x: candidate.startIndex + candidate.text.length,
-              y: bufferLineNumber,
-            },
+            start: { x: index + 1, y: bufferLineNumber },
+            end: { x: index + linkText.length, y: bufferLineNumber },
           },
           activate: () => {
             postMessage({
               type: "openFile",
-              path: parsedReference.path,
-              line: parsedReference.line,
-              endLine: parsedReference.endLine,
-              column: parsedReference.column,
+              path: decodedPath,
+              line: lineNumber,
+              endLine: endLineNumber,
+              column: columnNumber,
             });
           },
         });
+
+        match = PATH_REGEX.exec(lineText);
       }
 
       callback(links);

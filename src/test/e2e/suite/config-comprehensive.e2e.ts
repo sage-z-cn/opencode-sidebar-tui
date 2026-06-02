@@ -140,7 +140,10 @@ const configurationSpecs: Record<string, ConfigurationSpec> = {
     defaultValue: "horizontal",
     enumValues: ["horizontal", "vertical"],
   },
-  "opencodeTui.pane.focusOnClick": { type: "boolean", defaultValue: true },
+  "opencodeTui.pane.focusOnClick": {
+    type: "boolean",
+    defaultValue: true,
+  },
   "opencodeTui.pane.showPaneActions": {
     type: "boolean",
     defaultValue: true,
@@ -149,6 +152,10 @@ const configurationSpecs: Record<string, ConfigurationSpec> = {
     type: "string",
     defaultValue: "auto",
     enumValues: ["webgl", "canvas", "auto"],
+  },
+  "opencodeTui.projectList.openedOnly": {
+    type: "boolean",
+    defaultValue: true,
   },
 };
 
@@ -186,12 +193,12 @@ function assertConfigurationProperty(
 }
 
 suite("Comprehensive configuration contributions", () => {
-  test("contributes exactly the expected configuration properties", async () => {
+  test("contributes exactly the expected 29 configuration properties", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
     const expectedPropertyIds = Object.keys(configurationSpecs).sort();
 
-    assert.strictEqual(expectedPropertyIds.length, 28);
+    assert.strictEqual(expectedPropertyIds.length, 29);
     assert.deepStrictEqual(Object.keys(properties).sort(), expectedPropertyIds);
   });
 

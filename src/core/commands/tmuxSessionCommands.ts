@@ -1,14 +1,32 @@
 import * as vscode from "vscode";
+import * as path from "path";
 import type { TerminalProvider } from "../../providers/TerminalProvider";
 import type { InstanceController } from "../../services/InstanceController";
 import type { InstanceQuickPick } from "../../services/InstanceQuickPick";
 import type { InstanceStore } from "../../services/InstanceStore";
 import type { OutputChannelService } from "../../services/OutputChannelService";
+import { SessionWindowHandoffService } from "../../services/SessionWindowHandoffService";
 import type { TmuxSessionManager } from "../../services/TmuxSessionManager";
 import type { ZellijSessionManager } from "../../services/ZellijSessionManager";
 import type { TerminalBackendType } from "../../types";
 
+export type OpenSessionInNewWindowPayload = {
+  readonly sessionId: string;
+  readonly backend?: "tmux" | "zellij" | "native";
+  readonly workspaceUri: string;
+  readonly label?: string;
+};
+
+const reusableProjectStates = new Set<string>([
+  "connected",
+  "connecting",
+  "spawning",
+  "resolving",
+]);
+const inFlightProjectWindowOpens = new Set<string>();
+
 export interface TmuxSessionCommandDependencies {
+  context: vscode.ExtensionContext | undefined;
   provider: TerminalProvider | undefined;
   instanceStore: InstanceStore | undefined;
   instanceController: InstanceController | undefined;
@@ -26,6 +44,51 @@ function getActiveBackend(
   } catch {
     return "tmux";
   }
+}
+
+function currentWorkspaceUri(): string | undefined {
+  const uri = vscode.workspace.workspaceFolders?.[0]?.uri;
+  const value = uri?.toString();
+  if (value && value !== "[object Object]") {
+    return value;
+  }
+  return uri?.fsPath ? vscode.Uri.file(uri.fsPath).toString() : undefined;
+}
+
+function normalizeWorkspaceUri(workspaceUri: string): string {
+  try {
+    const parsed = vscode.Uri.parse(workspaceUri);
+    if (parsed.scheme === "file") {
+      return path.normalize(parsed.fsPath);
+    }
+  } catch {
+    return workspaceUri;
+  }
+
+  return workspaceUri;
+}
+
+function resolveOpenSessionPayload(
+  payloadOrSessionId: OpenSessionInNewWindowPayload | string | undefined,
+  backend: "tmux" | "zellij" | undefined,
+): OpenSessionInNewWindowPayload | undefined {
+  if (typeof payloadOrSessionId === "object") {
+    return payloadOrSessionId;
+  }
+  if (!payloadOrSessionId) {
+    return undefined;
+  }
+
+  const workspaceUri = currentWorkspaceUri();
+  if (!workspaceUri) {
+    return undefined;
+  }
+
+  return {
+    sessionId: payloadOrSessionId,
+    backend,
+    workspaceUri,
+  };
 }
 
 export function registerTmuxSessionCommands(
@@ -154,6 +217,78 @@ export function registerTmuxSessionCommands(
     },
   );
 
+  const openSessionInNewWindowCommand = vscode.commands.registerCommand(
+    "opencodeTui.openSessionInNewWindow",
+    async (
+      payloadOrSessionId?: OpenSessionInNewWindowPayload | string,
+      backend?: "tmux" | "zellij",
+    ) => {
+      if (!deps.context) {
+        vscode.window.showErrorMessage("Extension context not available");
+        return;
+      }
+      const payload = resolveOpenSessionPayload(payloadOrSessionId, backend);
+      if (!payload?.sessionId) {
+        vscode.window.showWarningMessage("No session specified");
+        return;
+      }
+      if (!payload.workspaceUri) {
+        vscode.window.showWarningMessage("No workspace folder available");
+        return;
+      }
+
+      const workspaceKey = normalizeWorkspaceUri(payload.workspaceUri);
+      const existingRecord = deps.instanceStore
+        ?.getAll()
+        .find(
+          (record) =>
+            record.config.workspaceUri &&
+            normalizeWorkspaceUri(record.config.workspaceUri) === workspaceKey &&
+            reusableProjectStates.has(record.state),
+        );
+      if (existingRecord) {
+        deps.instanceStore?.setActive(existingRecord.config.id);
+        await vscode.commands.executeCommand("opencodeTui.focus");
+        vscode.window.showInformationMessage(
+          `Project already open: ${
+            existingRecord.config.label || existingRecord.config.id
+          }`,
+        );
+        return;
+      }
+
+      if (inFlightProjectWindowOpens.has(workspaceKey)) {
+        vscode.window.showInformationMessage(
+          `Project already opening: ${payload.label || payload.sessionId}`,
+        );
+        return;
+      }
+
+      inFlightProjectWindowOpens.add(workspaceKey);
+      try {
+        const effectiveBackend = payload.backend ?? "tmux";
+        if (effectiveBackend !== "native") {
+          const handoffService = new SessionWindowHandoffService(deps.context);
+          await handoffService.writeHandoff({
+            workspaceUri: payload.workspaceUri,
+            sessionId: payload.sessionId,
+            backend: effectiveBackend,
+            label:
+              payload.label ?? `${payload.sessionId} (${effectiveBackend})`,
+          });
+        }
+
+        await vscode.commands.executeCommand(
+          "vscode.openFolder",
+          vscode.Uri.parse(payload.workspaceUri),
+          true,
+        );
+      } finally {
+        inFlightProjectWindowOpens.delete(workspaceKey);
+      }
+    },
+  );
+
   const selectInstanceCommand = vscode.commands.registerCommand(
     "opencodeTui.selectInstance",
     () => {
@@ -182,6 +317,18 @@ export function registerTmuxSessionCommands(
 
       await vscode.commands.executeCommand("opencodeTui.focus");
       return deps.provider.createTmuxSession();
+    },
+  );
+
+  const openNewSessionTerminalInEditorCommand = vscode.commands.registerCommand(
+    "opencodeTui.openNewSessionTerminalInEditor",
+    async () => {
+      if (!deps.provider) {
+        return;
+      }
+
+      await deps.provider.createTmuxSession();
+      await deps.provider.openInEditorTab();
     },
   );
 
@@ -314,9 +461,11 @@ export function registerTmuxSessionCommands(
   return [
     openInNewWindowCommand,
     spawnForWorkspaceCommand,
+    openSessionInNewWindowCommand,
     selectInstanceCommand,
     switchTmuxSessionCommand,
     createTmuxSessionCommand,
+    openNewSessionTerminalInEditorCommand,
     killTmuxSessionCommand,
     killNativeShellCommand,
     switchNativeShellCommand,
