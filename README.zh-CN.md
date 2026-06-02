@@ -26,7 +26,7 @@ Automatically render AI 侧边栏终端 in VS Code sidebar with full terminal su
 - **自动上下文共享**: 终端打开时自动共享编辑器上下文
 - **带行号的文件引用**: 以 `@filename#L10-L20` 语法发送文件引用
 - **代码操作**: 对错误和警告触发诊断代码操作
-- **键盘快捷键**: `Cmd+Alt+L`、`Cmd+Alt+A`、`Cmd+Alt+T` 快速操作
+- **键盘快捷键**: `Alt+A`、`Cmd+Alt+A`、`Cmd+Alt+T` 快速操作
 - **拖放支持**: 按住 Shift 拖放文件/文件夹发送引用
 - **右键菜单集成**: 在资源管理器或编辑器中右键发送到 AI 终端
 - **辅助侧边栏**: 将终端停靠在辅助侧边栏实现分屏工作流
@@ -106,7 +106,7 @@ npx @vscode/vsce package
 
 ### 文件引用命令
 
-- **Send File Reference (@file)** (`Cmd+Alt+L` / `Ctrl+Alt+L`) - 发送当前文件及行号
+- **Send File Reference (@file)** (`Alt+A`) - 发送当前文件及行号
   - 无选中：`@filename`
   - 单行：`@filename#L10`
   - 多行：`@filename#L10-L20`
@@ -149,7 +149,7 @@ npx @vscode/vsce package
 
 | 快捷键                    | 功能              | 适用场景                  |
 | ------------------------- | ----------------- | ------------------------- |
-| `Cmd+Alt+L` / `Ctrl+Alt+L` | 发送文件引用      | 编辑器或终端              |
+| `Alt+A`                    | 发送文件引用      | 编辑器或终端              |
 | `Cmd+Alt+A` / `Ctrl+Alt+A` | 发送所有打开文件  | 编辑器或终端              |
 | `Cmd+Alt+T` / `Ctrl+Alt+T` | 浏览 Tmux 会话    | 终端聚焦时                |
 | `Cmd+V` / `Ctrl+V`         | 粘贴              | 终端聚焦时                |

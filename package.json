@@ -307,8 +307,8 @@
     "keybindings": [
       {
         "command": "ai-sidebar-terminal.sendAtMention",
-        "key": "ctrl+alt+l",
-        "mac": "cmd+alt+l",
+        "key": "alt+a",
+        "mac": "alt+a",
         "when": "editorTextFocus || terminalFocus"
       },
       {

@@ -26,7 +26,7 @@ See [CHANGELOG.md](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/CH
 - **Auto-Context Sharing**: Automatically shares editor context when terminal opens
 - **File References with Line Numbers**: Send file references with `@filename#L10-L20` syntax
 - **Code Actions**: Diagnostic-triggered code actions for errors and warnings
-- **Keyboard Shortcuts**: Quick access with `Cmd+Alt+L`, `Cmd+Alt+A`, and `Cmd+Alt+T`
+- **Keyboard Shortcuts**: Quick access with `Alt+A`, `Cmd+Alt+A`, and `Cmd+Alt+T`
 - **Drag & Drop Support**: Hold Shift and drag files/folders to send as references
 - **Context Menu Integration**: Right-click files in Explorer or text in Editor to send to OpenCode
 - **Secondary Sidebar**: Dock the terminal in the secondary sidebar for split-screen workflows
@@ -106,7 +106,7 @@ npx @vscode/vsce package
 
 ### File Reference Commands
 
-- **Send File Reference (@file)** (`Cmd+Alt+L` / `Ctrl+Alt+L`) - Send current file with line numbers
+- **Send File Reference (@file)** (`Alt+A`) - Send current file with line numbers
   - No selection: `@filename`
   - Single line: `@filename#L10`
   - Multiple lines: `@filename#L10-L20`
@@ -149,7 +149,7 @@ npx @vscode/vsce package
 
 | Shortcut                   | Command              | Context                        |
 | -------------------------- | -------------------- | ------------------------------ |
-| `Cmd+Alt+L` / `Ctrl+Alt+L` | Send File Reference  | Editor or Terminal             |
+| `Alt+A`                    | Send File Reference  | Editor or Terminal             |
 | `Cmd+Alt+A` / `Ctrl+Alt+A` | Send All Open Files  | Editor or Terminal             |
 | `Cmd+Alt+T` / `Ctrl+Alt+T` | Browse Tmux Sessions | Terminal focused               |
 | `Cmd+V` / `Ctrl+V`         | Paste                | Terminal focused               |
