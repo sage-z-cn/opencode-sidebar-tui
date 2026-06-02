@@ -4,8 +4,129 @@ import {
   TerminalBackendType,
   TmuxWebviewCommandId,
 } from "../../types";
+import type { BackendOption } from "../../types";
 
 import * as TmuxCmd from "../tmux-command-dropdown";
+import { PillDropdown, type PillOption } from "./pill-dropdown";
+
+// ── Pill instances (lazy-initialised) ──
+
+let aiToolPill: PillDropdown | null = null;
+let backendPill: PillDropdown | null = null;
+
+export function initPills(): {
+  aiToolPill: PillDropdown;
+  backendPill: PillDropdown;
+} {
+  aiToolPill = new PillDropdown({
+    hostId: "pill-ai-tool",
+    buttonId: "btn-pill-ai-tool",
+    labelId: "pill-ai-tool-label",
+    dropdownId: "dropdown-ai-tool",
+    onSelect(value) {
+      const sessionId = getCurrentSessionId();
+      postMessage({
+        type: "launchAiTool",
+        sessionId: sessionId ?? "",
+        tool: value,
+        savePreference: false,
+      });
+    },
+  });
+
+  backendPill = new PillDropdown({
+    hostId: "pill-backend",
+    buttonId: "btn-pill-backend",
+    labelId: "pill-backend-label",
+    dropdownId: "dropdown-backend",
+    onSelect(value) {
+      // Value is encoded as "type:sessionId" or just "type"
+      const sepIdx = value.indexOf(":");
+      if (sepIdx >= 0) {
+        const backend = value.slice(0, sepIdx) as TerminalBackendType;
+        const sessionId = value.slice(sepIdx + 1);
+        postMessage({ type: "switchToBackend", backend, sessionId });
+      } else {
+        postMessage({
+          type: "switchToBackend",
+          backend: value as TerminalBackendType,
+        });
+      }
+    },
+  });
+
+  return { aiToolPill, backendPill };
+}
+
+export function getAiToolPill(): PillDropdown | null {
+  return aiToolPill;
+}
+
+export function getBackendPill(): PillDropdown | null {
+  return backendPill;
+}
+
+/**
+ * Update both pills from an activeSession message.
+ */
+export function updatePillsFromActiveSession(data: {
+  aiToolLabel?: string;
+  aiTools?: readonly { name: string; label: string }[];
+  backend?: TerminalBackendType;
+  backendOptions?: readonly BackendOption[];
+}): void {
+  // AI Tool pill
+  if (aiToolPill && data.aiTools) {
+    const toolOptions: PillOption[] = data.aiTools.map((t) => ({
+      value: t.name,
+      label: t.label,
+    }));
+    const currentTool =
+      data.aiTools.find((t) => t.label === data.aiToolLabel)?.name ??
+      data.aiTools[0]?.name ??
+      "";
+    aiToolPill.update(toolOptions, currentTool);
+  }
+
+  // Backend pill
+  if (backendPill && data.backendOptions) {
+    const backendOpts: PillOption[] = data.backendOptions.map((o) => ({
+      value: o.sessionId ? `${o.type}:${o.sessionId}` : o.type,
+      label: o.label,
+      group: o.group,
+    }));
+    // Compute current value for selection highlight
+    const currentBackend = data.backend ?? "native";
+    // Find the first option matching current backend type
+    // For native: match the native option (no sessionId)
+    // For tmux/zellij: match the first option of that type
+    const currentBackendOpt = data.backendOptions.find(
+      (o) =>
+        o.type === currentBackend &&
+        (currentBackend === "native" ? !o.sessionId : true),
+    );
+    const currentValue = currentBackendOpt
+      ? currentBackendOpt.sessionId
+        ? `${currentBackendOpt.type}:${currentBackendOpt.sessionId}`
+        : currentBackendOpt.type
+      : currentBackend;
+    backendPill.update(backendOpts, currentValue);
+  }
+}
+
+// ── Legacy helpers (still needed for tmux window buttons) ──
+
+let currentSessionId: string | null = null;
+
+function getCurrentSessionId(): string | null {
+  return currentSessionId;
+}
+
+export function setCurrentSessionId(id: string | null): void {
+  currentSessionId = id;
+}
+
+// ── Tmux command button ──
 
 export function setupTmuxCommandButton(
   getSessionId: () => string | null,
@@ -19,20 +140,10 @@ export function setupTmuxCommandButton(
   });
 }
 
-export function setupBackendToggleButton(
-  _getActiveBackend?: () => TerminalBackendType,
-): void {
-  const btn = document.getElementById("btn-toggle-backend");
-  btn?.addEventListener("click", () => {
-    postMessage({ type: "cycleTerminalBackend" });
-  });
-}
+// ── Tmux window buttons ──
 
 export function setupTmuxWindowButtons(): void {
-  bindTmuxCommandButton(
-    "btn-tmux-new-session",
-    "ost.createTmuxSession",
-  );
+  bindTmuxCommandButton("btn-tmux-new-session", "ost.createTmuxSession");
   bindTmuxCommandButton("btn-tmux-prev-window", "ost.tmuxPrevWindow");
   bindTmuxCommandButton("btn-tmux-new-window", "ost.tmuxCreateWindow");
   bindTmuxCommandButton("btn-tmux-next-window", "ost.tmuxNextWindow");
@@ -47,31 +158,22 @@ function bindTmuxCommandButton(
   });
 }
 
+// ── Backend toggle state (kept for tmux window button updates) ──
+
 export function updateBackendToggleButtonState(
   activeBackend: TerminalBackendType,
   availability: TerminalBackendAvailability,
 ): void {
   updateTmuxWindowButtonState(activeBackend, availability);
-
-  const btn = document.getElementById(
-    "btn-toggle-backend",
-  ) as HTMLButtonElement | null;
-  if (!btn) return;
-
-  const next = nextAvailableBackend(activeBackend, availability);
-  btn.disabled = next === activeBackend;
-  const L = (window as any).__TOOLBAR_L10N__ as Record<string, string> | undefined;
-  btn.title = btn.disabled
-    ? L?.noOtherBackend ?? "No other terminal backend is available"
-    : (L?.switchToBackend ?? "Switch to {backend}").replace("{backend}", backendLabel(next));
-  btn.textContent = backendGlyph(activeBackend);
 }
 
 function updateTmuxWindowButtonState(
   activeBackend: TerminalBackendType,
   availability: TerminalBackendAvailability,
 ): void {
-  const L = (window as any).__TOOLBAR_L10N__ as Record<string, string> | undefined;
+  const L = (window as any).__TOOLBAR_L10N__ as
+    | Record<string, string>
+    | undefined;
 
   const sessionButton = document.getElementById(
     "btn-tmux-new-session",
@@ -98,37 +200,12 @@ function updateTmuxWindowButtonState(
       ? L?.[l10nKey] ?? fallbackTitle
       : activeBackend === "zellij"
         ? L?.useTabControlsFromCommands ?? "Use tab controls from commands"
-        : L?.switchToTmuxToManageWindows ?? "Switch to tmux to manage windows";
+        : L?.switchToTmuxToManageWindows ??
+          "Switch to tmux to manage windows";
   });
 }
 
-function nextAvailableBackend(
-  activeBackend: TerminalBackendType,
-  availability: TerminalBackendAvailability,
-): TerminalBackendType {
-  const order: TerminalBackendType[] = ["native", "tmux", "zellij"];
-  const start = order.indexOf(activeBackend);
-  const offset = start >= 0 ? start : 0;
-  for (let step = 1; step <= order.length; step += 1) {
-    const candidate = order[(offset + step) % order.length];
-    if (availability[candidate]) {
-      return candidate;
-    }
-  }
-  return activeBackend;
-}
-
-function backendLabel(backend: TerminalBackendType): string {
-  if (backend === "tmux") return "Tmux";
-  if (backend === "zellij") return "Zellij";
-  return "Native Shell";
-}
-
-function backendGlyph(backend: TerminalBackendType): string {
-  if (backend === "tmux") return "T";
-  if (backend === "zellij") return "Z";
-  return "N";
-}
+// ── Other toolbar buttons ──
 
 export function setupReloadButton(): void {
   document.getElementById("btn-restart")?.addEventListener("click", () => {
@@ -166,4 +243,3 @@ export function setupSettingsButton(): void {
     postMessage({ type: "openSettings" });
   });
 }
-

@@ -10,6 +10,7 @@ import { OutputChannelService } from "../services/OutputChannelService";
 import { InstanceId, InstanceStore } from "../services/InstanceStore";
 import {
   AiToolConfig,
+  BackendOption,
   PaneConfig,
   resolveAiToolConfigs,
   TerminalBackendType,
@@ -663,6 +664,10 @@ export class SessionRuntime {
         }
 
         const operator = this.aiToolRegistry.getForConfig(resolvedTool);
+        if (!operator) {
+          this.isStarting = false;
+          return;
+        }
         command = operator.getLaunchCommand(resolvedTool);
       }
 
@@ -1873,21 +1878,33 @@ export class SessionRuntime {
       backend === "tmux" && Boolean(sessionId),
     );
 
-    if (!sessionId) {
-      this.stopClipboardSync();
-      this.callbacks.postMessage({ type: "activeSession", backend: "native" });
-      return;
-    }
-    if (backend === "tmux") {
-      this.startClipboardSync();
-    } else {
-      this.stopClipboardSync();
-    }
-    this.callbacks.postMessage({
-      type: "activeSession",
-      sessionName: sessionId,
-      sessionId,
-      backend,
+    // Fire-and-forget: discover backend options, then send message
+    void this.getBackendOptions().then((backendOptions) => {
+      if (!sessionId) {
+        this.stopClipboardSync();
+        this.callbacks.postMessage({
+          type: "activeSession",
+          backend: "native",
+          aiToolLabel: this.activeTool?.label,
+          aiTools: this.getToolLabelList(),
+          backendOptions,
+        });
+        return;
+      }
+      if (backend === "tmux") {
+        this.startClipboardSync();
+      } else {
+        this.stopClipboardSync();
+      }
+      this.callbacks.postMessage({
+        type: "activeSession",
+        sessionName: sessionId,
+        sessionId,
+        backend,
+        aiToolLabel: this.activeTool?.label,
+        aiTools: this.getToolLabelList(),
+        backendOptions,
+      });
     });
   }
 
@@ -2075,6 +2092,8 @@ export class SessionRuntime {
           windowIndex: activeWindow?.index,
           windowName: activeWindow?.name,
           canKillPane,
+          aiToolLabel: this.activeTool?.label,
+          aiTools: this.getToolLabelList(),
         });
       }
     } catch (error) {
@@ -2140,6 +2159,8 @@ export class SessionRuntime {
           windowIndex: activeTab?.index,
           windowName: activeTab?.name,
           canKillPane,
+          aiToolLabel: this.activeTool?.label,
+          aiTools: this.getToolLabelList(),
         });
       }
     } catch (error) {
@@ -2307,6 +2328,126 @@ export class SessionRuntime {
     return resolveAiToolConfigs(config.get("aiTools", []));
   }
 
+  private getToolLabelList(
+    config = vscode.workspace.getConfiguration("ost"),
+  ): { name: string; label: string }[] {
+    return this.getConfiguredTools(config).map((t) => ({
+      name: t.name,
+      label: t.label,
+    }));
+  }
+
+  /**
+   * Build the list of available backend options for the webview pill dropdown.
+   * Includes native shell + discovered tmux/zellij sessions (grouped).
+   */
+  public async getBackendOptions(): Promise<BackendOption[]> {
+    const options: BackendOption[] = [];
+    const availability = this.backendRegistry.getAvailability();
+
+    // Native shell is always available
+    options.push({
+      type: "native",
+      label: "Native Shell",
+      group: "Shell",
+    });
+
+    // Tmux sessions
+    if (availability.tmux && this.tmuxSessionManager) {
+      try {
+        const sessions = await this.tmuxSessionManager.discoverSessions();
+        const group = "Tmux";
+        if (sessions.length === 0) {
+          options.push({
+            type: "tmux",
+            label: "New Tmux Session",
+            group,
+          });
+        } else {
+          for (const s of sessions) {
+            options.push({
+              type: "tmux",
+              sessionId: s.id,
+              label: s.name,
+              group,
+            });
+          }
+        }
+      } catch {
+        // tmux not available — skip
+      }
+    }
+
+    // Zellij sessions
+    if (availability.zellij && this.zellijSessionManager) {
+      try {
+        const sessions = await this.zellijSessionManager.discoverSessions();
+        const group = "Zellij";
+        if (sessions.length === 0) {
+          options.push({
+            type: "zellij",
+            label: "New Zellij Session",
+            group,
+          });
+        } else {
+          for (const s of sessions) {
+            options.push({
+              type: "zellij",
+              sessionId: s.id,
+              label: s.name,
+              group,
+            });
+          }
+        }
+      } catch {
+        // zellij not available — skip
+      }
+    }
+
+    return options;
+  }
+
+  /**
+   * Switch to a specific backend, optionally targeting a specific session.
+   * Used by the webview `switchToBackend` message.
+   */
+  public async switchToBackend(
+    backend: TerminalBackendType,
+    sessionId?: string,
+  ): Promise<void> {
+    if (backend === "native") {
+      await this.switchToNativeShell();
+      return;
+    }
+
+    if (backend === "tmux") {
+      if (sessionId) {
+        await this.switchToTmuxSessionWithTool(sessionId, undefined, {
+          forceToolPrompt: true,
+        });
+      } else {
+        const sid = await this.ensureTmuxBackendSession();
+        if (sid) {
+          await this.switchToTmuxSessionWithTool(sid, undefined, {
+            forceToolPrompt: true,
+          });
+        }
+      }
+      return;
+    }
+
+    if (backend === "zellij") {
+      if (sessionId) {
+        await this.switchToZellijSession(sessionId);
+      } else {
+        const sid = await this.ensureZellijBackendSession();
+        if (sid) {
+          await this.switchToZellijSession(sid);
+        }
+      }
+    }
+  }
+
   private resolveStoredTool(
     instanceId = this.activeInstanceId,
   ): AiToolConfig | undefined {
@@ -2358,9 +2499,10 @@ export class SessionRuntime {
     config: vscode.WorkspaceConfiguration,
   ): Promise<AiToolConfig | undefined> {
     const preferredToolName =
-      this.pendingLaunchToolName ??
-      this.instanceStore?.get(this.activeInstanceId)?.config.selectedAiTool ??
-      config.get<string>("defaultAiTool", "");
+      (this.pendingLaunchToolName ??
+        this.instanceStore?.get(this.activeInstanceId)?.config.selectedAiTool ??
+        config.get<string>("defaultAiTool", "")) ||
+      "opencode";
 
     let tool = this.resolveToolConfig(preferredToolName, config);
     if (!tool) {

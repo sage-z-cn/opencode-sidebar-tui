@@ -3,18 +3,45 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   setupTmuxCommandButton,
-  setupBackendToggleButton,
   setupTmuxWindowButtons,
   updateBackendToggleButtonState,
+  initPills,
+  updatePillsFromActiveSession,
 } from "./index";
 import { resetVsCodeApi } from "../shared/vscode-api";
 
 const postMessageMock = vi.fn();
 
+function renderPillHtml(): void {
+  document.body.innerHTML = `
+    <div class="toolbar-context">
+      <div class="pill-host" id="pill-ai-tool">
+        <button type="button" class="toolbar-pill" id="btn-pill-ai-tool">
+          <span class="pill-label" id="pill-ai-tool-label">OpenCode</span>
+          <svg class="pill-chevron"></svg>
+        </button>
+        <div class="pill-dropdown hidden" id="dropdown-ai-tool" role="listbox"></div>
+      </div>
+      <span class="pill-separator">·</span>
+      <div class="pill-host" id="pill-backend">
+        <button type="button" class="toolbar-pill" id="btn-pill-backend">
+          <span class="pill-label" id="pill-backend-label">Native Shell</span>
+          <svg class="pill-chevron"></svg>
+        </button>
+        <div class="pill-dropdown hidden" id="dropdown-backend" role="listbox"></div>
+      </div>
+    </div>
+    <button id="btn-tmux-new-session"></button>
+    <button id="btn-tmux-prev-window"></button>
+    <button id="btn-tmux-new-window"></button>
+    <button id="btn-tmux-next-window"></button>
+  `;
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   resetVsCodeApi();
-  document.body.innerHTML = `<button id="btn-toggle-backend"></button>`;
+  renderPillHtml();
   vi.stubGlobal("acquireVsCodeApi", () => ({
     postMessage: postMessageMock,
     getState: vi.fn(),
@@ -22,43 +49,110 @@ beforeEach(() => {
   }));
 });
 
-describe("toolbar backend toggle", () => {
-  it("requests backend cycle on click", () => {
-    setupBackendToggleButton(() => "tmux");
+describe("pill dropdowns", () => {
+  it("initializes both pills and updates labels from activeSession data", () => {
+    initPills();
 
-    document.getElementById("btn-toggle-backend")?.click();
+    updatePillsFromActiveSession({
+      aiToolLabel: "Claude",
+      aiTools: [
+        { name: "opencode", label: "OpenCode" },
+        { name: "claude", label: "Claude" },
+      ],
+      backend: "tmux",
+      backendOptions: [
+        { type: "native", label: "Native Shell", group: "Shell" },
+        { type: "tmux", sessionId: "s1", label: "dev", group: "Tmux" },
+      ],
+    });
+
+    expect(
+      document.getElementById("pill-ai-tool-label")?.textContent,
+    ).toBe("Claude");
+    expect(
+      document.getElementById("pill-backend-label")?.textContent,
+    ).toBe("dev");
+  });
+
+  it("sends switchToBackend message when backend option is selected", () => {
+    initPills();
+
+    updatePillsFromActiveSession({
+      backend: "native",
+      backendOptions: [
+        { type: "native", label: "Native Shell", group: "Shell" },
+        { type: "tmux", sessionId: "s1", label: "dev", group: "Tmux" },
+      ],
+    });
+
+    // Open the backend dropdown
+    document.getElementById("btn-pill-backend")?.click();
+    // Click the tmux option
+    const items =
+      document.getElementById("dropdown-backend")?.querySelectorAll(
+        ".pill-option",
+      ) ?? [];
+    const tmuxItem = Array.from(items).find(
+      (el) => el.textContent === "dev",
+    );
+    (tmuxItem as HTMLElement)?.click();
 
     expect(postMessageMock).toHaveBeenCalledWith({
-      type: "cycleTerminalBackend",
+      type: "switchToBackend",
+      backend: "tmux",
+      sessionId: "s1",
     });
   });
 
-  it("skips unavailable backends in button title", () => {
-    const button = document.getElementById(
-      "btn-toggle-backend",
-    ) as HTMLButtonElement;
+  it("sends launchAiTool message when AI tool option is selected", () => {
+    initPills();
 
-    updateBackendToggleButtonState("native", {
-      native: true,
-      tmux: false,
-      zellij: true,
+    updatePillsFromActiveSession({
+      aiToolLabel: "OpenCode",
+      aiTools: [
+        { name: "opencode", label: "OpenCode" },
+        { name: "claude", label: "Claude" },
+      ],
+      backend: "native",
+      backendOptions: [{ type: "native", label: "Native Shell", group: "Shell" }],
     });
 
-    expect(button.disabled).toBe(false);
-    expect(button.title).toBe("Switch to Zellij");
-    expect(button.textContent).toBe("N");
+    // Open the AI tool dropdown
+    document.getElementById("btn-pill-ai-tool")?.click();
+    // Click Claude option
+    const items =
+      document.getElementById("dropdown-ai-tool")?.querySelectorAll(
+        ".pill-option",
+      ) ?? [];
+    const claudeItem = Array.from(items).find(
+      (el) => el.textContent === "Claude",
+    );
+    (claudeItem as HTMLElement)?.click();
 
-    updateBackendToggleButtonState("zellij", {
-      native: true,
-      tmux: false,
-      zellij: true,
-    });
-
-    expect(button.disabled).toBe(false);
-    expect(button.title).toBe("Switch to Native Shell");
-    expect(button.textContent).toBe("Z");
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "launchAiTool",
+        tool: "claude",
+      }),
+    );
   });
 
+  it("hides chevron and disables click when only one option", () => {
+    initPills();
+
+    updatePillsFromActiveSession({
+      aiToolLabel: "OpenCode",
+      aiTools: [{ name: "opencode", label: "OpenCode" }],
+      backend: "native",
+      backendOptions: [{ type: "native", label: "Native Shell", group: "Shell" }],
+    });
+
+    const btn = document.getElementById("btn-pill-ai-tool") as HTMLButtonElement;
+    expect(btn.dataset.single).toBe("true");
+  });
+});
+
+describe("tmux command button", () => {
   it("opens command dropdown with the active zellij backend", async () => {
     document.body.innerHTML = `
       <button id="btn-tmux-commands"></button>
@@ -74,7 +168,9 @@ describe("toolbar backend toggle", () => {
     expect(listText).toContain("New Tab");
     expect(listText).not.toContain("Swap Pane");
   });
+});
 
+describe("tmux window buttons", () => {
   it("dispatches direct tmux session and window commands from toolbar buttons", () => {
     document.body.innerHTML = `
       <button id="btn-tmux-new-session"></button>
@@ -140,4 +236,3 @@ describe("toolbar backend toggle", () => {
     ).toBe(true);
   });
 });
-

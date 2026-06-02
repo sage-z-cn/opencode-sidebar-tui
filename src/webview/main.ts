@@ -24,8 +24,10 @@ import {
   setupSettingsButton,
   setupTmuxCommandButton,
   setupTmuxWindowButtons,
-  setupBackendToggleButton,
   updateBackendToggleButtonState,
+  initPills,
+  updatePillsFromActiveSession,
+  setCurrentSessionId as setToolbarSessionId,
 } from "./toolbar";
 
 let currentSessionId: string | null = null;
@@ -66,7 +68,6 @@ function updateBackendOnlyElements(): void {
 const callbacks: MessageHandlerCallbacks = {
   onActiveSession(message) {
     const toolbar = document.getElementById("tmux-toolbar");
-    const label = document.getElementById("tmux-session-label");
     const toolbarControls = document.querySelector(".toolbar-controls");
 
     if (toolbar) toolbar.classList.remove("hidden");
@@ -74,14 +75,7 @@ const callbacks: MessageHandlerCallbacks = {
     if ("sessionName" in message && message.sessionName) {
       currentSessionId = message.sessionId;
       activeBackend = message.backend ?? "tmux";
-      if (label) {
-        const windowSuffix =
-          message.windowIndex !== undefined
-            ? ` [${message.windowIndex}]${message.windowName ? ` ${message.windowName}` : ""}`
-            : "";
-        const backendPrefix = activeBackend === "zellij" ? "Zellij: " : "";
-        label.textContent = backendPrefix + message.sessionName + windowSuffix;
-      }
+      setToolbarSessionId(currentSessionId);
       if (toolbarControls) {
         if (activeBackend === "tmux" || activeBackend === "zellij") {
           toolbarControls.classList.remove("hidden");
@@ -92,11 +86,20 @@ const callbacks: MessageHandlerCallbacks = {
     } else {
       currentSessionId = null;
       activeBackend = "native";
-      if (label) label.textContent = "Native Shell";
+      setToolbarSessionId(null);
       if (toolbarControls) {
         toolbarControls.classList.add("hidden");
       }
     }
+
+    // Update both pill dropdowns
+    updatePillsFromActiveSession({
+      aiToolLabel: "aiToolLabel" in message ? message.aiToolLabel : undefined,
+      aiTools: "aiTools" in message ? message.aiTools : undefined,
+      backend: activeBackend,
+      backendOptions:
+        "backendOptions" in message ? message.backendOptions : undefined,
+    });
 
     updateBackendToggleButtonState(activeBackend, backendAvailability);
   },
@@ -219,7 +222,7 @@ function initApp(): void {
   setupSettingsButton();
   setupTmuxCommandButton(() => currentSessionId, () => activeBackend);
   setupTmuxWindowButtons();
-  setupBackendToggleButton(() => activeBackend);
+  initPills();
 
   window.addEventListener("message", (event: MessageEvent) => {
     const msg = event.data as Record<string, unknown> | undefined;
@@ -256,6 +259,7 @@ function initApp(): void {
 
   setupAiToolSelectorEvents();
 }
+
 const aiCallbacks = {
   postMessage: (msg: unknown) => {
     const m = msg as Record<string, unknown>;

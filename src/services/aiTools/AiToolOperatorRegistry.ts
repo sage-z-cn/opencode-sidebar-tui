@@ -7,6 +7,8 @@ import { AiToolOperator } from "./AiToolOperator";
 import { OpenCodeToolOperator } from "./operators/OpenCodeToolOperator";
 import { ClaudeCodeToolOperator } from "./operators/ClaudeCodeToolOperator";
 import { CodexToolOperator } from "./operators/CodexToolOperator";
+import { GeminiCLIOperator } from "./operators/GeminiCLIOperator";
+import { KimiCodeOperator } from "./operators/KimiCodeOperator";
 
 export class AiToolOperatorRegistry {
   private readonly operators: AiToolOperator[];
@@ -16,6 +18,8 @@ export class AiToolOperatorRegistry {
       new OpenCodeToolOperator(),
       new ClaudeCodeToolOperator(),
       new CodexToolOperator(),
+      new GeminiCLIOperator(),
+      new KimiCodeOperator(),
     ];
   }
 

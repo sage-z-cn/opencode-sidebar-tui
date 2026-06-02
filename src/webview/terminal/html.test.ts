@@ -17,7 +17,8 @@ describe("renderTerminalHtml", () => {
     });
 
     expect(html).toContain('id="tmux-toolbar"');
-    expect(html).toContain('id="btn-toggle-backend"');
+    expect(html).toContain('id="pill-ai-tool"');
+    expect(html).toContain('id="pill-backend"');
     expect(html).toContain('id="btn-tmux-new-window"');
     expect(html).toContain('id="btn-toggle-editor-attachment"');
     expect(html).toContain('id="terminal-container"');

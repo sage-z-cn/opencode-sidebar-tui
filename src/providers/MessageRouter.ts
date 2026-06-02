@@ -37,6 +37,7 @@ export interface MessageRouterProviderBridge {
   openSettings(): void;
   switchToNativeShell(): Promise<void>;
   selectTerminalBackend(backend: TerminalBackendType): Promise<void>;
+  switchToBackend(backend: TerminalBackendType, sessionId?: string): Promise<void>;
   cycleTerminalBackend(): Promise<void>;
   pasteText(text: string): void;
   getActiveInstanceId(): InstanceId;
@@ -202,6 +203,9 @@ export class MessageRouter {
         break;
       case "selectTerminalBackend":
         void this.provider.selectTerminalBackend(message.backend);
+        break;
+      case "switchToBackend":
+        void this.provider.switchToBackend(message.backend, message.sessionId);
         break;
       case "cycleTerminalBackend":
         void this.provider.cycleTerminalBackend();

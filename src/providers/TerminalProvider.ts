@@ -116,6 +116,7 @@ export class TerminalProvider
       openSettings: () => this.openSettings(),
       switchToNativeShell: () => this.switchToNativeShell(),
       selectTerminalBackend: (backend) => this.selectTerminalBackend(backend),
+      switchToBackend: (backend, sessionId) => this.switchToBackend(backend, sessionId),
       cycleTerminalBackend: () => this.cycleTerminalBackend(),
       pasteText: (text) => this.pasteText(text),
       getActiveInstanceId: () => this.getActiveInstanceId(),
@@ -416,6 +417,13 @@ export class TerminalProvider
     await this.sessionRuntime.selectTerminalBackend(backend);
   }
 
+  public async switchToBackend(
+    backend: TerminalBackendType,
+    sessionId?: string,
+  ): Promise<void> {
+    await this.sessionRuntime.switchToBackend(backend, sessionId);
+  }
+
   public async cycleTerminalBackend(): Promise<void> {
     await this.sessionRuntime.cycleTerminalBackend();
   }
@@ -550,9 +558,11 @@ export class TerminalProvider
       }
 
       if (effectiveBackend !== "tmux" || !this.tmuxSessionManager) {
-        this.logger.warn(
-          `[TerminalProvider] launchAiTool skipped: backend ${effectiveBackend} does not support pane targeting`,
-        );
+        // Native shell or zellij without manager: restart directly with the new tool
+        void this.sessionRuntime.switchToInstance(instanceId, {
+          forceRestart: true,
+          preferredToolName: toolName,
+        });
         return;
       }
 
@@ -1141,17 +1151,24 @@ export class TerminalProvider
         ? "tmux"
         : "native";
 
+    const activeTool = this.sessionRuntime.getActiveTool();
+
     if (sessionId) {
       webview.postMessage({
         type: "activeSession",
         sessionName: sessionId,
         sessionId,
         backend: sessionBackend,
+        aiToolLabel: activeTool?.label,
       });
       return;
     }
 
-    webview.postMessage({ type: "activeSession", backend: "native" });
+    webview.postMessage({
+      type: "activeSession",
+      backend: "native",
+      aiToolLabel: activeTool?.label,
+    });
   }
 
   private getEditorPanelOptions(): vscode.WebviewOptions &

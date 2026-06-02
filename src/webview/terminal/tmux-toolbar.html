@@ -1,5 +1,21 @@
 <div id="tmux-toolbar" class="tmux-toolbar hidden">
-  <span id="tmux-session-label" class="tmux-session-label"></span>
+  <div class="toolbar-context">
+    <div class="pill-host" id="pill-ai-tool">
+      <button type="button" class="toolbar-pill" id="btn-pill-ai-tool" aria-haspopup="listbox" aria-label="Select AI tool">
+        <span class="pill-label" id="pill-ai-tool-label">OpenCode</span>
+        <svg class="pill-chevron" width="8" height="5" viewBox="0 0 8 5" fill="none" aria-hidden="true"><path d="M1 1l3 3 3-3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="pill-dropdown hidden" id="dropdown-ai-tool" role="listbox"></div>
+    </div>
+    <span class="pill-separator">·</span>
+    <div class="pill-host" id="pill-backend">
+      <button type="button" class="toolbar-pill" id="btn-pill-backend" aria-haspopup="listbox" aria-label="Select terminal backend">
+        <span class="pill-label" id="pill-backend-label">Native Shell</span>
+        <svg class="pill-chevron" width="8" height="5" viewBox="0 0 8 5" fill="none" aria-hidden="true"><path d="M1 1l3 3 3-3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="pill-dropdown hidden" id="dropdown-backend" role="listbox"></div>
+    </div>
+  </div>
   <div class="toolbar-controls">
     <div class="tmux-window-controls" data-tmux-window-controls>
       <button
@@ -82,15 +98,6 @@
     </div>
   </div>
   <div class="toolbar-right">
-    <button
-      type="button"
-      id="btn-toggle-backend"
-      class="tmux-btn"
-      aria-label="Toggle backend mode"
-      title="{{t:toggleBackend}}"
-    >
-      &#x21C4;
-    </button>
     <button
       type="button"
       id="btn-toggle-editor-attachment"

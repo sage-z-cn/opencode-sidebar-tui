@@ -129,6 +129,12 @@ export type WebviewMessage =
       backend: TerminalBackendType;
     }
   | { type: "cycleTerminalBackend"; paneId?: string }
+  | {
+      type: "switchToBackend";
+      backend: TerminalBackendType;
+      sessionId?: string;
+      paneId?: string;
+    }
   | { type: "requestAiToolSelector"; paneId?: string }
   | {
       type: "executeTmuxCommand";
@@ -157,6 +163,13 @@ export interface AiToolConfig {
   operator?: string;
 }
 
+export interface BackendOption {
+  type: TerminalBackendType;
+  sessionId?: string;
+  label: string;
+  group: string;
+}
+
 export const DEFAULT_AI_TOOLS: readonly AiToolConfig[] = [
   {
     name: "opencode",
@@ -181,6 +194,29 @@ export const DEFAULT_AI_TOOLS: readonly AiToolConfig[] = [
     args: [],
     aliases: [],
     operator: "codex",
+  },
+  {
+    name: "gemini",
+    label: "Gemini CLI",
+    path: "",
+    args: [],
+    aliases: [],
+    operator: "gemini",
+  },
+  {
+    name: "qwen",
+    label: "Qwen Code",
+    path: "",
+    args: [],
+    aliases: [],
+  },
+  {
+    name: "kimi",
+    label: "Kimi Code",
+    path: "",
+    args: [],
+    aliases: ["kimi-code"],
+    operator: "kimi",
   },
 ] as const;
 
@@ -447,8 +483,17 @@ export type HostMessage =
       windowName?: string;
       canKillPane?: boolean;
       backend?: TerminalBackendType;
+      aiToolLabel?: string;
+      aiTools?: readonly { name: string; label: string }[];
+      backendOptions?: readonly BackendOption[];
     }
-  | { type: "activeSession"; backend?: TerminalBackendType }
+  | {
+      type: "activeSession";
+      backend?: TerminalBackendType;
+      aiToolLabel?: string;
+      aiTools?: readonly { name: string; label: string }[];
+      backendOptions?: readonly BackendOption[];
+    }
   | {
       type: "showAiToolSelector";
       sessionId: string;

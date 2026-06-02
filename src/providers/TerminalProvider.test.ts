@@ -1136,7 +1136,7 @@ describe("TerminalProvider", () => {
     await flushAsyncStartup();
 
     expect(ensureSession).not.toHaveBeenCalled();
-    expect(discoverSessions).toHaveBeenCalledTimes(1);
+    expect(discoverSessions).toHaveBeenCalled();
     expect(createTerminalSpy).toHaveBeenCalledWith(
       "ost-main",
       "tmux attach-session -t shared-session \\; set-option -u status off",
@@ -2227,7 +2227,14 @@ describe("TerminalProvider", () => {
   it("honors the explicit backendHint when launching an AI tool", async () => {
     mockConfiguration();
     provider = createProvider();
-    const warnSpy = vi.spyOn((provider as any).logger, "warn");
+    const switchToInstanceSpy = vi.spyOn(
+      (provider as any).sessionRuntime,
+      "switchToInstance",
+    ).mockResolvedValue(undefined);
+    const resolveInstanceIdSpy = vi.spyOn(
+      (provider as any).sessionRuntime,
+      "resolveInstanceIdFromSessionId",
+    ).mockReturnValue("session-backend-hint");
 
     await provider.launchAiTool(
       "session-backend-hint",
@@ -2237,9 +2244,10 @@ describe("TerminalProvider", () => {
       "native",
     );
 
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("backend native does not support pane targeting"),
-    );
+    expect(switchToInstanceSpy).toHaveBeenCalledWith("session-backend-hint", {
+      forceRestart: true,
+      preferredToolName: "codex",
+    });
   });
 
   it("executeRawTmuxCommand rejects when active backend is not tmux", async () => {
@@ -2445,12 +2453,12 @@ describe("TerminalProvider", () => {
 
     const panel = vi.mocked(vscode.window.createWebviewPanel).mock.results[0]
       ?.value as any;
-    expect(panel.webview.postMessage).toHaveBeenCalledWith({
+    expect(panel.webview.postMessage).toHaveBeenCalledWith(expect.objectContaining({
       type: "activeSession",
       sessionName: "tmux-selected",
       sessionId: "tmux-selected",
       backend: "tmux",
-    });
+    }));
   });
 
   it("executes the dashboard command when toggling the dashboard", () => {
@@ -2795,12 +2803,12 @@ describe("TerminalProvider", () => {
     await provider.openInEditorTab();
     let panel = vi.mocked(vscode.window.createWebviewPanel).mock.results[0]
       ?.value;
-    expect(panel.webview.postMessage).toHaveBeenCalledWith({
+    expect(panel.webview.postMessage).toHaveBeenCalledWith(expect.objectContaining({
       type: "activeSession",
       sessionName: "zellij-active",
       sessionId: "zellij-active",
       backend: "zellij",
-    });
+    }));
 
     const disposeListener = vi.mocked(panel.onDidDispose).mock.calls[0]?.[0] as
       | (() => void)
@@ -2812,10 +2820,10 @@ describe("TerminalProvider", () => {
     );
     await provider.openInEditorTab();
     panel = vi.mocked(vscode.window.createWebviewPanel).mock.results[1]?.value;
-    expect(panel.webview.postMessage).toHaveBeenCalledWith({
+    expect(panel.webview.postMessage).toHaveBeenCalledWith(expect.objectContaining({
       type: "activeSession",
       backend: "native",
-    });
+    }));
   });
 
   it("rejects invalid raw tmux commands, missing managers, missing sessions, and cancelled prompts", async () => {

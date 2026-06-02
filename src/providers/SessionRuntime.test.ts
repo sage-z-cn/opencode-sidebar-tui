@@ -330,14 +330,14 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         sessionRuntime as unknown as { checkPaneChanges: () => Promise<void> }
       ).checkPaneChanges();
 
-      expect(postMessageMock).toHaveBeenCalledWith({
+      expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({
         type: "activeSession",
         sessionName: "fallback-session",
         sessionId: "fallback-session",
         windowIndex: 1,
         windowName: "main",
         canKillPane: false,
-      });
+      }));
 
       postMessageMock.mockClear();
       await (
@@ -366,14 +366,14 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         sessionRuntime as unknown as { checkPaneChanges: () => Promise<void> }
       ).checkPaneChanges();
 
-      expect(postMessageMock).toHaveBeenCalledWith({
+      expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({
         type: "activeSession",
         sessionName: "workspace-session",
         sessionId: "workspace-session",
         windowIndex: 2,
         windowName: "agent",
         canKillPane: true,
-      });
+      }));
     });
 
     it("silently ignores tmux polling errors", async () => {
@@ -420,14 +420,14 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
       expect(mockZellijSessionManager.listPanes).toHaveBeenCalled();
       expect(mockZellijSessionManager.listTabs).toHaveBeenCalled();
       expect(mockTmuxSessionManager.listPanes).not.toHaveBeenCalled();
-      expect(postMessageMock).toHaveBeenCalledWith({
+      expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({
         type: "activeSession",
         sessionName: "zellij-session",
         sessionId: "zellij-session",
         windowIndex: 1,
         windowName: "main",
         canKillPane: true,
-      });
+      }));
     });
 
     it("starts zellij change monitoring with polling only", async () => {
@@ -577,12 +577,13 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
       expect(
         instanceStore.get("workspace-instance")?.config.selectedAiTool,
       ).toBe("preferred-tool");
-      expect(postMessageMock).toHaveBeenCalledWith({
+      await flushAsyncWork();
+      expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({
         type: "activeSession",
         sessionName: "project-a",
         sessionId: "project-a",
         backend: "tmux",
-      });
+      }));
     });
 
     it("switches back to native shell and clears the stored tmux session", async () => {
@@ -604,10 +605,11 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
       expect(switchToInstanceSpy).toHaveBeenCalledWith("default", {
         forceRestart: true,
       });
-      expect(postMessageMock).toHaveBeenCalledWith({
+      await flushAsyncWork();
+      expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({
         type: "activeSession",
         backend: "native",
-      });
+      }));
     });
   });
 
@@ -1264,10 +1266,10 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         "/workspace/project-a",
       );
       expect(sessionRuntime.isStartedFlag()).toBe(true);
-      expect(postMessageMock).toHaveBeenCalledWith({
+      expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({
         type: "activeSession",
         backend: "native",
-      });
+      }));
       expect(
         instanceStore.get("default")?.runtime.tmuxSessionId,
       ).toBeUndefined();
@@ -1825,12 +1827,12 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         "workspace-session",
       );
       expect(instanceStore.get("default")?.runtime.port).toBe(4312);
-      expect(postMessageMock).toHaveBeenCalledWith({
+      expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({
         type: "activeSession",
         sessionName: "workspace-session",
         sessionId: "workspace-session",
         backend: "tmux",
-      });
+      }));
     });
 
     it("withLaunchEnvironment prepends port env vars when port is provided", () => {
@@ -4489,6 +4491,11 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         mockZellijSessionManager,
         {
           resolveAvailable: vi.fn(() => syntheticBackend),
+          getAvailability: vi.fn(() => ({
+            native: true,
+            tmux: false,
+            zellij: false,
+          })),
         } as unknown as TerminalBackendRegistry,
         instanceStore,
         mockLogger,
