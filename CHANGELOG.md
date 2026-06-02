@@ -5,6 +5,20 @@ All notable changes to the "AI Sidebar Terminal" extension will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-06-02
+
+### Added
+
+- **Pill dropdown toolbar**: Quick switching between AI tools (OpenCode, Claude, Codex, etc.) and terminal backends (tmux, native, zellij) via unified pill-style dropdowns.
+
+### Changed
+
+- **Rebrand**: Rename internal identifiers from `ost` to `ai-sidebar-terminal` for consistency.
+
+### Fixed
+
+- Remove global mouse tracking initialization in webview to prevent unintended event interference.
+
 ## [2.3.0] - 2026-06-01
 
 ### Added
