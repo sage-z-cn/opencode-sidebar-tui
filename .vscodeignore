@@ -33,7 +33,7 @@ scripts/**
 
 # Documentation
 *.md
-!CHANGELOG.md
+!changelog.md
 !README.md
 
 # Git
