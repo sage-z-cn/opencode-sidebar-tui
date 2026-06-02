@@ -9,35 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **l10n 翻译注入机制**：通过 `window.__TOOLBAR_L10N__` 将 extension host 端翻译字符串注入 webview，解决 webview 无法直接调用 `vscode.l10n` 的问题。
-- **l10n 构建集成**：webpack CopyPlugin 自动将 `l10n/` 复制到 `dist/`，支持 F5 开发模式下的翻译加载。
-- **l10n 覆盖率审计工具**：新增 `scripts/check-l10n.js`，可检测 bundle 中缺失或多余的翻译 key。
-- **独立构建安装脚本**：新增 `scripts/build-and-install.js`，输出的 VSIX 文件名使用 `{name}-{version}.vsix` 格式。
+- **l10n translation injection mechanism**: Inject extension host translation strings into webview via `window.__TOOLBAR_L10N__`, solving the issue that webview cannot directly call `vscode.l10n`.
+- **l10n build integration**: webpack CopyPlugin automatically copies `l10n/` to `dist/`, supporting translation loading in F5 development mode.
+- **l10n coverage audit tool**: Added `scripts/check-l10n.js` to detect missing or extra translation keys in the bundle.
+- **Standalone build-and-install script**: Added `scripts/build-and-install.js`, output VSIX filename uses `{name}-{version}.vsix` format.
 
 ### Fixed
 
-- 修复 `bundle.l10n.zh-cn.json` 中 16 个缺失的翻译 key（toolbar 按钮标题及动态状态提示）。
-- 修复 `bundle.l10n.zh-cn.json` 中 3 处引号嵌套问题（内部双引号改为单引号）。
-- 修复 `toolbar/index.ts` 中硬编码英文字符串覆盖已翻译 title 的问题。
-- 修复 `package.json` 缺少 `l10n` 字段导致 `vscode.l10n` API 无法加载翻译 bundle 的问题。
-- 修复 `package.nls.zh-cn.json` 中智能引号导致显示异常的问题。
+- Fix 16 missing translation keys in `bundle.l10n.zh-cn.json` (toolbar button titles and dynamic status tooltips).
+- Fix 3 quote nesting issues in `bundle.l10n.zh-cn.json` (inner double quotes changed to single quotes).
+- Fix hardcoded English strings in `toolbar/index.ts` overriding translated titles.
+- Fix missing `l10n` field in `package.json` preventing `vscode.l10n` API from loading translation bundles.
+- Fix smart quotes in `package.nls.zh-cn.json` causing display issues.
 
 ## [2.2.1] - 2026-05-31
 
 ### Changed
 
-- 统一 WebView 配色方案为深黑色背景。
+- Unified WebView color scheme to dark background.
 
 ## [2.2.0] - 2026-05-31
 
 ### Added
 
-- 工具栏新增设置按钮（⚙），点击直接打开扩展设置面板（已过滤 `ost.` 前缀）。
+- Added settings button (⚙) to toolbar, clicking directly opens extension settings panel (filtered by `ost.` prefix).
 
 ### Fixed
 
-- 修复后端切换按钮的提示文字从 "Switch to Native Shell" 改为 "Cycle terminal backend"。
-- 修复会话标签居中问题，改用绝对定位确保标签始终居中。
+- Fix backend switch button tooltip from "Switch to Native Shell" to "Cycle terminal backend".
+- Fix session tab centering issue, switched to absolute positioning to ensure tabs stay centered.
 
 ## [2.1.1] - 2026-05-31
 
