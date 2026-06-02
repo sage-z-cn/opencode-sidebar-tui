@@ -61,15 +61,15 @@ suite("Package contribution metadata", () => {
 
     assert.ok(container, "ai-sidebar-terminalContainer should be contributed");
     assert.strictEqual(container.title, "Open Sidebar Terminal");
-    assert.strictEqual(container.icon, "resources/opencode-activity-bar.svg");
+    assert.strictEqual(container.icon, "resources/activity-bar.svg");
   });
 
   test("contributes terminal view metadata", async () => {
     const packageJSON = await getPackageJSON();
     const views = packageJSON.contributes?.views?.ai-sidebar-terminalContainer ?? [];
-    const terminalView = views.find(({ id }) => id === "ost");
+    const terminalView = views.find(({ id }) => id === "ai-sidebar-terminal-view");
 
-    assert.ok(terminalView, "ost webview should be contributed");
+    assert.ok(terminalView, "ai-sidebar-terminal-view webview should be contributed");
     assert.strictEqual(terminalView.type, "webview");
   });
 
@@ -89,7 +89,7 @@ suite("Package contribution metadata", () => {
     assert.ok(
       explorerContext.some(
         ({ command, group, when }) =>
-          command === "ai-sidebar-terminal.sendFileToTerminal" &&
+          command === "ai-sidebar-terminal.sendToAiTerminal" &&
           group === "2_workspace" &&
           when === "!explorerResourceIsFolder",
       ),
@@ -98,7 +98,7 @@ suite("Package contribution metadata", () => {
     assert.ok(
       explorerContext.some(
         ({ command, group, when }) =>
-          command === "ai-sidebar-terminal.sendFileToTerminal" &&
+          command === "ai-sidebar-terminal.sendToAiTerminal" &&
           group === "2_workspace" &&
           when === "explorerResourceIsFolder",
       ),

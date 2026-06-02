@@ -138,7 +138,7 @@ describe("InstanceRegistry", () => {
       },
       workspaceValues: {
         [WORKSPACE_INSTANCES_KEY]: "not-an-object",
-        ost: {},
+        "ai-sidebar-terminal": {},
       },
     });
     const registry = new InstanceRegistry(

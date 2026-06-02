@@ -28,7 +28,7 @@ Automatically render AI 侧边栏终端 in VS Code sidebar with full terminal su
 - **代码操作**: 对错误和警告触发诊断代码操作
 - **键盘快捷键**: `Cmd+Alt+L`、`Cmd+Alt+A`、`Cmd+Alt+T` 快速操作
 - **拖放支持**: 按住 Shift 拖放文件/文件夹发送引用
-- **右键菜单集成**: 在资源管理器或编辑器中右键发送到 OpenCode
+- **右键菜单集成**: 在资源管理器或编辑器中右键发送到 AI 终端
 - **辅助侧边栏**: 将终端停靠在辅助侧边栏实现分屏工作流
 - **高度可配置**: 自定义命令、字体、终端设置、HTTP API 行为和 AI 工具偏好
 
@@ -62,7 +62,7 @@ Automatically render AI 侧边栏终端 in VS Code sidebar with full terminal su
 
 ```bash
 git clone https://github.com/sage-z-cn/ai-sidebar-terminal.git
-cd opencode-sidebar-tui
+cd ai-sidebar-terminal
 ```
 
 2. 安装依赖：
@@ -74,7 +74,7 @@ npm install
 3. 构建扩展：
 
 ```bash
-npm run compile
+npm run build-and-install
 ```
 
 4. 打包扩展：
@@ -157,7 +157,7 @@ npx @vscode/vsce package
 
 ### 右键菜单
 
-- **资源管理器**: 右键任意文件或文件夹 → "Send to OpenCode"
+- **资源管理器**: 右键任意文件或文件夹 → "Send to AI Terminal"
 - **编辑器**: 右键任意位置 → "Send File Reference (@file)"
 
 ### 拖放

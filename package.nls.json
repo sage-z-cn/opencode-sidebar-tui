@@ -8,7 +8,7 @@
   "command.ai-sidebar-terminal.sendToTerminal.title": "Send to Active Terminal",
   "command.ai-sidebar-terminal.sendAtMention.title": "Send File Reference (@file)",
   "command.ai-sidebar-terminal.sendAllOpenFiles.title": "Send All Open File References",
-  "command.ai-sidebar-terminal.sendFileToTerminal.title": "Send to OpenCode",
+  "command.ai-sidebar-terminal.sendToAiTerminal.title": "Send to AI Terminal",
   "command.ai-sidebar-terminal.paste.title": "Paste",
   "command.ai-sidebar-terminal.openInNewWindow.title": "Open Tmux Session in New Window",
   "command.ai-sidebar-terminal.spawnForWorkspace.title": "Spawn Tmux Session for Workspace",

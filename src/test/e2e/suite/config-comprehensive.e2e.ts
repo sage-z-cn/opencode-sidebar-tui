@@ -234,7 +234,7 @@ suite("Runtime configuration defaults", () => {
   test("reads key defaults from vscode.workspace.getConfiguration", async () => {
     await activateExtension();
 
-    const config = vscode.workspace.getConfiguration("ost");
+    const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
     const defaultValue = (key: string): unknown =>
       config.inspect(key)?.defaultValue;
 

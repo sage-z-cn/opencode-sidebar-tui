@@ -111,7 +111,7 @@ npx @vscode/vsce package
   - Single line: `@filename#L10`
   - Multiple lines: `@filename#L10-L20`
 - **Send All Open File References** (`Cmd+Alt+A` / `Ctrl+Alt+A`) - Send all open file references
-- **Send to OpenCode** - Send selected text or file from context menu
+- **Send to AI Terminal** - Send selected text or file from context menu to the active AI agent
 - **Send to Active Terminal** - Send selected text to the active terminal
 
 ### Tmux Session Commands
@@ -157,7 +157,7 @@ npx @vscode/vsce package
 
 ### Context Menu Options
 
-- **Explorer**: Right-click any file or folder → "Send to OpenCode"
+- **Explorer**: Right-click any file or folder → "Send to AI Terminal"
 - **Editor**: Right-click anywhere → "Send File Reference (@file)"
 
 ### Drag & Drop

@@ -44,17 +44,17 @@
         {
           "id": "ai-sidebar-terminalContainer",
           "title": "%views.container.title%",
-          "icon": "resources/opencode-activity-bar.svg"
+          "icon": "resources/activity-bar.svg"
         }
       ]
     },
     "views": {
       "ai-sidebar-terminalContainer": [
         {
-          "id": "ost",
+          "id": "ai-sidebar-terminal-view",
           "name": "%views.terminal.name%",
           "type": "webview",
-          "icon": "resources/opencode-activity-bar.svg",
+          "icon": "resources/activity-bar.svg",
           "initialOrder": 1
         }
       ]
@@ -63,7 +63,7 @@
       {
         "command": "ai-sidebar-terminal.start",
         "title": "%command.ai-sidebar-terminal.start.title%",
-        "category": "%command.category.ost%"
+        "category": "%command.category.ai-sidebar-terminal%"
       },
       {
         "command": "ai-sidebar-terminal.focus",
@@ -72,51 +72,51 @@
       {
         "command": "ai-sidebar-terminal.sendToTerminal",
         "title": "%command.ai-sidebar-terminal.sendToTerminal.title%",
-        "category": "%command.category.ost%"
+        "category": "%command.category.ai-sidebar-terminal%"
       },
       {
         "command": "ai-sidebar-terminal.sendAtMention",
         "title": "%command.ai-sidebar-terminal.sendAtMention.title%",
-        "category": "%command.category.ost%"
+        "category": "%command.category.ai-sidebar-terminal%"
       },
       {
         "command": "ai-sidebar-terminal.sendAllOpenFiles",
         "title": "%command.ai-sidebar-terminal.sendAllOpenFiles.title%",
-        "category": "%command.category.ost%"
+        "category": "%command.category.ai-sidebar-terminal%"
       },
       {
-        "command": "ai-sidebar-terminal.sendFileToTerminal",
-        "title": "%command.ai-sidebar-terminal.sendFileToTerminal.title%",
-        "category": "%command.category.ost%"
+        "command": "ai-sidebar-terminal.sendToAiTerminal",
+        "title": "%command.ai-sidebar-terminal.sendToAiTerminal.title%",
+        "category": "%command.category.ai-sidebar-terminal%"
       },
       {
         "command": "ai-sidebar-terminal.paste",
         "title": "%command.ai-sidebar-terminal.paste.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(clippy)"
       },
       {
         "command": "ai-sidebar-terminal.openInNewWindow",
         "title": "%command.ai-sidebar-terminal.openInNewWindow.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(empty-window)"
       },
       {
         "command": "ai-sidebar-terminal.spawnForWorkspace",
         "title": "%command.ai-sidebar-terminal.spawnForWorkspace.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(add)"
       },
       {
         "command": "ai-sidebar-terminal.selectInstance",
         "title": "%command.ai-sidebar-terminal.selectInstance.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(server-environment)"
       },
       {
         "command": "ai-sidebar-terminal.switchTmuxSession",
         "title": "%command.ai-sidebar-terminal.switchTmuxSession.title%",
-        "category": "%command.category.ost%"
+        "category": "%command.category.ai-sidebar-terminal%"
       },
       {
         "command": "ai-sidebar-terminal.createTmuxSession",
@@ -125,13 +125,13 @@
       {
         "command": "ai-sidebar-terminal.browseTmuxSessions",
         "title": "%command.ai-sidebar-terminal.browseTmuxSessions.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(server-environment)"
       },
       {
         "command": "ai-sidebar-terminal.switchNativeShell",
         "title": "%command.ai-sidebar-terminal.switchNativeShell.title%",
-        "category": "%command.category.ost%"
+        "category": "%command.category.ai-sidebar-terminal%"
       },
       {
         "command": "ai-sidebar-terminal.killNativeShell",
@@ -140,124 +140,124 @@
       {
         "command": "ai-sidebar-terminal.openTerminalManager",
         "title": "%command.ai-sidebar-terminal.openTerminalManager.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(server)"
       },
       {
         "command": "ai-sidebar-terminal.toggleDashboard",
         "title": "%command.ai-sidebar-terminal.toggleDashboard.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(dashboard)"
       },
       {
         "command": "ai-sidebar-terminal.toggleTmuxCommandToolbar",
         "title": "%command.ai-sidebar-terminal.toggleTmuxCommandToolbar.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(list-tree)"
       },
       {
         "command": "ai-sidebar-terminal.openDashboardInEditor",
         "title": "%command.ai-sidebar-terminal.openDashboardInEditor.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(editor-layout)"
       },
       {
         "command": "ai-sidebar-terminal.openTerminalInEditor",
         "title": "%command.ai-sidebar-terminal.openTerminalInEditor.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": {
-          "light": "resources/opencode-activity-bar.svg",
-          "dark": "resources/opencode-activity-bar-dark.svg"
+          "light": "resources/activity-bar.svg",
+          "dark": "resources/activity-bar.svg"
         }
       },
       {
         "command": "ai-sidebar-terminal.restoreTerminalToSidebar",
         "title": "%command.ai-sidebar-terminal.restoreTerminalToSidebar.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(layout-sidebar-left)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxSwitchPane",
         "title": "%command.ai-sidebar-terminal.tmuxSwitchPane.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(check)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxSplitPaneH",
         "title": "%command.ai-sidebar-terminal.tmuxSplitPaneH.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(split-horizontal)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxSplitPaneV",
         "title": "%command.ai-sidebar-terminal.tmuxSplitPaneV.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(split-vertical)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxSplitPaneWithCommand",
         "title": "%command.ai-sidebar-terminal.tmuxSplitPaneWithCommand.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(terminal)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxSendTextToPane",
         "title": "%command.ai-sidebar-terminal.tmuxSendTextToPane.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(file-symlink-file)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxResizePane",
         "title": "%command.ai-sidebar-terminal.tmuxResizePane.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(move)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxSwapPane",
         "title": "%command.ai-sidebar-terminal.tmuxSwapPane.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(arrow-swap)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxKillPane",
         "title": "%command.ai-sidebar-terminal.tmuxKillPane.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(trash)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxNextWindow",
         "title": "%command.ai-sidebar-terminal.tmuxNextWindow.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(chevron-right)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxPrevWindow",
         "title": "%command.ai-sidebar-terminal.tmuxPrevWindow.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(chevron-left)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxCreateWindow",
         "title": "%command.ai-sidebar-terminal.tmuxCreateWindow.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(add)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxKillWindow",
         "title": "%command.ai-sidebar-terminal.tmuxKillWindow.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(trash)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxSelectWindow",
         "title": "%command.ai-sidebar-terminal.tmuxSelectWindow.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(list-selection)"
       },
       {
         "command": "ai-sidebar-terminal.tmuxKillSession",
         "title": "%command.ai-sidebar-terminal.tmuxKillSession.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(trash)"
       },
       {
@@ -267,7 +267,7 @@
       {
         "command": "ai-sidebar-terminal.tmuxRefresh",
         "title": "%command.ai-sidebar-terminal.tmuxRefresh.title%",
-        "category": "%command.category.ost%",
+        "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(refresh)"
       }
     ],
@@ -287,12 +287,12 @@
       ],
       "explorer/context": [
         {
-          "command": "ai-sidebar-terminal.sendFileToTerminal",
+          "command": "ai-sidebar-terminal.sendToAiTerminal",
           "group": "2_workspace",
           "when": "!explorerResourceIsFolder"
         },
         {
-          "command": "ai-sidebar-terminal.sendFileToTerminal",
+          "command": "ai-sidebar-terminal.sendToAiTerminal",
           "group": "2_workspace",
           "when": "explorerResourceIsFolder"
         }
@@ -321,12 +321,12 @@
         "command": "ai-sidebar-terminal.browseTmuxSessions",
         "key": "ctrl+alt+t",
         "mac": "cmd+alt+t",
-        "when": "focusedView == 'ost'"
+        "when": "focusedView == 'ai-sidebar-terminal-view'"
       },
       {
         "command": "-workbench.action.quickOpen",
         "key": "ctrl+p",
-        "when": "focusedView == 'ost'"
+        "when": "focusedView == 'ai-sidebar-terminal-view'"
       },
       {
         "command": "-workbench.action.quickOpenNavigateNextInFilePicker",
@@ -337,13 +337,13 @@
         "command": "ai-sidebar-terminal.paste",
         "key": "ctrl+v",
         "mac": "cmd+v",
-        "when": "focusedView == 'ost'"
+        "when": "focusedView == 'ai-sidebar-terminal-view'"
       },
       {
         "command": "ai-sidebar-terminal.toggleTmuxCommandToolbar",
         "key": "ctrl+alt+m",
         "mac": "cmd+alt+m",
-        "when": "focusedView == 'ost'"
+        "when": "focusedView == 'ai-sidebar-terminal-view'"
       }
     ],
     "configuration": {

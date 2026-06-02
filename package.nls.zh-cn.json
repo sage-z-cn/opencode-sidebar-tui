@@ -8,7 +8,7 @@
   "command.ai-sidebar-terminal.sendToTerminal.title": "发送到活动终端",
   "command.ai-sidebar-terminal.sendAtMention.title": "发送文件引用 (@file)",
   "command.ai-sidebar-terminal.sendAllOpenFiles.title": "发送所有打开的文件引用",
-  "command.ai-sidebar-terminal.sendFileToTerminal.title": "发送到 OpenCode",
+  "command.ai-sidebar-terminal.sendToAiTerminal.title": "发送到 AI 终端",
   "command.ai-sidebar-terminal.paste.title": "粘贴",
   "command.ai-sidebar-terminal.openInNewWindow.title": "在新窗口中打开 Tmux 会话",
   "command.ai-sidebar-terminal.spawnForWorkspace.title": "为工作区创建 Tmux 会话",

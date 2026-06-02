@@ -23,7 +23,7 @@ const commandCategories = {
     "ai-sidebar-terminal.sendToTerminal",
     "ai-sidebar-terminal.sendAtMention",
     "ai-sidebar-terminal.sendAllOpenFiles",
-    "ai-sidebar-terminal.sendFileToTerminal",
+    "ai-sidebar-terminal.sendToAiTerminal",
   ],
   "tmux-session": [
     "ai-sidebar-terminal.openInNewWindow",

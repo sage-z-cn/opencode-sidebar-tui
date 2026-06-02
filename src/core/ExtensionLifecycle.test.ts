@@ -63,7 +63,7 @@ describe("ExtensionLifecycle", () => {
       await lifecycle.activate(mockContext);
 
       expect(vscode.window.registerWebviewViewProvider).toHaveBeenCalledWith(
-        "ost",
+        "ai-sidebar-terminal-view",
         expect.any(Object),
         expect.objectContaining({
           webviewOptions: { retainContextWhenHidden: true },
@@ -88,7 +88,7 @@ describe("ExtensionLifecycle", () => {
       await lifecycle.activate(mockContext);
 
       expect(vscode.window.registerWebviewViewProvider).toHaveBeenCalledWith(
-        "ost",
+        "ai-sidebar-terminal-view",
         expect.any(Object),
         expect.objectContaining({
           webviewOptions: { retainContextWhenHidden: true },
@@ -122,7 +122,7 @@ describe("ExtensionLifecycle", () => {
     it("should swallow duplicate webview provider registration races", async () => {
       vi.mocked(vscode.window.registerWebviewViewProvider).mockImplementation(
         () => {
-          throw new Error("provider already registered for ost");
+          throw new Error("provider already registered for ai-sidebar-terminal-view");
         },
       );
 
@@ -1038,10 +1038,10 @@ describe("ExtensionLifecycle", () => {
       expect(allFilesCall).toBeDefined();
     });
 
-    it("should register sendFileToTerminal command", () => {
+    it("should register sendToAiTerminal command", () => {
       const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
       const fileCall = calls.find(
-        (call) => call[0] === "ai-sidebar-terminal.sendFileToTerminal",
+        (call) => call[0] === "ai-sidebar-terminal.sendToAiTerminal",
       );
 
       expect(fileCall).toBeDefined();

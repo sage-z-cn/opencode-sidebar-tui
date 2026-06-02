@@ -33,7 +33,7 @@ import { TerminalBackendRegistry } from "../services/terminalBackends";
 export class TerminalProvider
   implements vscode.WebviewViewProvider, vscode.WebviewPanelSerializer
 {
-  public static readonly viewType = "ost";
+  public static readonly viewType = "ai-sidebar-terminal-view";
   public static readonly panelViewType = "ai-sidebar-terminal.terminalEditor";
 
   private _view?: vscode.WebviewView;

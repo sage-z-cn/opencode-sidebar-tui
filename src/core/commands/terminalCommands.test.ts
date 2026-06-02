@@ -133,7 +133,7 @@ describe("registerTerminalCommands", () => {
         "ai-sidebar-terminal.sendToTerminal",
         "ai-sidebar-terminal.sendAtMention",
         "ai-sidebar-terminal.sendAllOpenFiles",
-        "ai-sidebar-terminal.sendFileToTerminal",
+        "ai-sidebar-terminal.sendToAiTerminal",
         "ai-sidebar-terminal.paste",
         "ai-sidebar-terminal.focus",
         "ai-sidebar-terminal.openTerminalInEditor",
@@ -359,13 +359,13 @@ describe("registerTerminalCommands", () => {
       .mockReturnValueOnce("@workspace/b.ts");
 
     const commands = registerAndGetCommands(deps);
-    const sendFileToTerminal = getCommand(
+    const sendToAiTerminal = getCommand(
       commands,
-      "ai-sidebar-terminal.sendFileToTerminal",
+      "ai-sidebar-terminal.sendToAiTerminal",
     );
 
-    sendFileToTerminal("ignored", [firstUri]);
-    sendFileToTerminal("ignored", [duplicateUri, secondUri]);
+    sendToAiTerminal("ignored", [firstUri]);
+    sendToAiTerminal("ignored", [duplicateUri, secondUri]);
 
     expect(deps.sendPrompt).not.toHaveBeenCalled();
 
@@ -373,7 +373,7 @@ describe("registerTerminalCommands", () => {
 
     expect(deps.provider?.formatUriReference).toHaveBeenCalledTimes(2);
     expect(deps.outputChannel?.info).toHaveBeenCalledWith(
-      '[DIAG:sendFileToTerminal] terminalId="terminal-1" fileCount=2 refs="@workspace/a.ts @workspace/b.ts"',
+      '[DIAG:sendToAiTerminal] terminalId="terminal-1" fileCount=2 refs="@workspace/a.ts @workspace/b.ts"',
     );
     expect(deps.sendPrompt).toHaveBeenCalledTimes(1);
     expect(deps.sendPrompt).toHaveBeenCalledWith(
@@ -388,7 +388,7 @@ describe("registerTerminalCommands", () => {
   it("ignores file sends without context sharing or usable uri arguments", () => {
     const noContextDeps = createDependencies({ contextSharingService: undefined });
     const noContextCommands = registerAndGetCommands(noContextDeps);
-    getCommand(noContextCommands, "ai-sidebar-terminal.sendFileToTerminal")(
+    getCommand(noContextCommands, "ai-sidebar-terminal.sendToAiTerminal")(
       vscode.Uri.file("/workspace/a.ts"),
     );
     vi.advanceTimersByTime(100);
@@ -400,8 +400,8 @@ describe("registerTerminalCommands", () => {
 
     const invalidArgsDeps = createDependencies();
     const invalidArgsCommands = registerAndGetCommands(invalidArgsDeps);
-    getCommand(invalidArgsCommands, "ai-sidebar-terminal.sendFileToTerminal")("ignored");
-    getCommand(invalidArgsCommands, "ai-sidebar-terminal.sendFileToTerminal")();
+    getCommand(invalidArgsCommands, "ai-sidebar-terminal.sendToAiTerminal")("ignored");
+    getCommand(invalidArgsCommands, "ai-sidebar-terminal.sendToAiTerminal")();
     vi.advanceTimersByTime(100);
 
     expect(invalidArgsDeps.sendPrompt).not.toHaveBeenCalled();
@@ -414,7 +414,7 @@ describe("registerTerminalCommands", () => {
     );
     const commands = registerAndGetCommands(deps);
 
-    getCommand(commands, "ai-sidebar-terminal.sendFileToTerminal")(
+    getCommand(commands, "ai-sidebar-terminal.sendToAiTerminal")(
       vscode.Uri.file("/workspace/direct.ts"),
     );
     vi.advanceTimersByTime(100);
@@ -427,7 +427,7 @@ describe("registerTerminalCommands", () => {
     const deps = createDependencies();
     const commands = registerAndGetCommands(deps);
 
-    getCommand(commands, "ai-sidebar-terminal.sendFileToTerminal")([]);
+    getCommand(commands, "ai-sidebar-terminal.sendToAiTerminal")([]);
     vi.advanceTimersByTime(100);
 
     expect(deps.provider?.formatUriReference).not.toHaveBeenCalled();
@@ -437,17 +437,17 @@ describe("registerTerminalCommands", () => {
   it("drops queued file references when provider is unavailable", () => {
     const deps = createDependencies({ provider: undefined });
     const commands = registerAndGetCommands(deps);
-    const sendFileToTerminal = getCommand(
+    const sendToAiTerminal = getCommand(
       commands,
-      "ai-sidebar-terminal.sendFileToTerminal",
+      "ai-sidebar-terminal.sendToAiTerminal",
     );
 
-    sendFileToTerminal("ignored", [vscode.Uri.file("/workspace/a.ts")]);
+    sendToAiTerminal("ignored", [vscode.Uri.file("/workspace/a.ts")]);
     vi.advanceTimersByTime(100);
 
     expect(deps.sendPrompt).not.toHaveBeenCalled();
 
-    sendFileToTerminal("ignored", [vscode.Uri.file("/workspace/b.ts")]);
+    sendToAiTerminal("ignored", [vscode.Uri.file("/workspace/b.ts")]);
     vi.advanceTimersByTime(100);
 
     expect(deps.sendPrompt).not.toHaveBeenCalled();
@@ -518,13 +518,13 @@ describe("registerTerminalCommands", () => {
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
       "workbench.view.focus",
-      "ost",
+      "ai-sidebar-terminal-view",
     );
     expect(deps.provider?.openInEditorTab).toHaveBeenCalledTimes(1);
     expect(deps.provider?.toggleEditorAttachment).toHaveBeenCalledTimes(1);
   });
 
-  it("returns the executeCommand promise from ost.focus", () => {
+  it("returns the executeCommand promise from ai-sidebar-terminal.focus", () => {
     const deps = createDependencies();
     const commands = registerAndGetCommands(deps);
     const focusCommand = getCommand(commands, "ai-sidebar-terminal.focus");

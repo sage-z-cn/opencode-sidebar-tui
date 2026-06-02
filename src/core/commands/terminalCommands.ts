@@ -114,8 +114,8 @@ export function registerTerminalCommands(
     },
   );
 
-  const sendFileToTerminalCommand = vscode.commands.registerCommand(
-    "ai-sidebar-terminal.sendFileToTerminal",
+  const sendToAiTerminalCommand = vscode.commands.registerCommand(
+    "ai-sidebar-terminal.sendToAiTerminal",
     (...args: unknown[]) => {
       if (!deps.contextSharingService) {
         return;
@@ -160,7 +160,7 @@ export function registerTerminalCommands(
 
         const terminalId = deps.getActiveTerminalId();
         deps.outputChannel?.info(
-          `[DIAG:sendFileToTerminal] terminalId="${terminalId}" fileCount=${uniqueUris.length} refs="${allRefs}"`,
+          `[DIAG:sendToAiTerminal] terminalId="${terminalId}" fileCount=${uniqueUris.length} refs="${allRefs}"`,
         );
         void deps.sendPrompt(allRefs + " ");
 
@@ -191,7 +191,7 @@ export function registerTerminalCommands(
     () => {
       return vscode.commands.executeCommand(
         "workbench.view.focus",
-        "ost",
+        "ai-sidebar-terminal-view",
       );
     },
   );
@@ -215,7 +215,7 @@ export function registerTerminalCommands(
     sendToTerminalCommand,
     sendAtMentionCommand,
     sendAllOpenFilesCommand,
-    sendFileToTerminalCommand,
+    sendToAiTerminalCommand,
     pasteCommand,
     focusCommand,
     openInEditorCommand,
