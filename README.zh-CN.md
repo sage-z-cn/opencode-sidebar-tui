@@ -4,7 +4,7 @@
 [English](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/README.md)
 
 
-Automatically render AI 侧边栏终端 in VS Code sidebar with full terminal support.
+在 VS Code 侧边栏中嵌入多种 AI 编程助手（OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code 或任意自定义 AI 工具），提供完整终端与 tmux 会话管理。
 
 > 最初 fork 自 [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui)。现已发展为独立扩展，新增多项功能及 Windows 兼容性改进。
 

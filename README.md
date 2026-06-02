@@ -4,7 +4,7 @@
 
 [中文文档](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/README.zh-CN.md)
 
-Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code) in the VS Code sidebar with full terminal and tmux session management.
+Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, or any custom AI tool) in the VS Code sidebar with full terminal and tmux session management.
 
 > Originally forked from [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui). Now a standalone extension with new features and Windows compatibility improvements.
 

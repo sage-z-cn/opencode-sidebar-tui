@@ -1,6 +1,6 @@
 {
   "extension.displayName": "AI Sidebar Terminal",
-  "extension.description": "Embed AI coding agents (OpenCode, Claude Code, Codex, Gemini, Kimi Code, Qwen Code) in the VS Code sidebar with full terminal and tmux session management",
+  "extension.description": "Embed AI coding agents (OpenCode, Claude Code, Codex, Gemini, Kimi Code, Qwen Code, or any custom AI tool) in the VS Code sidebar with full terminal and tmux session management",
   "views.container.title": "AI Sidebar Terminal",
   "views.terminal.name": "Terminal",
   "command.ai-sidebar-terminal.start.title": "Start OpenCode",
