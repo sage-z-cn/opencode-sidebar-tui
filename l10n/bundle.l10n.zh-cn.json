@@ -1,5 +1,5 @@
 {
-  "Failed to activate Open Sidebar TUI: {error}": "激活 Open Sidebar TUI 失败：{error}",
+  "Failed to activate AI Sidebar Terminal: {error}": "激活 AI 侧边栏终端失败：{error}",
   "No active terminal": "没有活动终端",
   "Could not determine terminal working directory. Make sure shell integration is enabled.": "无法确定终端工作目录。请确保已启用 Shell 集成。",
   "{count} tmux session is running. Kill it when closing VS Code?": "{count} 个 tmux 会话正在运行。关闭 VS Code 时终止它？",

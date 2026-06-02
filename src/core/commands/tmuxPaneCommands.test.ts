@@ -364,27 +364,27 @@ describe("registerTmuxPaneCommands", () => {
 
     expect(harness.handlers.size).toBe(15);
     expect([...harness.handlers.keys()]).toEqual([
-      "ost.tmuxSwitchPane",
-      "ost.tmuxSplitPaneH",
-      "ost.tmuxSplitPaneV",
-      "ost.tmuxSplitPaneWithCommand",
-      "ost.tmuxSendTextToPane",
-      "ost.tmuxResizePane",
-      "ost.tmuxSwapPane",
-      "ost.tmuxKillPane",
-      "ost.tmuxNextWindow",
-      "ost.tmuxPrevWindow",
-      "ost.tmuxCreateWindow",
-      "ost.tmuxKillWindow",
-      "ost.tmuxSelectWindow",
-      "ost.tmuxKillSession",
-      "ost.tmuxRefresh",
+      "ai-sidebar-terminal.tmuxSwitchPane",
+      "ai-sidebar-terminal.tmuxSplitPaneH",
+      "ai-sidebar-terminal.tmuxSplitPaneV",
+      "ai-sidebar-terminal.tmuxSplitPaneWithCommand",
+      "ai-sidebar-terminal.tmuxSendTextToPane",
+      "ai-sidebar-terminal.tmuxResizePane",
+      "ai-sidebar-terminal.tmuxSwapPane",
+      "ai-sidebar-terminal.tmuxKillPane",
+      "ai-sidebar-terminal.tmuxNextWindow",
+      "ai-sidebar-terminal.tmuxPrevWindow",
+      "ai-sidebar-terminal.tmuxCreateWindow",
+      "ai-sidebar-terminal.tmuxKillWindow",
+      "ai-sidebar-terminal.tmuxSelectWindow",
+      "ai-sidebar-terminal.tmuxKillSession",
+      "ai-sidebar-terminal.tmuxRefresh",
     ]);
   });
 
   it("switches panes via direct arg and quick pick selection with active markers", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxSwitchPane");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxSwitchPane");
 
     await handler({ paneId: "%2" });
     expect(harness.selectPane).toHaveBeenCalledWith("%2");
@@ -420,7 +420,7 @@ describe("registerTmuxPaneCommands", () => {
     const horizontalHarness = createHarness();
     const horizontal = getHandler(
       horizontalHarness,
-      "ost.tmuxSplitPaneH",
+      "ai-sidebar-terminal.tmuxSplitPaneH",
     );
 
     await horizontal({ paneId: "%2", sessionId: "session-2" });
@@ -434,7 +434,7 @@ describe("registerTmuxPaneCommands", () => {
     });
 
     const noSessionHarness = createHarness({ sessionId: undefined });
-    await getHandler(noSessionHarness, "ost.tmuxSplitPaneV")();
+    await getHandler(noSessionHarness, "ai-sidebar-terminal.tmuxSplitPaneV")();
     expect(noSessionHarness.splitPane).not.toHaveBeenCalled();
 
     const verticalHarness = createHarness();
@@ -442,7 +442,7 @@ describe("registerTmuxPaneCommands", () => {
 
     await getHandler(
       verticalHarness,
-      "ost.tmuxSplitPaneV",
+      "ai-sidebar-terminal.tmuxSplitPaneV",
     )({
       sessionId: "session-3",
     });
@@ -457,7 +457,7 @@ describe("registerTmuxPaneCommands", () => {
 
   it("splits pane with command for cancel, success, and error paths", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxSplitPaneWithCommand");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxSplitPaneWithCommand");
 
     mockInputBoxOnce(undefined);
     await handler({ sessionId: "session-1" });
@@ -480,7 +480,7 @@ describe("registerTmuxPaneCommands", () => {
 
   it("sends text to panes from direct args and quick-pick selection", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxSendTextToPane");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxSendTextToPane");
 
     mockInputBoxOnce(undefined);
     mockInputBoxOnce("ls -la");
@@ -505,14 +505,14 @@ describe("registerTmuxPaneCommands", () => {
   it("returns early when sending text without a focused session", async () => {
     const harness = createHarness({ sessionId: undefined });
 
-    await getHandler(harness, "ost.tmuxSendTextToPane")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSendTextToPane")();
 
     expect(harness.sendTextToPane).not.toHaveBeenCalled();
   });
 
   it("resizes panes across cancel, validation, success, and error branches", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxResizePane");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxResizePane");
 
     mockQuickPickOnce(undefined);
     mockQuickPickOnce(panePick("%1", "Pane 0: editor", "%1"));
@@ -549,7 +549,7 @@ describe("registerTmuxPaneCommands", () => {
 
   it("swaps panes across cancellation, last-target prevention, success, and error paths", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxSwapPane");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxSwapPane");
 
     mockQuickPickOnce(undefined);
     mockQuickPickOnce(panePick("%1", "Pane 0: editor", "%1"));
@@ -568,7 +568,7 @@ describe("registerTmuxPaneCommands", () => {
     const singlePaneHarness = createHarness({ panes: [defaultPanes[0]] });
     const singlePaneHandler = getHandler(
       singlePaneHarness,
-      "ost.tmuxSwapPane",
+      "ai-sidebar-terminal.tmuxSwapPane",
     );
     vi.mocked(vscode.window.showQuickPick).mockReset();
     mockQuickPickOnce(panePick("%1", "Pane 0: editor", "%1"));
@@ -586,18 +586,18 @@ describe("registerTmuxPaneCommands", () => {
 
   it("returns early for direct swap pane when there are no targets or target pick is cancelled", async () => {
     const singlePaneHarness = createHarness({ panes: [defaultPanes[0]] });
-    await getHandler(singlePaneHarness, "ost.tmuxSwapPane")({ paneId: "%1" });
+    await getHandler(singlePaneHarness, "ai-sidebar-terminal.tmuxSwapPane")({ paneId: "%1" });
     expect(singlePaneHarness.swapPanes).not.toHaveBeenCalled();
 
     const harness = createHarness();
     mockQuickPickOnce(undefined);
-    await getHandler(harness, "ost.tmuxSwapPane")({ paneId: "%1" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSwapPane")({ paneId: "%1" });
     expect(harness.swapPanes).not.toHaveBeenCalled();
   });
 
   it("kills panes with last-pane prevention, destructive confirmation, cancellation, and error handling", async () => {
     const multiPaneHarness = createHarness();
-    const handler = getHandler(multiPaneHarness, "ost.tmuxKillPane");
+    const handler = getHandler(multiPaneHarness, "ai-sidebar-terminal.tmuxKillPane");
 
     mockQuickPickOnce(undefined);
     mockQuickPickOnce(panePick("%2", "Pane 1: shell", "%2"));
@@ -623,7 +623,7 @@ describe("registerTmuxPaneCommands", () => {
     const singlePaneHarness = createHarness({ panes: [defaultPanes[0]] });
     const singlePaneHandler = getHandler(
       singlePaneHarness,
-      "ost.tmuxKillPane",
+      "ai-sidebar-terminal.tmuxKillPane",
     );
 
     await singlePaneHandler();
@@ -636,7 +636,7 @@ describe("registerTmuxPaneCommands", () => {
 
   it("handles quick-pick kill pane confirmation cancellation and errors", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxKillPane");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxKillPane");
 
     mockQuickPickOnce(panePick("%2", "Pane 1: shell", "%2"));
     mockWarningOnce("Cancel");
@@ -654,16 +654,16 @@ describe("registerTmuxPaneCommands", () => {
 
   it.each([
     [
-      "ost.tmuxNextWindow",
+      "ai-sidebar-terminal.tmuxNextWindow",
       "nextWindow",
       "Failed to switch to next window",
     ],
     [
-      "ost.tmuxPrevWindow",
+      "ai-sidebar-terminal.tmuxPrevWindow",
       "prevWindow",
       "Failed to switch to previous window",
     ],
-    ["ost.tmuxCreateWindow", "createWindow", "Failed to create window"],
+    ["ai-sidebar-terminal.tmuxCreateWindow", "createWindow", "Failed to create window"],
   ] as const)(
     "%s navigates tmux windows and reports command errors",
     async (commandId, methodName, errorMessage) => {
@@ -693,7 +693,7 @@ describe("registerTmuxPaneCommands", () => {
 
   it("kills windows through quick pick, confirmation, direct args, and error handling", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxKillWindow");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxKillWindow");
 
     mockQuickPickOnce(undefined);
     mockQuickPickOnce(windowPick("@1", "$(check) Window 1: main", "@1"));
@@ -730,7 +730,7 @@ describe("registerTmuxPaneCommands", () => {
 
   it("selects windows from quick picks or direct args and handles errors", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxSelectWindow");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxSelectWindow");
 
     mockQuickPickOnce(undefined);
     mockQuickPickOnce(windowPick("@2", "Window 2: logs", "@2"));
@@ -750,11 +750,11 @@ describe("registerTmuxPaneCommands", () => {
 
   it("kills sessions only after confirmation and surfaces failures", async () => {
     const noSessionHarness = createHarness({ sessionId: undefined });
-    await getHandler(noSessionHarness, "ost.tmuxKillSession")();
+    await getHandler(noSessionHarness, "ai-sidebar-terminal.tmuxKillSession")();
     expect(noSessionHarness.killSession).not.toHaveBeenCalled();
 
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxKillSession");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxKillSession");
 
     mockWarningOnce("Cancel");
     mockWarningOnce("Kill");
@@ -776,12 +776,12 @@ describe("registerTmuxPaneCommands", () => {
   it("routes pane operations to zellij when zellij is active", async () => {
     const harness = createZellijHarness();
 
-    await getHandler(harness, "ost.tmuxSwitchPane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSwitchPane")({
       paneId: "terminal_2",
     });
     expect(harness.selectPane).toHaveBeenCalledWith("terminal_2");
 
-    await getHandler(harness, "ost.tmuxSplitPaneH")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSplitPaneH")({
       paneId: "terminal_1",
       sessionId: "zellij-1",
     });
@@ -791,7 +791,7 @@ describe("registerTmuxPaneCommands", () => {
     });
 
     mockInputBoxOnce("pwd");
-    await getHandler(harness, "ost.tmuxSendTextToPane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSendTextToPane")({
       paneId: "terminal_2",
     });
     expect(harness.selectPane).toHaveBeenLastCalledWith("terminal_2");
@@ -799,7 +799,7 @@ describe("registerTmuxPaneCommands", () => {
 
     mockQuickPickOnce("Left");
     mockInputBoxOnce("4");
-    await getHandler(harness, "ost.tmuxResizePane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxResizePane")({
       paneId: "terminal_2",
     });
     expect(harness.resizePane).toHaveBeenCalledWith("left", 4);
@@ -816,7 +816,7 @@ describe("registerTmuxPaneCommands", () => {
       panePick("terminal_2", "$(check) Pane 1: shell", "terminal_2"),
     );
 
-    await getHandler(harness, "ost.tmuxSwitchPane")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSwitchPane")();
 
     expect(harness.listPanes).toHaveBeenCalledTimes(1);
     expect(harness.selectPane).toHaveBeenCalledWith("terminal_2");
@@ -841,7 +841,7 @@ describe("registerTmuxPaneCommands", () => {
       ],
     });
 
-    await getHandler(harness, "ost.tmuxSplitPaneV")({ sessionId: "zellij-1" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSplitPaneV")({ sessionId: "zellij-1" });
 
     expect(harness.selectPane).toHaveBeenCalledWith("terminal_1");
     expect(harness.splitPane).toHaveBeenCalledWith("v", {
@@ -849,29 +849,29 @@ describe("registerTmuxPaneCommands", () => {
     });
 
     const noSessionHarness = createZellijHarness({ sessionId: undefined });
-    await getHandler(noSessionHarness, "ost.tmuxSplitPaneH")();
+    await getHandler(noSessionHarness, "ai-sidebar-terminal.tmuxSplitPaneH")();
     expect(noSessionHarness.splitPane).not.toHaveBeenCalled();
   });
 
   it("returns early when focused zellij or tmux context cannot resolve panes", async () => {
     const emptyZellijHarness = createZellijHarness({ panes: [] });
-    await getHandler(emptyZellijHarness, "ost.tmuxSplitPaneH")();
+    await getHandler(emptyZellijHarness, "ai-sidebar-terminal.tmuxSplitPaneH")();
     expect(emptyZellijHarness.splitPane).not.toHaveBeenCalled();
 
     const failingZellijHarness = createZellijHarness();
     failingZellijHarness.listPanes.mockRejectedValueOnce(new Error("list failed"));
-    await getHandler(failingZellijHarness, "ost.tmuxSplitPaneH")();
+    await getHandler(failingZellijHarness, "ai-sidebar-terminal.tmuxSplitPaneH")();
     expect(failingZellijHarness.splitPane).not.toHaveBeenCalled();
 
     const emptyTmuxHarness = createHarness({ panes: [] });
     emptyTmuxHarness.deps.resolveActiveTmuxFocus = vi.fn(async () => undefined);
-    await getHandler(emptyTmuxHarness, "ost.tmuxSplitPaneH")();
+    await getHandler(emptyTmuxHarness, "ai-sidebar-terminal.tmuxSplitPaneH")();
     expect(emptyTmuxHarness.splitPane).not.toHaveBeenCalled();
 
     const failingTmuxHarness = createHarness();
     failingTmuxHarness.deps.resolveActiveTmuxFocus = vi.fn(async () => undefined);
     failingTmuxHarness.listPanes.mockRejectedValueOnce(new Error("list failed"));
-    await getHandler(failingTmuxHarness, "ost.tmuxSplitPaneH")();
+    await getHandler(failingTmuxHarness, "ai-sidebar-terminal.tmuxSplitPaneH")();
     expect(failingTmuxHarness.splitPane).not.toHaveBeenCalled();
   });
 
@@ -883,7 +883,7 @@ describe("registerTmuxPaneCommands", () => {
     });
     harness.deps.instanceStore = instanceStore;
 
-    await getHandler(harness, "ost.tmuxSwitchPane")({ paneId: "%2" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSwitchPane")({ paneId: "%2" });
 
     expect(harness.selectPane).toHaveBeenCalledWith("%2");
   });
@@ -901,14 +901,14 @@ describe("registerTmuxPaneCommands", () => {
         throw new Error("session missing");
       });
 
-    await getHandler(harness, "ost.tmuxSplitPaneH")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSplitPaneH")();
 
     expect(harness.splitPane).not.toHaveBeenCalled();
   });
 
   it("covers resize direction variants and default fallback", async () => {
     const harness = createHarness();
-    const handler = getHandler(harness, "ost.tmuxResizePane");
+    const handler = getHandler(harness, "ai-sidebar-terminal.tmuxResizePane");
 
     mockQuickPickOnce("Right");
     mockInputBoxOnce("6");
@@ -926,14 +926,14 @@ describe("registerTmuxPaneCommands", () => {
     const harness = createHarness();
     harness.deps.tmuxManager = undefined;
 
-    await getHandler(harness, "ost.tmuxSplitPaneH")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSplitPaneH")({
       paneId: "%1",
       sessionId: "session-1",
     });
-    await getHandler(harness, "ost.tmuxResizePane")({ paneId: "%1" });
-    await getHandler(harness, "ost.tmuxKillWindow")({ windowId: "@1" });
-    await getHandler(harness, "ost.tmuxSelectWindow")({ windowId: "@1" });
-    await getHandler(harness, "ost.tmuxKillPane")({ paneId: "%1" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxResizePane")({ paneId: "%1" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxKillWindow")({ windowId: "@1" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSelectWindow")({ windowId: "@1" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxKillPane")({ paneId: "%1" });
 
     expect(harness.splitPane).not.toHaveBeenCalled();
     expect(harness.resizePane).not.toHaveBeenCalled();
@@ -945,9 +945,9 @@ describe("registerTmuxPaneCommands", () => {
   it("routes zellij tab and session commands and disables swap", async () => {
     const harness = createZellijHarness();
 
-    await getHandler(harness, "ost.tmuxNextWindow")();
-    await getHandler(harness, "ost.tmuxPrevWindow")();
-    await getHandler(harness, "ost.tmuxCreateWindow")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxNextWindow")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxPrevWindow")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxCreateWindow")();
     expect(harness.nextTab).toHaveBeenCalledTimes(1);
     expect(harness.prevTab).toHaveBeenCalledTimes(1);
     expect(harness.createTab).toHaveBeenCalledWith({
@@ -955,16 +955,16 @@ describe("registerTmuxPaneCommands", () => {
     });
 
     mockQuickPickOnce(windowPick("2", "Tab 2: logs", "2"));
-    await getHandler(harness, "ost.tmuxSelectWindow")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSelectWindow")();
     expect(harness.listTabs).toHaveBeenCalledTimes(1);
     expect(harness.selectTab).toHaveBeenCalledWith(2);
 
     mockWarningOnce("Kill");
-    await getHandler(harness, "ost.tmuxKillWindow")({ windowId: "2" });
+    await getHandler(harness, "ai-sidebar-terminal.tmuxKillWindow")({ windowId: "2" });
     expect(harness.selectTab).toHaveBeenLastCalledWith(2);
     expect(harness.killTab).toHaveBeenCalledTimes(1);
 
-    await getHandler(harness, "ost.tmuxSwapPane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSwapPane")({
       paneId: "terminal_1",
     });
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
@@ -972,7 +972,7 @@ describe("registerTmuxPaneCommands", () => {
     );
 
     mockWarningOnce("Kill");
-    await getHandler(harness, "ost.tmuxKillSession")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxKillSession")();
     expect(harness.killSession).toHaveBeenCalledWith("zellij-1");
   });
 
@@ -980,7 +980,7 @@ describe("registerTmuxPaneCommands", () => {
     const harness = createZellijHarness();
     mockWarningOnce("Kill");
 
-    await getHandler(harness, "ost.tmuxKillPane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxKillPane")({
       paneId: "terminal_2",
     });
 
@@ -991,7 +991,7 @@ describe("registerTmuxPaneCommands", () => {
   it("returns early for zellij kill pane when no active session exists", async () => {
     const harness = createZellijHarness({ sessionId: undefined });
 
-    await getHandler(harness, "ost.tmuxKillPane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxKillPane")({
       paneId: "terminal_2",
     });
 
@@ -1002,20 +1002,20 @@ describe("registerTmuxPaneCommands", () => {
     const noManager = createHarness();
     noManager.deps.tmuxManager = undefined;
 
-    await getHandler(noManager, "ost.tmuxSwitchPane")({ paneId: "%1" });
-    await getHandler(noManager, "ost.tmuxSplitPaneV")({
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxSwitchPane")({ paneId: "%1" });
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxSplitPaneV")({
       paneId: "%1",
       sessionId: "session-1",
     });
-    await getHandler(noManager, "ost.tmuxSplitPaneWithCommand")({
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxSplitPaneWithCommand")({
       paneId: "%1",
       sessionId: "session-1",
     });
-    await getHandler(noManager, "ost.tmuxSendTextToPane")({ paneId: "%1" });
-    await getHandler(noManager, "ost.tmuxSwapPane")({ paneId: "%1" });
-    await getHandler(noManager, "ost.tmuxPrevWindow")();
-    await getHandler(noManager, "ost.tmuxCreateWindow")();
-    await getHandler(noManager, "ost.tmuxKillSession")({
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxSendTextToPane")({ paneId: "%1" });
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxSwapPane")({ paneId: "%1" });
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxPrevWindow")();
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxCreateWindow")();
+    await getHandler(noManager, "ai-sidebar-terminal.tmuxKillSession")({
       sessionId: "session-1",
     });
 
@@ -1028,10 +1028,10 @@ describe("registerTmuxPaneCommands", () => {
     expect(noManager.killSession).not.toHaveBeenCalled();
 
     const noSession = createHarness({ sessionId: undefined });
-    await getHandler(noSession, "ost.tmuxSwitchPane")();
-    await getHandler(noSession, "ost.tmuxSwapPane")({ paneId: "%1" });
-    await getHandler(noSession, "ost.tmuxKillWindow")({ windowId: "@1" });
-    await getHandler(noSession, "ost.tmuxSelectWindow")({ windowId: "@1" });
+    await getHandler(noSession, "ai-sidebar-terminal.tmuxSwitchPane")();
+    await getHandler(noSession, "ai-sidebar-terminal.tmuxSwapPane")({ paneId: "%1" });
+    await getHandler(noSession, "ai-sidebar-terminal.tmuxKillWindow")({ windowId: "@1" });
+    await getHandler(noSession, "ai-sidebar-terminal.tmuxSelectWindow")({ windowId: "@1" });
     expect(noSession.selectPane).not.toHaveBeenCalled();
     expect(noSession.swapPanes).not.toHaveBeenCalled();
     expect(noSession.killWindow).not.toHaveBeenCalled();
@@ -1042,7 +1042,7 @@ describe("registerTmuxPaneCommands", () => {
       splitHelper.deps.tmuxManager = undefined;
       return "/test/workspace";
     });
-    await getHandler(splitHelper, "ost.tmuxSplitPaneH")({
+    await getHandler(splitHelper, "ai-sidebar-terminal.tmuxSplitPaneH")({
       paneId: "%1",
       sessionId: "session-1",
     });
@@ -1053,7 +1053,7 @@ describe("registerTmuxPaneCommands", () => {
       sendPick.deps.tmuxManager = undefined;
       return { sessionId: "session-1", windowId: "@1", paneId: "%1" };
     });
-    await getHandler(sendPick, "ost.tmuxSendTextToPane")();
+    await getHandler(sendPick, "ai-sidebar-terminal.tmuxSendTextToPane")();
     expect(sendPick.sendTextToPane).not.toHaveBeenCalled();
 
     const resizeHelper = createHarness();
@@ -1062,7 +1062,7 @@ describe("registerTmuxPaneCommands", () => {
       resizeHelper.deps.tmuxManager = undefined;
       return "3";
     });
-    await getHandler(resizeHelper, "ost.tmuxResizePane")({ paneId: "%1" });
+    await getHandler(resizeHelper, "ai-sidebar-terminal.tmuxResizePane")({ paneId: "%1" });
     expect(resizeHelper.resizePane).not.toHaveBeenCalled();
 
     const listWindowHelper = createHarness();
@@ -1070,8 +1070,8 @@ describe("registerTmuxPaneCommands", () => {
       listWindowHelper.deps.tmuxManager = undefined;
       return { sessionId: "session-1", windowId: "@1", paneId: "%1" };
     });
-    await getHandler(listWindowHelper, "ost.tmuxKillWindow")();
-    await getHandler(listWindowHelper, "ost.tmuxSelectWindow")();
+    await getHandler(listWindowHelper, "ai-sidebar-terminal.tmuxKillWindow")();
+    await getHandler(listWindowHelper, "ai-sidebar-terminal.tmuxSelectWindow")();
     expect(listWindowHelper.killWindow).not.toHaveBeenCalled();
     expect(listWindowHelper.selectWindow).not.toHaveBeenCalled();
   });
@@ -1081,7 +1081,7 @@ describe("registerTmuxPaneCommands", () => {
       panes: [{ paneId: "%3", index: 2, title: "", isActive: false }],
     });
     noActivePane.deps.resolveActiveTmuxFocus = vi.fn(async () => undefined);
-    await getHandler(noActivePane, "ost.tmuxSplitPaneH")();
+    await getHandler(noActivePane, "ai-sidebar-terminal.tmuxSplitPaneH")();
     expect(noActivePane.splitPane).toHaveBeenCalledWith("%3", "h", {
       workingDirectory: "/test/workspace",
     });
@@ -1089,7 +1089,7 @@ describe("registerTmuxPaneCommands", () => {
     const emptyTmux = createHarness({ panes: [] });
     emptyTmux.deps.resolveActiveTmuxFocus = vi.fn(async () => undefined);
     mockInputBoxOnce("npm test");
-    await getHandler(emptyTmux, "ost.tmuxSplitPaneWithCommand")({
+    await getHandler(emptyTmux, "ai-sidebar-terminal.tmuxSplitPaneWithCommand")({
       sessionId: "session-1",
     });
     expect(emptyTmux.splitPane).not.toHaveBeenCalled();
@@ -1098,7 +1098,7 @@ describe("registerTmuxPaneCommands", () => {
       panes: [{ paneId: "%4", index: 4, title: "", isActive: true }],
     });
     mockQuickPickOnce(panePick("%4", "$(check) Pane 4", "%4"));
-    await getHandler(emptyTitleSwitch, "ost.tmuxSwitchPane")();
+    await getHandler(emptyTitleSwitch, "ai-sidebar-terminal.tmuxSwitchPane")();
     const quickPickCalls = vi.mocked(vscode.window.showQuickPick).mock.calls;
     const emptyTitleItems = quickPickCalls[quickPickCalls.length - 1]?.[0] as Array<{
       label: string;
@@ -1113,7 +1113,7 @@ describe("registerTmuxPaneCommands", () => {
 
     const splitHError = createHarness();
     splitHError.splitPane.mockRejectedValueOnce(new Error("boom"));
-    await getHandler(splitHError, "ost.tmuxSplitPaneH")({
+    await getHandler(splitHError, "ai-sidebar-terminal.tmuxSplitPaneH")({
       paneId: "%1",
       sessionId: "session-1",
     });
@@ -1122,10 +1122,10 @@ describe("registerTmuxPaneCommands", () => {
     );
 
     const resizeNoSession = createHarness({ sessionId: undefined });
-    await getHandler(resizeNoSession, "ost.tmuxResizePane")();
+    await getHandler(resizeNoSession, "ai-sidebar-terminal.tmuxResizePane")();
     expect(resizeNoSession.resizePane).not.toHaveBeenCalled();
     mockQuickPickOnce(undefined);
-    await getHandler(resizeNoSession, "ost.tmuxResizePane")({ paneId: "%1" });
+    await getHandler(resizeNoSession, "ai-sidebar-terminal.tmuxResizePane")({ paneId: "%1" });
     expect(resizeNoSession.resizePane).not.toHaveBeenCalled();
 
     const resizeNoManagerAfterPick = createHarness();
@@ -1135,14 +1135,14 @@ describe("registerTmuxPaneCommands", () => {
       resizeNoManagerAfterPick.deps.tmuxManager = undefined;
       return "2";
     });
-    await getHandler(resizeNoManagerAfterPick, "ost.tmuxResizePane")();
+    await getHandler(resizeNoManagerAfterPick, "ai-sidebar-terminal.tmuxResizePane")();
     expect(resizeNoManagerAfterPick.resizePane).not.toHaveBeenCalled();
 
     const sourceSwapError = createHarness();
     mockQuickPickOnce(panePick("%1", "Pane 0", "%1"));
     mockQuickPickOnce(panePick("%2", "Pane 1", "%2"));
     sourceSwapError.swapPanes.mockRejectedValueOnce(new Error("boom"));
-    await getHandler(sourceSwapError, "ost.tmuxSwapPane")();
+    await getHandler(sourceSwapError, "ai-sidebar-terminal.tmuxSwapPane")();
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       "Failed to swap panes",
     );
@@ -1161,7 +1161,7 @@ describe("registerTmuxPaneCommands", () => {
       .mockImplementationOnce(() => {
         throw new Error("missing active runtime");
       });
-    await getHandler(zellijThrow, "ost.tmuxKillSession")();
+    await getHandler(zellijThrow, "ai-sidebar-terminal.tmuxKillSession")();
     expect(zellijThrow.killSession).not.toHaveBeenCalled();
 
     const selectHelper = createHarness();
@@ -1169,7 +1169,7 @@ describe("registerTmuxPaneCommands", () => {
       selectHelper.deps.tmuxManager = undefined;
       return { sessionId: "session-1", windowId: "@1", paneId: "%1" };
     });
-    await getHandler(selectHelper, "ost.tmuxSelectWindow")({ windowId: "@1" });
+    await getHandler(selectHelper, "ai-sidebar-terminal.tmuxSelectWindow")({ windowId: "@1" });
     expect(selectHelper.selectWindow).not.toHaveBeenCalled();
 
     const killHelper = createHarness();
@@ -1178,20 +1178,20 @@ describe("registerTmuxPaneCommands", () => {
       return { sessionId: "session-1", windowId: "@1", paneId: "%1" };
     });
     mockWarningOnce("Kill");
-    await getHandler(killHelper, "ost.tmuxKillWindow")({ windowId: "@1" });
+    await getHandler(killHelper, "ai-sidebar-terminal.tmuxKillWindow")({ windowId: "@1" });
     expect(killHelper.killWindow).not.toHaveBeenCalled();
 
     const sendTextCancelledAfterPick = createHarness();
     mockQuickPickOnce(panePick("%1", "Pane 0", "%1"));
     mockInputBoxOnce(undefined);
-    await getHandler(sendTextCancelledAfterPick, "ost.tmuxSendTextToPane")();
+    await getHandler(sendTextCancelledAfterPick, "ai-sidebar-terminal.tmuxSendTextToPane")();
     expect(sendTextCancelledAfterPick.sendTextToPane).not.toHaveBeenCalled();
   });
 
   it("covers zellij unavailable-manager and resize direction branches", async () => {
     const noZellijManager = createZellijHarness();
     noZellijManager.deps.zellijManager = undefined;
-    await getHandler(noZellijManager, "ost.tmuxSwitchPane")({
+    await getHandler(noZellijManager, "ai-sidebar-terminal.tmuxSwitchPane")({
       paneId: "terminal_1",
     });
     expect(noZellijManager.selectPane).not.toHaveBeenCalled();
@@ -1199,17 +1199,17 @@ describe("registerTmuxPaneCommands", () => {
     const harness = createZellijHarness();
     mockQuickPickOnce("Right");
     mockInputBoxOnce("2");
-    await getHandler(harness, "ost.tmuxResizePane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxResizePane")({
       paneId: "terminal_1",
     });
     mockQuickPickOnce("Up");
     mockInputBoxOnce("3");
-    await getHandler(harness, "ost.tmuxResizePane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxResizePane")({
       paneId: "terminal_1",
     });
     mockQuickPickOnce("Down");
     mockInputBoxOnce("4");
-    await getHandler(harness, "ost.tmuxResizePane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxResizePane")({
       paneId: "terminal_1",
     });
 
@@ -1226,10 +1226,10 @@ describe("registerTmuxPaneCommands", () => {
       state: "connected",
     });
 
-    await getHandler(harness, "ost.tmuxSwitchPane")({
+    await getHandler(harness, "ai-sidebar-terminal.tmuxSwitchPane")({
       paneId: "terminal_2",
     });
-    await getHandler(harness, "ost.tmuxNextWindow")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxNextWindow")();
 
     expect(harness.selectPane).not.toHaveBeenCalled();
     expect(harness.nextTab).not.toHaveBeenCalled();
@@ -1238,10 +1238,10 @@ describe("registerTmuxPaneCommands", () => {
   it("refreshes the terminal manager", async () => {
     const harness = createHarness();
 
-    await getHandler(harness, "ost.tmuxRefresh")();
+    await getHandler(harness, "ai-sidebar-terminal.tmuxRefresh")();
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.openTerminalManager",
+      "ai-sidebar-terminal.openTerminalManager",
     );
   });
 });

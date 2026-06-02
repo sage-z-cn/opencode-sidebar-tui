@@ -37,7 +37,7 @@ const commands: TmuxCommand[] = [
     requiresSession: false,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.browseTmuxSessions",
+      commandId: "ai-sidebar-terminal.browseTmuxSessions",
     }),
   },
   {
@@ -47,7 +47,7 @@ const commands: TmuxCommand[] = [
     requiresSession: false,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.createTmuxSession",
+      commandId: "ai-sidebar-terminal.createTmuxSession",
     }),
   },
   {
@@ -57,7 +57,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxKillSession",
+      commandId: "ai-sidebar-terminal.tmuxKillSession",
     }),
   },
   {
@@ -67,7 +67,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxCreateWindow",
+      commandId: "ai-sidebar-terminal.tmuxCreateWindow",
     }),
   },
   {
@@ -77,7 +77,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxNextWindow",
+      commandId: "ai-sidebar-terminal.tmuxNextWindow",
     }),
   },
   {
@@ -87,7 +87,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxPrevWindow",
+      commandId: "ai-sidebar-terminal.tmuxPrevWindow",
     }),
   },
   {
@@ -97,7 +97,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxSelectWindow",
+      commandId: "ai-sidebar-terminal.tmuxSelectWindow",
     }),
   },
   {
@@ -107,7 +107,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxKillWindow",
+      commandId: "ai-sidebar-terminal.tmuxKillWindow",
     }),
   },
   {
@@ -127,7 +127,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxSwitchPane",
+      commandId: "ai-sidebar-terminal.tmuxSwitchPane",
     }),
   },
   {
@@ -137,7 +137,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxSplitPaneH",
+      commandId: "ai-sidebar-terminal.tmuxSplitPaneH",
     }),
   },
   {
@@ -147,7 +147,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxSplitPaneV",
+      commandId: "ai-sidebar-terminal.tmuxSplitPaneV",
     }),
   },
   {
@@ -157,7 +157,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxSplitPaneWithCommand",
+      commandId: "ai-sidebar-terminal.tmuxSplitPaneWithCommand",
     }),
   },
   {
@@ -167,7 +167,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxSendTextToPane",
+      commandId: "ai-sidebar-terminal.tmuxSendTextToPane",
     }),
   },
   {
@@ -177,7 +177,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxResizePane",
+      commandId: "ai-sidebar-terminal.tmuxResizePane",
     }),
   },
   {
@@ -188,7 +188,7 @@ const commands: TmuxCommand[] = [
     unsupportedBackends: ["zellij"],
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxSwapPane",
+      commandId: "ai-sidebar-terminal.tmuxSwapPane",
     }),
   },
   {
@@ -198,7 +198,7 @@ const commands: TmuxCommand[] = [
     requiresSession: true,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxKillPane",
+      commandId: "ai-sidebar-terminal.tmuxKillPane",
     }),
   },
   {
@@ -217,7 +217,7 @@ const commands: TmuxCommand[] = [
     requiresSession: false,
     buildMessage: () => ({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxRefresh",
+      commandId: "ai-sidebar-terminal.tmuxRefresh",
     }),
   },
   {

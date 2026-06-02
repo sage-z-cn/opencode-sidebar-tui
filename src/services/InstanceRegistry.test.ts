@@ -12,9 +12,9 @@ vi.mock("vscode", async () => {
   return actual;
 });
 
-const GLOBAL_INSTANCES_KEY = "ost.instances.global";
-const WORKSPACE_INSTANCES_KEY = "ost.instances.workspace";
-const LEGACY_INSTANCE_KEY = "ost.instanceConfig";
+const GLOBAL_INSTANCES_KEY = "ai-sidebar-terminal.instances.global";
+const WORKSPACE_INSTANCES_KEY = "ai-sidebar-terminal.instances.workspace";
+const LEGACY_INSTANCE_KEY = "ai-sidebar-terminal.instanceConfig";
 
 function createContext(options?: {
   globalValues?: Record<string, unknown>;
@@ -164,13 +164,13 @@ describe("InstanceRegistry", () => {
   it("migrates the first workspace legacy config before global legacy fallback", () => {
     const { context } = createContext({
       globalValues: {
-        "ost.instance": {
+        "ai-sidebar-terminal.instance": {
           label: "Global Legacy",
           preferredPort: 4100,
         },
       },
       workspaceValues: {
-        "ost.instance": {
+        "ai-sidebar-terminal.instance": {
           workspaceUri: "file:///workspace-legacy",
           label: "Workspace Legacy",
           args: ["--ok", false, "--still-ok"],
@@ -200,7 +200,7 @@ describe("InstanceRegistry", () => {
   it("ignores malformed workspace active ids and empty legacy configs", () => {
     const { context } = createContext({
       globalValues: {
-        "ost.instance": {
+        "ai-sidebar-terminal.instance": {
           workspaceUri: 123,
           label: null,
           args: "--bad",
@@ -229,7 +229,7 @@ describe("InstanceRegistry", () => {
   it("does not migrate legacy configs when every legacy field is malformed", () => {
     const { context } = createContext({
       globalValues: {
-        "ost.instance": {
+        "ai-sidebar-terminal.instance": {
           workspaceUri: 123,
           label: null,
           args: "--bad",
@@ -266,7 +266,7 @@ describe("InstanceRegistry", () => {
 
     for (const { legacy, expected } of legacyCases) {
       const { context } = createContext({
-        globalValues: { "ost.instance": legacy },
+        globalValues: { "ai-sidebar-terminal.instance": legacy },
       });
       const registry = new InstanceRegistry(
         context as unknown as ConstructorParameters<typeof InstanceRegistry>[0],

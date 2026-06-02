@@ -2,11 +2,11 @@ import * as vscode from "vscode";
 import { TerminalBackendType } from "../types";
 import { InstanceConfig, InstanceRecord, InstanceStore } from "./InstanceStore";
 
-const GLOBAL_INSTANCES_KEY = "ost.instances.global";
-const WORKSPACE_INSTANCES_KEY = "ost.instances.workspace";
+const GLOBAL_INSTANCES_KEY = "ai-sidebar-terminal.instances.global";
+const WORKSPACE_INSTANCES_KEY = "ai-sidebar-terminal.instances.workspace";
 const LEGACY_INSTANCE_KEYS = [
-  "ost.instance",
-  "ost.instanceConfig",
+  "ai-sidebar-terminal.instance",
+  "ai-sidebar-terminal.instanceConfig",
 ];
 const DEFAULT_INSTANCE_ID = "default";
 const DEFAULT_DEBOUNCE_MS = 500;

@@ -14,7 +14,7 @@
 如果还没 clone 这个仓库，先 clone 并添加上游远程：
 
 ```bash
-git clone https://github.com/sage-z-cn/opencode-sidebar-tui.git
+git clone https://github.com/sage-z-cn/ai-sidebar-terminal.git
 cd opencode-sidebar-tui
 git remote add upstream https://github.com/islee23520/open-sidebar-terminal.git
 ```
@@ -23,8 +23,8 @@ git remote add upstream https://github.com/islee23520/open-sidebar-terminal.git
 
 ```bash
 git remote -v
-# origin    https://github.com/sage-z-cn/opencode-sidebar-tui.git (fetch)
-# origin    https://github.com/sage-z-cn/opencode-sidebar-tui.git (push)
+# origin    https://github.com/sage-z-cn/ai-sidebar-terminal.git (fetch)
+# origin    https://github.com/sage-z-cn/ai-sidebar-terminal.git (push)
 # upstream  https://github.com/islee23520/open-sidebar-terminal.git (fetch)
 # upstream  https://github.com/islee23520/open-sidebar-terminal.git (push)
 ```

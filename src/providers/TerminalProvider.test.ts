@@ -227,8 +227,8 @@ describe("TerminalProvider", () => {
     await Promise.resolve();
 
     expect(showSpy).toHaveBeenCalledWith(
-      "ost-main",
-      "ost-main",
+      "ai-sidebar-terminal-main",
+      "ai-sidebar-terminal-main",
       true,
       undefined,
     );
@@ -622,7 +622,7 @@ describe("TerminalProvider", () => {
     await provider.openInEditorTab();
 
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
-      "ost.terminalEditor",
+      "ai-sidebar-terminal.terminalEditor",
       "Open Sidebar Terminal",
       vscode.ViewColumn.Beside,
       expect.objectContaining({
@@ -703,7 +703,7 @@ describe("TerminalProvider", () => {
 
     expect(panel.dispose).toHaveBeenCalledTimes(1);
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "workbench.view.extension.ostContainer",
+      "workbench.view.extension.ai-sidebar-terminalContainer",
     );
     expect(view.show).toHaveBeenCalledWith(true);
   });
@@ -718,13 +718,13 @@ describe("TerminalProvider", () => {
     await flushAsyncStartup();
 
     expect(createTerminalSpy).toHaveBeenCalledWith(
-      "ost-main",
+      "ai-sidebar-terminal-main",
       "opencode -c",
       {},
       undefined,
       120,
       40,
-      "ost-main",
+      "ai-sidebar-terminal-main",
       os.homedir(),
     );
   });
@@ -843,13 +843,13 @@ describe("TerminalProvider", () => {
     await flushAsyncStartup();
 
     expect(createTerminalSpy).toHaveBeenCalledWith(
-      "ost-main",
+      "ai-sidebar-terminal-main",
       "codex",
       {},
       undefined,
       120,
       40,
-      "ost-main",
+      "ai-sidebar-terminal-main",
       expect.any(String),
     );
   });
@@ -1138,13 +1138,13 @@ describe("TerminalProvider", () => {
     expect(ensureSession).not.toHaveBeenCalled();
     expect(discoverSessions).toHaveBeenCalled();
     expect(createTerminalSpy).toHaveBeenCalledWith(
-      "ost-main",
+      "ai-sidebar-terminal-main",
       "tmux attach-session -t shared-session \\; set-option -u status off",
       {},
       undefined,
       96,
       28,
-      "ost-main",
+      "ai-sidebar-terminal-main",
       os.homedir(),
     );
   });
@@ -2294,7 +2294,7 @@ describe("TerminalProvider", () => {
         "HTTP API send failed, falling back to terminal write: network down",
       ),
     );
-    expect(writeSpy).toHaveBeenCalledWith("ost-main", "hello fallback");
+    expect(writeSpy).toHaveBeenCalledWith("ai-sidebar-terminal-main", "hello fallback");
   });
 
   it("resets stale runtime state and starts immediately when a visible webview opens", () => {
@@ -2356,7 +2356,7 @@ describe("TerminalProvider", () => {
     await provider.openInEditorTab();
 
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
-      "ost.terminalEditor",
+      "ai-sidebar-terminal.terminalEditor",
       "Open Sidebar Terminal",
       vscode.ViewColumn.Beside,
       expect.any(Object),
@@ -2468,7 +2468,7 @@ describe("TerminalProvider", () => {
     provider.toggleDashboard();
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.openTerminalManager",
+      "ai-sidebar-terminal.openTerminalManager",
     );
   });
 
@@ -2694,7 +2694,7 @@ describe("TerminalProvider", () => {
     expect(selectBackendSpy).toHaveBeenCalledWith("native");
     expect(cycleBackendSpy).toHaveBeenCalledTimes(2);
     expect(switchZellijSpy).toHaveBeenCalledWith("zellij-a");
-    expect(resizeSpy).toHaveBeenCalledWith("ost-main", 120, 33);
+    expect(resizeSpy).toHaveBeenCalledWith("ai-sidebar-terminal-main", 120, 33);
     expect(view.webview.postMessage).toHaveBeenCalledWith({
       type: "clipboardContent",
       text: "from bridge",
@@ -3158,7 +3158,7 @@ describe("TerminalProvider", () => {
     expect(provider.formatEditorReference(editor)).toBe("@src/empty.ts");
     await provider.sendPrompt("fallback prompt");
 
-    expect(writeSpy).toHaveBeenCalledWith("ost-main", "fallback prompt");
+    expect(writeSpy).toHaveBeenCalledWith("ai-sidebar-terminal-main", "fallback prompt");
   });
 
   it("covers remaining TerminalProvider error and fallback branches", async () => {

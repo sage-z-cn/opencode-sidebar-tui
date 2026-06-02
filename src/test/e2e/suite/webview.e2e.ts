@@ -21,7 +21,7 @@ suite("Webview registration", () => {
     };
 
     const sidebarViews =
-      packageJSON.contributes?.views?.ostContainer ?? [];
+      packageJSON.contributes?.views?.ai-sidebar-terminalContainer ?? [];
     const terminalView = sidebarViews.find((view) => view.id === "ost");
 
     assert.ok(terminalView, "ost sidebar view should be contributed");
@@ -33,7 +33,7 @@ suite("Webview registration", () => {
 
     const commands = await vscode.commands.getCommands(true);
     assert.ok(
-      commands.includes("ost.toggleDashboard"),
+      commands.includes("ai-sidebar-terminal.toggleDashboard"),
       "Dashboard command should be registered",
     );
   });
@@ -42,7 +42,7 @@ suite("Webview registration", () => {
     await activateExtension();
 
     const commands = await vscode.commands.getCommands(true);
-    const viewContainerCommand = "workbench.view.extension.ostContainer";
+    const viewContainerCommand = "workbench.view.extension.ai-sidebar-terminalContainer";
 
     assert.ok(
       commands.includes(viewContainerCommand),

@@ -103,28 +103,28 @@ function getCommandHandlers(): CommandHandlers {
 
   return {
     openInNewWindow: getHandler(
-      "ost.openInNewWindow",
+      "ai-sidebar-terminal.openInNewWindow",
     ) as () => Promise<void>,
-    spawnForWorkspace: getHandler("ost.spawnForWorkspace") as (uri?: {
+    spawnForWorkspace: getHandler("ai-sidebar-terminal.spawnForWorkspace") as (uri?: {
       toString(): string;
     }) => Promise<void>,
-    selectInstance: getHandler("ost.selectInstance") as () => void,
-    switchTmuxSession: getHandler("ost.switchTmuxSession") as (
+    selectInstance: getHandler("ai-sidebar-terminal.selectInstance") as () => void,
+    switchTmuxSession: getHandler("ai-sidebar-terminal.switchTmuxSession") as (
       sessionId?: string,
     ) => Promise<void>,
     createTmuxSession: getHandler(
-      "ost.createTmuxSession",
+      "ai-sidebar-terminal.createTmuxSession",
     ) as () => Promise<void>,
-    killTmuxSession: getHandler("ost.killTmuxSession") as (
+    killTmuxSession: getHandler("ai-sidebar-terminal.killTmuxSession") as (
       sessionId?: string,
     ) => Promise<void>,
     switchNativeShell: getHandler(
-      "ost.switchNativeShell",
+      "ai-sidebar-terminal.switchNativeShell",
     ) as () => Promise<void>,
     browseTmuxSessions: getHandler(
-      "ost.browseTmuxSessions",
+      "ai-sidebar-terminal.browseTmuxSessions",
     ) as () => Promise<void>,
-    killNativeShell: getHandler("ost.killNativeShell") as (
+    killNativeShell: getHandler("ai-sidebar-terminal.killNativeShell") as (
       instanceId?: string,
     ) => Promise<void>,
   };
@@ -376,7 +376,7 @@ describe("registerTmuxSessionCommands", () => {
     expect(instanceController.spawn).not.toHaveBeenCalled();
     expect(instanceStore.getActive().config.id).toBe("existing");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.focus",
+      "ai-sidebar-terminal.focus",
     );
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
       "Focused existing OpenCode for workspace: Reusable Workspace",
@@ -630,7 +630,7 @@ describe("registerTmuxSessionCommands", () => {
 
     expect(provider.switchToTmuxSession).toHaveBeenCalledWith("tmux-1");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.focus",
+      "ai-sidebar-terminal.focus",
     );
     expect(
       vi.mocked(vscode.commands.executeCommand).mock.invocationCallOrder[0],
@@ -696,7 +696,7 @@ describe("registerTmuxSessionCommands", () => {
 
     expect(provider.createTmuxSession).toHaveBeenCalledTimes(1);
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.focus",
+      "ai-sidebar-terminal.focus",
     );
     expect(
       vi.mocked(vscode.commands.executeCommand).mock.invocationCallOrder[0],
@@ -929,7 +929,7 @@ describe("registerTmuxSessionCommands", () => {
 
     expect(provider.switchToTmuxSession).toHaveBeenCalledWith("tmux-b");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.focus",
+      "ai-sidebar-terminal.focus",
     );
     expect(
       vi.mocked(vscode.commands.executeCommand).mock.invocationCallOrder[0],

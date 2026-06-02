@@ -50,7 +50,7 @@ suite("AI tool selector E2E surface", () => {
   test("contributes promptAiToolOnSession with expected type and default", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const promptAiToolOnSession = properties["ost.promptAiToolOnSession"];
+    const promptAiToolOnSession = properties["ai-sidebar-terminal.promptAiToolOnSession"];
 
     assert.strictEqual(promptAiToolOnSession?.type, "boolean");
     assert.strictEqual(promptAiToolOnSession?.default, true);
@@ -59,7 +59,7 @@ suite("AI tool selector E2E surface", () => {
   test("contributes defaultAiTool as opencode", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const defaultAiTool = properties["ost.defaultAiTool"];
+    const defaultAiTool = properties["ai-sidebar-terminal.defaultAiTool"];
 
     assert.strictEqual(defaultAiTool?.type, "string");
     assert.strictEqual(defaultAiTool?.default, "opencode");
@@ -68,7 +68,7 @@ suite("AI tool selector E2E surface", () => {
   test("defines the default AI tool selector entries", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const aiTools = properties["ost.aiTools"];
+    const aiTools = properties["ai-sidebar-terminal.aiTools"];
     const defaults = aiTools?.default as AiToolDefault[] | undefined;
 
     assert.strictEqual(aiTools?.type, "array");
@@ -94,7 +94,7 @@ suite("AI tool selector E2E surface", () => {
   test("defines AI tool item schema required by the selector", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const itemProperties = properties["ost.aiTools"]?.items?.properties;
+    const itemProperties = properties["ai-sidebar-terminal.aiTools"]?.items?.properties;
 
     assert.strictEqual(itemProperties?.name?.type, "string");
     assert.strictEqual(itemProperties?.label?.type, "string");
@@ -107,7 +107,7 @@ suite("AI tool selector E2E surface", () => {
   test("supports available terminal backends for selector launch flows", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const terminalBackend = properties["ost.terminalBackend"];
+    const terminalBackend = properties["ai-sidebar-terminal.terminalBackend"];
 
     assert.strictEqual(terminalBackend?.type, "string");
     assert.deepStrictEqual(terminalBackend?.enum, ["native", "tmux", "zellij"]);
@@ -117,11 +117,11 @@ suite("AI tool selector E2E surface", () => {
     await activateExtension();
     const commands = await vscode.commands.getCommands(true);
     const expectedCommands = [
-      "ost.switchTmuxSession",
-      "ost.browseTmuxSessions",
-      "ost.switchNativeShell",
-      "ost.toggleDashboard",
-      "ost.openDashboardInEditor",
+      "ai-sidebar-terminal.switchTmuxSession",
+      "ai-sidebar-terminal.browseTmuxSessions",
+      "ai-sidebar-terminal.switchNativeShell",
+      "ai-sidebar-terminal.toggleDashboard",
+      "ai-sidebar-terminal.openDashboardInEditor",
     ];
 
     for (const command of expectedCommands) {

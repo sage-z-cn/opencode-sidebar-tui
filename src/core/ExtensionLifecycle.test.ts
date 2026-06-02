@@ -71,11 +71,11 @@ describe("ExtensionLifecycle", () => {
       );
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
-        "ost.openTerminalManager",
+        "ai-sidebar-terminal.openTerminalManager",
         expect.any(Function),
       );
       expect(vscode.window.registerWebviewPanelSerializer).toHaveBeenCalledWith(
-        "ost.terminalEditor",
+        "ai-sidebar-terminal.terminalEditor",
         expect.any(Object),
       );
     });
@@ -96,7 +96,7 @@ describe("ExtensionLifecycle", () => {
       );
       expect(
         vscode.window.registerWebviewViewProvider,
-      ).not.toHaveBeenCalledWith("ost.tmuxSessions", expect.anything());
+      ).not.toHaveBeenCalledWith("ai-sidebar-terminal.tmuxSessions", expect.anything());
     });
 
     it("should log unavailable terminal backends and continue activation", async () => {
@@ -140,7 +140,7 @@ describe("ExtensionLifecycle", () => {
       await lifecycle.activate(mockContext);
 
       expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
-        "ost.start",
+        "ai-sidebar-terminal.start",
         expect.any(Function),
       );
     });
@@ -224,7 +224,7 @@ describe("ExtensionLifecycle", () => {
 
       const explainAndFix = getRegisteredCommandHandler<
         (args: { diagnostic: unknown; documentUri: string }) => Promise<void>
-      >("ost.explainAndFix");
+      >("ai-sidebar-terminal.explainAndFix");
 
       await explainAndFix({
         diagnostic: {
@@ -279,7 +279,7 @@ describe("ExtensionLifecycle", () => {
       await lifecycle.activate(mockContext);
 
       const openTerminalManager = getRegisteredCommandHandler<() => void>(
-        "ost.openTerminalManager",
+        "ai-sidebar-terminal.openTerminalManager",
       );
 
       openTerminalManager();
@@ -512,7 +512,7 @@ describe("ExtensionLifecycle", () => {
         getActive: vi.fn(() => undefined),
       });
 
-      expect((lifecycle as any).getActiveTerminalId()).toBe("ost-main");
+      expect((lifecycle as any).getActiveTerminalId()).toBe("ai-sidebar-terminal-main");
       expect(warn).toHaveBeenCalledWith(
         expect.stringContaining("NO active instance"),
       );
@@ -527,7 +527,7 @@ describe("ExtensionLifecycle", () => {
         }),
       });
 
-      expect((lifecycle as any).getActiveTerminalId()).toBe("ost-main");
+      expect((lifecycle as any).getActiveTerminalId()).toBe("ai-sidebar-terminal-main");
       expect(error).toHaveBeenCalledWith(
         expect.stringContaining("ERROR: boom"),
       );
@@ -542,7 +542,7 @@ describe("ExtensionLifecycle", () => {
         }),
       });
 
-      expect((lifecycle as any).getActiveTerminalId()).toBe("ost-main");
+      expect((lifecycle as any).getActiveTerminalId()).toBe("ai-sidebar-terminal-main");
       expect(error).toHaveBeenCalledWith(
         expect.stringContaining("ERROR: string boom"),
       );
@@ -685,7 +685,7 @@ describe("ExtensionLifecycle", () => {
       expect(startOpenCode).toHaveBeenCalledTimes(1);
       expect(appendPrompt).toHaveBeenCalledWith("ship it");
       expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-        "ost.focus",
+        "ai-sidebar-terminal.focus",
       );
       expect(focus).toHaveBeenCalledTimes(1);
       expect(terminalManager.writeToTerminal).not.toHaveBeenCalled();
@@ -741,7 +741,7 @@ describe("ExtensionLifecycle", () => {
         expect.stringContaining("falling back to terminal input"),
       );
       expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-        "ost-main",
+        "ai-sidebar-terminal-main",
         "hello\n",
       );
     });
@@ -773,7 +773,7 @@ describe("ExtensionLifecycle", () => {
         expect.stringContaining("http string down"),
       );
       expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-        "ost-main",
+        "ai-sidebar-terminal-main",
         "hello\n",
       );
     });
@@ -801,11 +801,11 @@ describe("ExtensionLifecycle", () => {
       await (lifecycle as any).sendPromptToOpenCode("fallback");
 
       expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-        "ost-main",
+        "ai-sidebar-terminal-main",
         "fallback\n",
       );
       expect(vscode.commands.executeCommand).not.toHaveBeenCalledWith(
-        "ost.focus",
+        "ai-sidebar-terminal.focus",
       );
     });
   });
@@ -854,11 +854,11 @@ describe("ExtensionLifecycle", () => {
       await vi.runAllTimersAsync();
 
       expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-        "ost-main",
+        "ai-sidebar-terminal-main",
         "@packages/core ",
       );
       expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-        "ost.focus",
+        "ai-sidebar-terminal.focus",
       );
       expect(focus).toHaveBeenCalledTimes(1);
     });
@@ -874,7 +874,7 @@ describe("ExtensionLifecycle", () => {
       (lifecycle as any).sendTerminalCwd();
 
       expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-        "ost-main",
+        "ai-sidebar-terminal-main",
         "@/tmp/project ",
       );
     });
@@ -894,7 +894,7 @@ describe("ExtensionLifecycle", () => {
       await vi.runAllTimersAsync();
 
       expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-        "ost-main",
+        "ai-sidebar-terminal-main",
         "@/tmp/project ",
       );
     });
@@ -1006,7 +1006,7 @@ describe("ExtensionLifecycle", () => {
 
     it("should register start command", () => {
       const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
-      const startCall = calls.find((call) => call[0] === "ost.start");
+      const startCall = calls.find((call) => call[0] === "ai-sidebar-terminal.start");
 
       expect(startCall).toBeDefined();
     });
@@ -1014,7 +1014,7 @@ describe("ExtensionLifecycle", () => {
     it("should register sendToTerminal command", () => {
       const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
       const sendCall = calls.find(
-        (call) => call[0] === "ost.sendToTerminal",
+        (call) => call[0] === "ai-sidebar-terminal.sendToTerminal",
       );
 
       expect(sendCall).toBeDefined();
@@ -1023,7 +1023,7 @@ describe("ExtensionLifecycle", () => {
     it("should register sendAtMention command", () => {
       const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
       const mentionCall = calls.find(
-        (call) => call[0] === "ost.sendAtMention",
+        (call) => call[0] === "ai-sidebar-terminal.sendAtMention",
       );
 
       expect(mentionCall).toBeDefined();
@@ -1032,7 +1032,7 @@ describe("ExtensionLifecycle", () => {
     it("should register sendAllOpenFiles command", () => {
       const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
       const allFilesCall = calls.find(
-        (call) => call[0] === "ost.sendAllOpenFiles",
+        (call) => call[0] === "ai-sidebar-terminal.sendAllOpenFiles",
       );
 
       expect(allFilesCall).toBeDefined();
@@ -1041,7 +1041,7 @@ describe("ExtensionLifecycle", () => {
     it("should register sendFileToTerminal command", () => {
       const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
       const fileCall = calls.find(
-        (call) => call[0] === "ost.sendFileToTerminal",
+        (call) => call[0] === "ai-sidebar-terminal.sendFileToTerminal",
       );
 
       expect(fileCall).toBeDefined();
@@ -1058,10 +1058,10 @@ describe("ExtensionLifecycle", () => {
 
       const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
       const createCall = calls.find(
-        (call) => call[0] === "ost.createTmuxSession",
+        (call) => call[0] === "ai-sidebar-terminal.createTmuxSession",
       );
       const nativeCall = calls.find(
-        (call) => call[0] === "ost.switchNativeShell",
+        (call) => call[0] === "ai-sidebar-terminal.switchNativeShell",
       );
 
       expect(createCall).toBeDefined();
@@ -1077,12 +1077,12 @@ describe("ExtensionLifecycle", () => {
       expect(switchToNativeShell).toHaveBeenCalledTimes(1);
     });
 
-    describe("ost.spawnForWorkspace", () => {
+    describe("ai-sidebar-terminal.spawnForWorkspace", () => {
       const getSpawnForWorkspaceHandler = () => {
         (lifecycle as any).registerCommands(mockContext);
         const commandCall = vi
           .mocked(vscode.commands.registerCommand)
-          .mock.calls.find((call) => call[0] === "ost.spawnForWorkspace");
+          .mock.calls.find((call) => call[0] === "ai-sidebar-terminal.spawnForWorkspace");
 
         expect(commandCall).toBeDefined();
         return commandCall?.[1] as (uri?: {
@@ -1116,7 +1116,7 @@ describe("ExtensionLifecycle", () => {
           "existing-workspace-instance",
         );
         expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-          "ost.focus",
+          "ai-sidebar-terminal.focus",
         );
       });
 
@@ -1176,7 +1176,7 @@ describe("ExtensionLifecycle", () => {
       const inspectMock = vi.fn(() => ({ globalValue: false }));
       const updateMock = vi.fn();
       vi.mocked(vscode.workspace.getConfiguration).mockImplementation((section) => {
-        if (section === "ost") {
+        if (section === "ai-sidebar-terminal") {
           return {
             inspect: inspectMock,
             update: updateMock,
@@ -1200,7 +1200,7 @@ describe("ExtensionLifecycle", () => {
       const inspectMock = vi.fn(() => ({ workspaceValue: true }));
       const updateMock = vi.fn();
       vi.mocked(vscode.workspace.getConfiguration).mockImplementation((section) => {
-        if (section === "ost") {
+        if (section === "ai-sidebar-terminal") {
           return {
             inspect: inspectMock,
             update: updateMock,
@@ -1224,7 +1224,7 @@ describe("ExtensionLifecycle", () => {
       const inspectMock = vi.fn(() => ({ workspaceFolderValue: false }));
       const updateMock = vi.fn();
       vi.mocked(vscode.workspace.getConfiguration).mockImplementation((section) => {
-        if (section === "ost") {
+        if (section === "ai-sidebar-terminal") {
           return {
             inspect: inspectMock,
             update: updateMock,
@@ -1246,20 +1246,20 @@ describe("ExtensionLifecycle", () => {
 
     it("should skip auto-enable when alreadyAutoEnabled flag is true in globalState", async () => {
       vi.mocked(mockContext.globalState.get).mockImplementation((key: string, def: any) => {
-        if (key === "ost.hasAutoEnabledKeybindings") return true;
+        if (key === "ai-sidebar-terminal.hasAutoEnabledKeybindings") return true;
         return def;
       });
 
       await lifecycle.activate(mockContext);
 
       expect(mockContext.globalState.get).toHaveBeenCalledWith(
-        "ost.hasAutoEnabledKeybindings",
+        "ai-sidebar-terminal.hasAutoEnabledKeybindings",
         false,
       );
       // ensure no auto-enable update happened for this path (default getConfiguration mock has update)
       // we can check globalState update not called for the flag
       expect(mockContext.globalState.update).not.toHaveBeenCalledWith(
-        "ost.hasAutoEnabledKeybindings",
+        "ai-sidebar-terminal.hasAutoEnabledKeybindings",
         true,
       );
     });
@@ -1271,7 +1271,7 @@ describe("ExtensionLifecycle", () => {
       Reflect.set(lifecycle, "outputChannelService", { warn: warnSpy });
 
       vi.mocked(vscode.workspace.getConfiguration).mockImplementation((section) => {
-        if (section === "ost") {
+        if (section === "ai-sidebar-terminal") {
           return {
             inspect: vi.fn(() => undefined),
             update: failingUpdate,
@@ -1307,7 +1307,7 @@ describe("ExtensionLifecycle", () => {
       Reflect.set(lifecycle, "outputChannelService", { warn: warnSpy });
 
       vi.mocked(vscode.workspace.getConfiguration).mockImplementation((section) => {
-        if (section === "ost") {
+        if (section === "ai-sidebar-terminal") {
           return {
             inspect: vi.fn(() => undefined),
             update: failingUpdate,
@@ -1330,12 +1330,12 @@ describe("ExtensionLifecycle", () => {
 
       Reflect.set(lifecycle, "outputChannelService", { info: infoSpy });
       vi.mocked(mockContext.globalState.get).mockImplementation((key: string, def: any) => {
-        if (key === "ost.hasAutoEnabledKeybindings") return false;
+        if (key === "ai-sidebar-terminal.hasAutoEnabledKeybindings") return false;
         return def;
       });
       vi.mocked(mockContext.globalState.update).mockImplementation(globalStateUpdateMock);
       vi.mocked(vscode.workspace.getConfiguration).mockImplementation((section) => {
-        if (section === "ost") {
+        if (section === "ai-sidebar-terminal") {
           return {
             inspect: vi.fn(() => ({})),
             update: updateMock,
@@ -1353,7 +1353,7 @@ describe("ExtensionLifecycle", () => {
         vscode.ConfigurationTarget.Global,
       );
       expect(globalStateUpdateMock).toHaveBeenCalledWith(
-        "ost.hasAutoEnabledKeybindings",
+        "ai-sidebar-terminal.hasAutoEnabledKeybindings",
         true,
       );
       expect(infoSpy).toHaveBeenCalledWith(

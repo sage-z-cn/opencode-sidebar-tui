@@ -56,17 +56,17 @@ suite("Package contribution metadata", () => {
     const secondarySidebar =
       packageJSON.contributes?.viewsContainers?.secondarySidebar ?? [];
     const container = secondarySidebar.find(
-      ({ id }) => id === "ostContainer",
+      ({ id }) => id === "ai-sidebar-terminalContainer",
     );
 
-    assert.ok(container, "ostContainer should be contributed");
+    assert.ok(container, "ai-sidebar-terminalContainer should be contributed");
     assert.strictEqual(container.title, "Open Sidebar Terminal");
     assert.strictEqual(container.icon, "resources/opencode-activity-bar.svg");
   });
 
   test("contributes terminal view metadata", async () => {
     const packageJSON = await getPackageJSON();
-    const views = packageJSON.contributes?.views?.ostContainer ?? [];
+    const views = packageJSON.contributes?.views?.ai-sidebar-terminalContainer ?? [];
     const terminalView = views.find(({ id }) => id === "ost");
 
     assert.ok(terminalView, "ost webview should be contributed");
@@ -82,14 +82,14 @@ suite("Package contribution metadata", () => {
     assert.ok(
       editorContext.some(
         ({ command, group }) =>
-          command === "ost.sendAtMention" && group === "navigation",
+          command === "ai-sidebar-terminal.sendAtMention" && group === "navigation",
       ),
       "editor/context should include sendAtMention",
     );
     assert.ok(
       explorerContext.some(
         ({ command, group, when }) =>
-          command === "ost.sendFileToTerminal" &&
+          command === "ai-sidebar-terminal.sendFileToTerminal" &&
           group === "2_workspace" &&
           when === "!explorerResourceIsFolder",
       ),
@@ -98,7 +98,7 @@ suite("Package contribution metadata", () => {
     assert.ok(
       explorerContext.some(
         ({ command, group, when }) =>
-          command === "ost.sendFileToTerminal" &&
+          command === "ai-sidebar-terminal.sendFileToTerminal" &&
           group === "2_workspace" &&
           when === "explorerResourceIsFolder",
       ),
@@ -111,17 +111,17 @@ suite("Package contribution metadata", () => {
     const keybindings = packageJSON.contributes?.keybindings ?? [];
     const expectedKeybindings = [
       {
-        command: "ost.sendAtMention",
+        command: "ai-sidebar-terminal.sendAtMention",
         key: "ctrl+alt+l",
         mac: "cmd+alt+l",
       },
       {
-        command: "ost.sendAllOpenFiles",
+        command: "ai-sidebar-terminal.sendAllOpenFiles",
         key: "ctrl+alt+a",
         mac: "cmd+alt+a",
       },
       {
-        command: "ost.browseTmuxSessions",
+        command: "ai-sidebar-terminal.browseTmuxSessions",
         key: "ctrl+alt+t",
         mac: "cmd+alt+t",
       },

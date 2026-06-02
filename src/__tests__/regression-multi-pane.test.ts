@@ -188,7 +188,7 @@ describe("multi-pane regression coverage", () => {
 
     const providerRegistration = vi
       .mocked(vscode.window.registerWebviewViewProvider)
-      .mock.calls.find((call) => call[0] === "ost");
+      .mock.calls.find((call) => call[0] === "ai-sidebar-terminal");
 
     expect(providerRegistration).toBeDefined();
 
@@ -221,7 +221,7 @@ describe("multi-pane regression coverage", () => {
     messageHandler({ type: "ready", cols: 80, rows: 24 });
     await flushAsyncStartup();
 
-    const terminal = terminalManager.getTerminal("ost-main");
+    const terminal = terminalManager.getTerminal("ai-sidebar-terminal-main");
     expect(terminal).toBeDefined();
 
     messageHandler({ type: "terminalInput", data: "echo regression\n" });
@@ -256,7 +256,7 @@ describe("multi-pane regression coverage", () => {
     });
     await flushAsyncStartup();
 
-    expect(writeSpy).toHaveBeenCalledWith("ost-main", "@/tmp/regression.ts ");
+    expect(writeSpy).toHaveBeenCalledWith("ai-sidebar-terminal-main", "@/tmp/regression.ts ");
   });
 
   it("enables pane creation for the tmux backend (Phase 2: all backends support multi-pane)", async () => {
@@ -327,7 +327,7 @@ describe("multi-pane regression coverage", () => {
       paneId: "pane-2",
     });
 
-    expect(resizeSpy).toHaveBeenCalledWith("ost-main", 120, 40);
+    expect(resizeSpy).toHaveBeenCalledWith("ai-sidebar-terminal-main", 120, 40);
     expect(resizeSpy).toHaveBeenCalledWith("pane-2", 88, 22);
   });
 
@@ -388,12 +388,12 @@ describe("multi-pane regression coverage", () => {
 
     expect(config.get).not.toHaveBeenCalledWith("paneLayout", expect.anything());
     expect(provider["paneStore"].getAllPanes().size).toBe(1);
-    expect(provider["sessionRuntime"].getActiveTerminalId()).toBe("ost-main");
+    expect(provider["sessionRuntime"].getActiveTerminalId()).toBe("ai-sidebar-terminal-main");
     expect(provider["sessionRuntime"].getSession("default")).toEqual(
       expect.objectContaining({
         paneId: "default",
-        instanceId: "ost-main",
-        terminalKey: "ost-main",
+        instanceId: "ai-sidebar-terminal-main",
+        terminalKey: "ai-sidebar-terminal-main",
       }),
     );
     expect(provider.formatEditorReference(editor)).toBe("@src/legacy.ts#L10-L20");

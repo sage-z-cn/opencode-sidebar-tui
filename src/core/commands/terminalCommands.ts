@@ -21,9 +21,9 @@ export interface TerminalCommandDependencies {
 function focusSidebarIfConfigured(
   provider: TerminalProvider | undefined,
 ): void {
-  const config = vscode.workspace.getConfiguration("ost");
+  const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
   if (config.get<boolean>("autoFocusOnSend", true)) {
-    vscode.commands.executeCommand("ost.focus");
+    vscode.commands.executeCommand("ai-sidebar-terminal.focus");
     setTimeout(() => {
       provider?.focus();
     }, 100);
@@ -34,14 +34,14 @@ export function registerTerminalCommands(
   deps: TerminalCommandDependencies,
 ): vscode.Disposable[] {
   const startCommand = vscode.commands.registerCommand(
-    "ost.start",
+    "ai-sidebar-terminal.start",
     () => {
       deps.provider?.startOpenCode();
     },
   );
 
   const sendToTerminalCommand = vscode.commands.registerCommand(
-    "ost.sendToTerminal",
+    "ai-sidebar-terminal.sendToTerminal",
     () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.selection.isEmpty) {
@@ -59,7 +59,7 @@ export function registerTerminalCommands(
   );
 
   const sendAtMentionCommand = vscode.commands.registerCommand(
-    "ost.sendAtMention",
+    "ai-sidebar-terminal.sendAtMention",
     () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
@@ -87,7 +87,7 @@ export function registerTerminalCommands(
   );
 
   const sendAllOpenFilesCommand = vscode.commands.registerCommand(
-    "ost.sendAllOpenFiles",
+    "ai-sidebar-terminal.sendAllOpenFiles",
     () => {
       const fileRefs: string[] = [];
 
@@ -115,7 +115,7 @@ export function registerTerminalCommands(
   );
 
   const sendFileToTerminalCommand = vscode.commands.registerCommand(
-    "ost.sendFileToTerminal",
+    "ai-sidebar-terminal.sendFileToTerminal",
     (...args: unknown[]) => {
       if (!deps.contextSharingService) {
         return;
@@ -171,7 +171,7 @@ export function registerTerminalCommands(
   );
 
   const pasteCommand = vscode.commands.registerCommand(
-    "ost.paste",
+    "ai-sidebar-terminal.paste",
     async () => {
       try {
         if (deps.provider) {
@@ -187,7 +187,7 @@ export function registerTerminalCommands(
   );
 
   const focusCommand = vscode.commands.registerCommand(
-    "ost.focus",
+    "ai-sidebar-terminal.focus",
     () => {
       return vscode.commands.executeCommand(
         "workbench.view.focus",
@@ -197,14 +197,14 @@ export function registerTerminalCommands(
   );
 
   const openInEditorCommand = vscode.commands.registerCommand(
-    "ost.openTerminalInEditor",
+    "ai-sidebar-terminal.openTerminalInEditor",
     () => {
       void deps.provider?.openInEditorTab();
     },
   );
 
   const restoreToSidebarCommand = vscode.commands.registerCommand(
-    "ost.restoreTerminalToSidebar",
+    "ai-sidebar-terminal.restoreTerminalToSidebar",
     () => {
       void deps.provider?.toggleEditorAttachment();
     },

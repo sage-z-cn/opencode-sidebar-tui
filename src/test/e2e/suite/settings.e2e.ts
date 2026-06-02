@@ -41,7 +41,7 @@ suite("AI tool settings", () => {
     const properties = getConfigurationProperties(extension);
 
     assert.strictEqual(
-      properties["ost.promptAiToolOnSession"]?.default,
+      properties["ai-sidebar-terminal.promptAiToolOnSession"]?.default,
       true,
     );
   });
@@ -51,7 +51,7 @@ suite("AI tool settings", () => {
     const properties = getConfigurationProperties(extension);
 
     assert.strictEqual(
-      properties["ost.defaultAiTool"]?.default,
+      properties["ai-sidebar-terminal.defaultAiTool"]?.default,
       "opencode",
     );
   });
@@ -59,13 +59,13 @@ suite("AI tool settings", () => {
   test("aiTools config structure is correct", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const aiTools = properties["ost.aiTools"];
+    const aiTools = properties["ai-sidebar-terminal.aiTools"];
 
-    assert.ok(aiTools, "ost.aiTools should be contributed");
+    assert.ok(aiTools, "ai-sidebar-terminal.aiTools should be contributed");
     assert.strictEqual(aiTools.type, "array");
 
     const items = aiTools.items as ConfigurationProperty | undefined;
-    assert.ok(items, "ost.aiTools should define array item schema");
+    assert.ok(items, "ai-sidebar-terminal.aiTools should define array item schema");
     assert.strictEqual(items.type, "object");
     assert.deepStrictEqual(items.required, ["name", "label"]);
 

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the "Open Sidebar TUI" extension will be documented in this file.
+All notable changes to the "AI Sidebar Terminal" extension will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added settings button (⚙) to toolbar, clicking directly opens extension settings panel (filtered by `ost.` prefix).
+- Added settings button (⚙) to toolbar, clicking directly opens extension settings panel (filtered by `ai-sidebar-terminal.` prefix).
 
 ### Fixed
 
@@ -75,12 +75,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add multi-backend terminal support with `native`, `tmux`, and `zellij` backend selection.
 - Add native terminal backend support with ask-first AI tool selection.
-- Add `ost.terminalBackend` setting for choosing the terminal backend.
-- Add `ost.sendKeybindingsToShell` so terminal-focused Ctrl/Cmd shortcuts can be passed through to the TUI.
+- Add `ai-sidebar-terminal.terminalBackend` setting for choosing the terminal backend.
+- Add `ai-sidebar-terminal.sendKeybindingsToShell` so terminal-focused Ctrl/Cmd shortcuts can be passed through to the TUI.
 
 ### Changed
 
-- Change `ost.autoStartOnOpen` default to `false` so users can choose which AI tool to launch when opening the sidebar.
+- Change `ai-sidebar-terminal.autoStartOnOpen` default to `false` so users can choose which AI tool to launch when opening the sidebar.
 - Rename dashboard command labels to `Open Terminal Managers` for clearer VS Code command palette and menu wording.
 - Improve Windows compatibility and terminal UX around shell handling, paths, clipboard behavior, and terminal focus.
 - Expand automated test coverage across core commands, providers, services, terminals, webview keyboard handling, and VS Code mocks.
@@ -138,7 +138,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Shares all open files on terminal startup
   - Includes line numbers for active selections
   - Format: `@path/to/file#L10-L20`
-  - Configurable via `ost.autoShareContext` setting
+  - Configurable via `ai-sidebar-terminal.autoShareContext` setting
 
 - **Port Management Service**: Ephemeral port allocation for HTTP communication
   - Port range: 16384-65535 (standard ephemeral range)
@@ -152,9 +152,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Supports `@file`, `@file#L10`, `@file#L10-L20` formats
 
 - **New Configuration Options**:
-  - `ost.enableHttpApi`: Enable/disable HTTP API (default: `true`)
-  - `ost.httpTimeout`: HTTP request timeout in milliseconds (default: `5000`, range: 1000-30000)
-  - `ost.autoShareContext`: Auto-share editor context on terminal open (default: `true`)
+  - `ai-sidebar-terminal.enableHttpApi`: Enable/disable HTTP API (default: `true`)
+  - `ai-sidebar-terminal.httpTimeout`: HTTP request timeout in milliseconds (default: `5000`, range: 1000-30000)
+  - `ai-sidebar-terminal.autoShareContext`: Auto-share editor context on terminal open (default: `true`)
 
 ### Changed
 
@@ -199,8 +199,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Drag & Drop**: Shift-drag files to send as references
 - **Configuration**: Customizable command, font, and terminal settings
 
-[2.0.0]: https://github.com/sage-z-cn/opencode-sidebar-tui/compare/v1.8.0...v2.0.0
-[1.8.0]: https://github.com/sage-z-cn/opencode-sidebar-tui/compare/v1.3.2...v1.8.0
-[1.1.0]: https://github.com/sage-z-cn/opencode-sidebar-tui/compare/v1.0.4...v1.1.0
-[1.0.4]: https://github.com/sage-z-cn/opencode-sidebar-tui/releases/tag/v1.0.4
+[2.0.0]: https://github.com/sage-z-cn/ai-sidebar-terminal/compare/v1.8.0...v2.0.0
+[1.8.0]: https://github.com/sage-z-cn/ai-sidebar-terminal/compare/v1.3.2...v1.8.0
+[1.1.0]: https://github.com/sage-z-cn/ai-sidebar-terminal/compare/v1.0.4...v1.1.0
+[1.0.4]: https://github.com/sage-z-cn/ai-sidebar-terminal/releases/tag/v1.0.4
 

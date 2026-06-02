@@ -1,26 +1,26 @@
-# Opencode Sidebar TUI
+# AI Sidebar Terminal
 
-[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/sagez.opencode-sidebar-tui-sage?logo=visual-studio-code&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=sagez.opencode-sidebar-tui-sage)
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/sagez.ai-sidebar-terminal?logo=visual-studio-code&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=sagez.ai-sidebar-terminal)
 
+[中文文档](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/README.zh-CN.md)
 
-[中文文档](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/README.zh-CN.md)
+Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code) in the VS Code sidebar with full terminal and tmux session management.
 
-Automatically render Opencode Sidebar Terminal in VS Code sidebar with full terminal support.
+> Originally forked from [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui). Now a standalone extension with new features and Windows compatibility improvements.
 
-> This extension is a fork of [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui) with Windows compatibility improvements.
+## Changes from Upstream
 
-## Changes in this Fork
-
-See [CHANGELOG.md](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/CHANGELOG.md) for modifications starting from v2.0.0.
+See [CHANGELOG.md](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/CHANGELOG.md) for modifications starting from v2.0.0.
 
 ## Features
 
-- **Auto-launch OpenCode**: Opens OpenCode automatically when the sidebar is activated
+- **Auto-launch AI Tools**: Automatically start your chosen AI coding agent when the sidebar is activated
 - **Full TUI Support**: Complete terminal emulation with xterm.js and WebGL rendering
-- **Multi-AI Tool Support**: Configure and switch between OpenCode, Claude, Codex, or custom AI tools
+- **Multi-AI Tool Support**: Built-in support for OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code with custom tool configuration
+- **Pill Dropdown Toolbar**: Unified pill-style dropdowns for quick AI tool and backend switching
 - **Terminal Managers**: Dedicated tmux session management surface with inline pane and window controls
 - **Tmux Integration**: Automatic tmux session discovery, workspace-scoped session filtering, and tmux status bar hidden in sidebar
-- **Native Shell Switching**: Toggle between OpenCode and a native shell in the same terminal
+- **Native Shell Switching**: Toggle between AI tools and a native shell in the same terminal
 - **Return to Workspace Banner**: Quick navigation back to the active workspace from Terminal Managers
 - **HTTP API Integration**: Bidirectional communication with OpenCode CLI via HTTP API
 - **Auto-Context Sharing**: Automatically shares editor context when terminal opens
@@ -61,7 +61,7 @@ The extension uses a hybrid communication approach:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/sage-z-cn/opencode-sidebar-tui.git
+git clone https://github.com/sage-z-cn/ai-sidebar-terminal.git
 cd opencode-sidebar-tui
 ```
 
@@ -93,16 +93,16 @@ npx @vscode/vsce package
 ## Usage
 
 1. Click the OpenCode icon in the Activity Bar (sidebar) to open Terminal Managers
-2. The Open Sidebar Terminal is available in the secondary sidebar
-3. Open Sidebar Terminal automatically starts when the terminal view is activated
+2. The AI Sidebar Terminal is available in the secondary sidebar
+3. AI Sidebar Terminal automatically starts when the terminal view is activated
 4. Interact with OpenCode directly in the sidebar
 
 ## Commands
 
 ### Basic Commands
 
-- **Open Sidebar Terminal: Start OpenCode** - Manually start OpenCode
-- **Open Sidebar Terminal: Paste** - Paste text into the terminal
+- **AI Sidebar Terminal: Start OpenCode** - Manually start OpenCode
+- **AI Sidebar Terminal: Paste** - Paste text into the terminal
 
 ### File Reference Commands
 
@@ -197,9 +197,9 @@ The extension communicates with OpenCode CLI via an HTTP API for reliable bidire
 
 ```json
 {
-  "ost.enableHttpApi": true,
-  "ost.httpTimeout": 5000,
-  "ost.autoShareContext": true
+  "ai-sidebar-terminal.enableHttpApi": true,
+  "ai-sidebar-terminal.httpTimeout": 5000,
+  "ai-sidebar-terminal.autoShareContext": true
 }
 ```
 
@@ -221,16 +221,16 @@ Available settings in VS Code settings (`Cmd+,` / `Ctrl+,`):
 
 | Setting                       | Type    | Default           | Description                                             |
 | ----------------------------- | ------- | ----------------- | ------------------------------------------------------- |
-| `ost.autoStart`       | boolean | `true`            | Automatically start OpenCode when the view is activated |
-| `ost.autoStartOnOpen` | boolean | `true`            | Automatically start OpenCode when sidebar is opened     |
-| `ost.fontSize`        | number  | `14`              | Terminal font size in pixels (6-25)                     |
-| `ost.fontFamily`      | string  | Nerd Font stack\* | Terminal font family                                    |
-| `ost.cursorBlink`     | boolean | `true`            | Enable cursor blinking                                  |
-| `ost.cursorStyle`     | string  | `"block"`         | Cursor style: `block`, `underline`, or `bar`            |
-| `ost.scrollback`      | number  | `10000`           | Maximum lines in scrollback buffer (0-100000)           |
-| `ost.autoFocusOnSend` | boolean | `true`            | Auto-focus sidebar after sending file references        |
-| `ost.shellPath`       | string  | `""`              | Custom shell path (empty = VS Code default)             |
-| `ost.shellArgs`       | array   | `[]`              | Custom shell arguments                                  |
+| `ai-sidebar-terminal.autoStart`       | boolean | `true`            | Automatically start OpenCode when the view is activated |
+| `ai-sidebar-terminal.autoStartOnOpen` | boolean | `true`            | Automatically start OpenCode when sidebar is opened     |
+| `ai-sidebar-terminal.fontSize`        | number  | `14`              | Terminal font size in pixels (6-25)                     |
+| `ai-sidebar-terminal.fontFamily`      | string  | Nerd Font stack\* | Terminal font family                                    |
+| `ai-sidebar-terminal.cursorBlink`     | boolean | `true`            | Enable cursor blinking                                  |
+| `ai-sidebar-terminal.cursorStyle`     | string  | `"block"`         | Cursor style: `block`, `underline`, or `bar`            |
+| `ai-sidebar-terminal.scrollback`      | number  | `10000`           | Maximum lines in scrollback buffer (0-100000)           |
+| `ai-sidebar-terminal.autoFocusOnSend` | boolean | `true`            | Auto-focus sidebar after sending file references        |
+| `ai-sidebar-terminal.shellPath`       | string  | `""`              | Custom shell path (empty = VS Code default)             |
+| `ai-sidebar-terminal.shellArgs`       | array   | `[]`              | Custom shell arguments                                  |
 
 \* Default: `'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace`
 
@@ -238,49 +238,49 @@ Available settings in VS Code settings (`Cmd+,` / `Ctrl+,`):
 
 | Setting                         | Type    | Default | Description                                      |
 | ------------------------------- | ------- | ------- | ------------------------------------------------ |
-| `ost.enableHttpApi`     | boolean | `true`  | Enable HTTP API for OpenCode communication       |
-| `ost.httpTimeout`       | number  | `5000`  | HTTP API request timeout in ms (1000-30000)      |
-| `ost.autoShareContext`  | boolean | `true`  | Auto-share editor context with OpenCode          |
-| `ost.contextDebounceMs` | number  | `500`   | Debounce delay for context updates (100-5000 ms) |
+| `ai-sidebar-terminal.enableHttpApi`     | boolean | `true`  | Enable HTTP API for OpenCode communication       |
+| `ai-sidebar-terminal.httpTimeout`       | number  | `5000`  | HTTP API request timeout in ms (1000-30000)      |
+| `ai-sidebar-terminal.autoShareContext`  | boolean | `true`  | Auto-share editor context with OpenCode          |
+| `ai-sidebar-terminal.contextDebounceMs` | number  | `500`   | Debounce delay for context updates (100-5000 ms) |
 
 ### AI Tool Settings
 
 | Setting                       | Type    | Default                       | Description                                               |
 | ----------------------------- | ------- | ----------------------------- | --------------------------------------------------------- |
-| `ost.aiTools`         | array   | `[{opencode, claude, codex}]` | Configure AI coding tools with custom paths and arguments |
-| `ost.defaultAiTool`   | string  | `"opencode"`                  | Default AI tool for new tmux sessions                     |
-| `ost.enableAutoSpawn` | boolean | `true`                        | Auto-spawn OpenCode if not running                        |
+| `ai-sidebar-terminal.aiTools`         | array   | `[{opencode, claude, codex}]` | Configure AI coding tools with custom paths and arguments |
+| `ai-sidebar-terminal.defaultAiTool`   | string  | `"opencode"`                  | Default AI tool for new tmux sessions                     |
+| `ai-sidebar-terminal.enableAutoSpawn` | boolean | `true`                        | Auto-spawn OpenCode if not running                        |
 
 ### Tmux Settings
 
 | Setting                          | Type    | Default | Description                                                            |
 | -------------------------------- | ------- | ------- | ---------------------------------------------------------------------- |
-| `ost.nativeShellDefault` | string  | `""`    | Default behavior for native shell switch (`""`, `"opencode"`, `"shell"`) |
-| `ost.tmuxSessionDefault` | string  | `""`    | Default behavior for new tmux sessions (`""`, `"opencode"`, `"shell"`) |
-| `ost.showTmuxWindowControls` | boolean | `true` | Show direct tmux session/window controls in the terminal toolbar       |
+| `ai-sidebar-terminal.nativeShellDefault` | string  | `""`    | Default behavior for native shell switch (`""`, `"opencode"`, `"shell"`) |
+| `ai-sidebar-terminal.tmuxSessionDefault` | string  | `""`    | Default behavior for new tmux sessions (`""`, `"opencode"`, `"shell"`) |
+| `ai-sidebar-terminal.showTmuxWindowControls` | boolean | `true` | Show direct tmux session/window controls in the terminal toolbar       |
 
 ### Advanced Settings
 
 | Setting                            | Type   | Default                | Description                                      |
 | ---------------------------------- | ------ | ---------------------- | ------------------------------------------------ |
-| `ost.logLevel`             | string | `"info"`               | Log level: `debug`, `info`, `warn`, `error`      |
-| `ost.maxDiagnosticLength`  | number | `500`                  | Maximum length of diagnostic messages (100-2000) |
-| `ost.codeActionSeverities` | array  | `["error", "warning"]` | Diagnostic severities that trigger code actions  |
+| `ai-sidebar-terminal.logLevel`             | string | `"info"`               | Log level: `debug`, `info`, `warn`, `error`      |
+| `ai-sidebar-terminal.maxDiagnosticLength`  | number | `500`                  | Maximum length of diagnostic messages (100-2000) |
+| `ai-sidebar-terminal.codeActionSeverities` | array  | `["error", "warning"]` | Diagnostic severities that trigger code actions  |
 
 ### Example Configuration
 
 ```json
 {
-  "ost.autoStart": true,
-  "ost.fontSize": 14,
-  "ost.fontFamily": "'JetBrainsMono Nerd Font', monospace",
-  "ost.cursorBlink": true,
-  "ost.cursorStyle": "block",
-  "ost.scrollback": 10000,
-  "ost.enableHttpApi": true,
-  "ost.httpTimeout": 5000,
-  "ost.autoShareContext": true,
-  "ost.defaultAiTool": "opencode"
+  "ai-sidebar-terminal.autoStart": true,
+  "ai-sidebar-terminal.fontSize": 14,
+  "ai-sidebar-terminal.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+  "ai-sidebar-terminal.cursorBlink": true,
+  "ai-sidebar-terminal.cursorStyle": "block",
+  "ai-sidebar-terminal.scrollback": 10000,
+  "ai-sidebar-terminal.enableHttpApi": true,
+  "ai-sidebar-terminal.httpTimeout": 5000,
+  "ai-sidebar-terminal.autoShareContext": true,
+  "ai-sidebar-terminal.defaultAiTool": "opencode"
 }
 ```
 
@@ -365,7 +365,7 @@ src/
 
 ## Implementation Details
 
-Based on the excellent vscode-sidebar-terminal extension, streamlined specifically for Open Sidebar Terminal:
+Based on the excellent vscode-sidebar-terminal extension, streamlined specifically for AI Sidebar Terminal:
 
 - **Terminal Backend**: node-pty for PTY support
 - **Terminal Frontend**: xterm.js with WebGL rendering

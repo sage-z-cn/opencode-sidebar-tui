@@ -51,87 +51,87 @@ const nerdFontStack =
   "'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace";
 
 const configurationSpecs: Record<string, ConfigurationSpec> = {
-  "ost.fontSize": {
+  "ai-sidebar-terminal.fontSize": {
     type: "number",
     defaultValue: 14,
     minimum: 6,
     maximum: 25,
   },
-  "ost.fontFamily": {
+  "ai-sidebar-terminal.fontFamily": {
     type: "string",
     defaultValue: nerdFontStack,
   },
-  "ost.cursorBlink": { type: "boolean", defaultValue: true },
-  "ost.cursorStyle": {
+  "ai-sidebar-terminal.cursorBlink": { type: "boolean", defaultValue: true },
+  "ai-sidebar-terminal.cursorStyle": {
     type: "string",
     defaultValue: "block",
     enumValues: ["block", "underline", "bar"],
   },
-  "ost.scrollback": {
+  "ai-sidebar-terminal.scrollback": {
     type: "number",
     defaultValue: 10000,
     minimum: 0,
     maximum: 100000,
   },
-  "ost.autoFocusOnSend": { type: "boolean", defaultValue: true },
-  "ost.autoStartOnOpen": { type: "boolean", defaultValue: true },
-  "ost.shellPath": { type: "string", defaultValue: "" },
-  "ost.shellArgs": {
+  "ai-sidebar-terminal.autoFocusOnSend": { type: "boolean", defaultValue: true },
+  "ai-sidebar-terminal.autoStartOnOpen": { type: "boolean", defaultValue: true },
+  "ai-sidebar-terminal.shellPath": { type: "string", defaultValue: "" },
+  "ai-sidebar-terminal.shellArgs": {
     type: "array",
     defaultValue: [],
     itemType: "string",
   },
-  "ost.sendKeybindingsToShell": {
+  "ai-sidebar-terminal.sendKeybindingsToShell": {
     type: "boolean",
     defaultValue: true,
   },
-  "ost.showTmuxWindowControls": {
+  "ai-sidebar-terminal.showTmuxWindowControls": {
     type: "boolean",
     defaultValue: true,
   },
-  "ost.autoShareContext": { type: "boolean", defaultValue: true },
-  "ost.httpTimeout": {
+  "ai-sidebar-terminal.autoShareContext": { type: "boolean", defaultValue: true },
+  "ai-sidebar-terminal.httpTimeout": {
     type: "number",
     defaultValue: 5000,
     minimum: 1000,
     maximum: 30000,
   },
-  "ost.enableHttpApi": { type: "boolean", defaultValue: true },
-  "ost.logLevel": {
+  "ai-sidebar-terminal.enableHttpApi": { type: "boolean", defaultValue: true },
+  "ai-sidebar-terminal.logLevel": {
     type: "string",
     defaultValue: "info",
     enumValues: ["debug", "info", "warn", "error"],
   },
-  "ost.contextDebounceMs": {
+  "ai-sidebar-terminal.contextDebounceMs": {
     type: "number",
     defaultValue: 500,
     minimum: 100,
     maximum: 5000,
   },
-  "ost.maxDiagnosticLength": {
+  "ai-sidebar-terminal.maxDiagnosticLength": {
     type: "number",
     defaultValue: 500,
     minimum: 100,
     maximum: 2000,
   },
-  "ost.enableAutoSpawn": { type: "boolean", defaultValue: true },
-  "ost.terminalBackend": {
+  "ai-sidebar-terminal.enableAutoSpawn": { type: "boolean", defaultValue: true },
+  "ai-sidebar-terminal.terminalBackend": {
     type: "string",
     defaultValue: "tmux",
     enumValues: ["native", "tmux", "zellij"],
   },
-  "ost.collapseSecondaryBarOnEditorOpen": {
+  "ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen": {
     type: "boolean",
     defaultValue: true,
   },
-  "ost.codeActionSeverities": {
+  "ai-sidebar-terminal.codeActionSeverities": {
     type: "array",
     defaultValue: ["error", "warning"],
     itemType: "string",
   },
-  "ost.aiTools": { type: "array", defaultValue: undefined },
-  "ost.defaultAiTool": { type: "string", defaultValue: "opencode" },
-  "ost.promptAiToolOnSession": {
+  "ai-sidebar-terminal.aiTools": { type: "array", defaultValue: undefined },
+  "ai-sidebar-terminal.defaultAiTool": { type: "string", defaultValue: "opencode" },
+  "ai-sidebar-terminal.promptAiToolOnSession": {
     type: "boolean",
     defaultValue: true,
   },
@@ -145,7 +145,7 @@ function assertConfigurationProperty(
   assert.ok(property, `${id} should be contributed`);
   assert.strictEqual(property.type, spec.type, `${id} should have expected type`);
 
-  if (id !== "ost.aiTools") {
+  if (id !== "ai-sidebar-terminal.aiTools") {
     assert.deepStrictEqual(
       property.default,
       spec.defaultValue,
@@ -192,7 +192,7 @@ suite("Comprehensive configuration contributions", () => {
   test("defines aiTools object schema and default tools", async () => {
     const extension = await activateExtension();
     const properties = getConfigurationProperties(extension);
-    const aiTools = properties["ost.aiTools"];
+    const aiTools = properties["ai-sidebar-terminal.aiTools"];
 
     assert.strictEqual(aiTools?.type, "array");
     assert.strictEqual(aiTools?.items?.type, "object");

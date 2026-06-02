@@ -674,7 +674,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
 
       expect(
         runtimeWithoutStore.resolveInstanceIdFromSessionId("anything"),
-      ).toBe("ost-main");
+      ).toBe("ai-sidebar-terminal-main");
 
       runtimeWithoutStore.dispose();
     });
@@ -2710,7 +2710,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         runtimeWithoutManagers.createTmuxSession(),
       ).resolves.toBeUndefined();
       expect(runtimeWithoutManagers.getActiveTerminalId()).toBe(
-        "ost-main",
+        "ai-sidebar-terminal-main",
       );
       runtimeWithoutManagers.dispose();
     });

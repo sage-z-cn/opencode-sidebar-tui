@@ -1,5 +1,5 @@
 {
-  "ost.autoStartOnOpen": false,
-  "ost.enableAutoSpawn": false,
-  "ost.enableTmux": false
+  "ai-sidebar-terminal.autoStartOnOpen": false,
+  "ai-sidebar-terminal.enableAutoSpawn": false,
+  "ai-sidebar-terminal.enableTmux": false
 }

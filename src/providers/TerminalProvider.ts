@@ -34,7 +34,7 @@ export class TerminalProvider
   implements vscode.WebviewViewProvider, vscode.WebviewPanelSerializer
 {
   public static readonly viewType = "ost";
-  public static readonly panelViewType = "ost.terminalEditor";
+  public static readonly panelViewType = "ai-sidebar-terminal.terminalEditor";
 
   private _view?: vscode.WebviewView;
   private _panel?: vscode.WebviewPanel;
@@ -227,7 +227,7 @@ export class TerminalProvider
     this.postCurrentSessionState(webviewView.webview);
     this.flushPendingWebviewMessages(webviewView.webview);
 
-    const config = vscode.workspace.getConfiguration("ost");
+    const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
     const autoStartOnOpen = config.get<boolean>("autoStartOnOpen", true);
     const visibilityListener = webviewView.onDidChangeVisibility(() => {
       if (!webviewView.visible) {
@@ -305,7 +305,7 @@ export class TerminalProvider
       return;
     }
 
-    const config = vscode.workspace.getConfiguration("ost");
+    const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
 
     if (config.get<boolean>("collapseSecondaryBarOnEditorOpen", true)) {
       await vscode.commands.executeCommand(
@@ -385,7 +385,7 @@ export class TerminalProvider
   }
 
   public openSettings(): void {
-    vscode.commands.executeCommand("workbench.action.openSettings", "ost.");
+    vscode.commands.executeCommand("workbench.action.openSettings", "ai-sidebar-terminal.");
   }
 
   public async switchToInstance(
@@ -505,7 +505,7 @@ export class TerminalProvider
     backendHint?: TerminalBackendType,
   ): Promise<void> {
     if (savePreference) {
-      const config = vscode.workspace.getConfiguration("ost");
+      const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
       await config.update(
         "defaultAiTool",
         toolName,
@@ -677,7 +677,7 @@ export class TerminalProvider
     forceShow = false,
     targetPaneId?: string,
   ): void {
-    const config = vscode.workspace.getConfiguration("ost");
+    const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
     if (forceShow && !config.get<boolean>("promptAiToolOnSession", true)) {
       return;
     }
@@ -743,7 +743,7 @@ export class TerminalProvider
       return false;
     }
 
-    const config = vscode.workspace.getConfiguration("ost");
+    const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
     const selectedAiTool = record.config.selectedAiTool;
     const items = resolveAiToolConfigs(config.get("aiTools", [])).map((tool) => ({
       label:
@@ -1217,7 +1217,7 @@ export class TerminalProvider
   private async revealSidebarView(): Promise<void> {
     try {
       await vscode.commands.executeCommand(
-        "workbench.view.extension.ostContainer",
+        "workbench.view.extension.ai-sidebar-terminalContainer",
       );
     } catch {
       // intentionally empty: sidebar reveal is best-effort
@@ -1242,7 +1242,7 @@ export class TerminalProvider
     Extract<HostMessage, { type: "terminalConfig" }>,
     "type"
   > {
-    const config = vscode.workspace.getConfiguration("ost");
+    const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
     return {
       fontSize: config.get<number>("fontSize", 14),
       fontFamily: config.get<string>(
@@ -1429,7 +1429,7 @@ export class TerminalProvider
   }
 
   public toggleDashboard(): void {
-    void vscode.commands.executeCommand("ost.openTerminalManager");
+    void vscode.commands.executeCommand("ai-sidebar-terminal.openTerminalManager");
   }
 
   public toggleTmuxCommandToolbar(): void {

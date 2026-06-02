@@ -1,25 +1,26 @@
-# Opencode Sidebar TUI
+# AI 侧边栏终端
 
-[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/sagez.opencode-sidebar-tui-sage?logo=visual-studio-code&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=sagez.opencode-sidebar-tui-sage)
-[English](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/README.md)
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/sagez.ai-sidebar-terminal?logo=visual-studio-code&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=sagez.ai-sidebar-terminal)
+[English](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/README.md)
 
 
-Automatically render Opencode Sidebar Terminal in VS Code sidebar with full terminal support.
+Automatically render AI 侧边栏终端 in VS Code sidebar with full terminal support.
 
-> 本插件是 [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui) 的 fork 版本，增加了 Windows 兼容性修复。
+> 最初 fork 自 [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui)。现已发展为独立扩展，新增多项功能及 Windows 兼容性改进。
 
-## Fork 修改记录
+## 与上游的差异
 
-详见 [CHANGELOG.md](https://github.com/sage-z-cn/opencode-sidebar-tui/blob/main/CHANGELOG.md) 中 v2.0.0 及之后的更新日志。
+详见 [CHANGELOG.md](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/CHANGELOG.md) 中 v2.0.0 及之后的更新日志。
 
 ## 功能特性
 
-- **自动启动 OpenCode**: 侧边栏激活时自动启动 OpenCode
+- **自动启动 AI 工具**: 侧边栏激活时自动启动所选 AI 编程助手
 - **完整 TUI 支持**: xterm.js + WebGL 渲染的终端模拟
-- **多 AI 工具支持**: 可配置切换 OpenCode、Claude、Codex 及自定义 AI 工具
+- **多 AI 工具支持**: 内置 OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code，可自定义扩展
+- **Pill Dropdown 工具栏**: 统一的 pill 式下拉菜单，快速切换 AI 工具和终端后端
 - **终端管理器**: 专用的 tmux 会话管理面板，支持内联窗格和窗口控制
 - **Tmux 集成**: 自动发现 tmux 会话、工作区级过滤、侧边栏中隐藏 tmux 状态栏
-- **原生 Shell 切换**: 在同一终端中切换 OpenCode 和原生 Shell
+- **原生 Shell 切换**: 在同一终端中切换 AI 工具和原生 Shell
 - **返回工作区横幅**: 在终端管理器中快速返回活动工作区
 - **HTTP API 集成**: 通过 HTTP API 与 OpenCode CLI 双向通信
 - **自动上下文共享**: 终端打开时自动共享编辑器上下文
@@ -60,7 +61,7 @@ Automatically render Opencode Sidebar Terminal in VS Code sidebar with full term
 1. 克隆仓库：
 
 ```bash
-git clone https://github.com/sage-z-cn/opencode-sidebar-tui.git
+git clone https://github.com/sage-z-cn/ai-sidebar-terminal.git
 cd opencode-sidebar-tui
 ```
 
@@ -92,7 +93,7 @@ npx @vscode/vsce package
 ## 使用方法
 
 1. 点击活动栏中的 OpenCode 图标打开终端管理器
-2. 在辅助侧边栏中使用 Open Sidebar Terminal
+2. 在辅助侧边栏中使用 AI 侧边栏终端
 3. 终端视图激活时自动启动
 4. 直接在侧边栏中与 OpenCode 交互
 
@@ -100,8 +101,8 @@ npx @vscode/vsce package
 
 ### 基础命令
 
-- **Open Sidebar Terminal: Start OpenCode** - 手动启动 OpenCode
-- **Open Sidebar Terminal: Paste** - 粘贴文本到终端
+- **AI 侧边栏终端: Start OpenCode** - 手动启动 OpenCode
+- **AI 侧边栏终端: Paste** - 粘贴文本到终端
 
 ### 文件引用命令
 
@@ -210,16 +211,16 @@ npx @vscode/vsce package
 
 | 设置                          | 类型    | 默认值            | 描述                                      |
 | ----------------------------- | ------- | ----------------- | ----------------------------------------- |
-| `ost.autoStart`       | boolean | `true`            | 视图激活时自动启动 OpenCode              |
-| `ost.autoStartOnOpen` | boolean | `true`            | 侧边栏打开时自动启动 OpenCode            |
-| `ost.fontSize`        | number  | `14`              | 终端字号（像素，6-25）                    |
-| `ost.fontFamily`      | string  | Nerd Font 字体栈* | 终端字体族                                |
-| `ost.cursorBlink`     | boolean | `true`            | 启用光标闪烁                              |
-| `ost.cursorStyle`     | string  | `"block"`         | 光标样式：`block`、`underline`、`bar`     |
-| `ost.scrollback`      | number  | `10000`           | 回滚缓冲区最大行数（0-100000）            |
-| `ost.autoFocusOnSend` | boolean | `true`            | 发送文件引用后自动聚焦侧边栏              |
-| `ost.shellPath`       | string  | `""`              | 自定义 Shell 路径（空 = VS Code 默认）    |
-| `ost.shellArgs`       | array   | `[]`              | 自定义 Shell 参数                         |
+| `ai-sidebar-terminal.autoStart`       | boolean | `true`            | 视图激活时自动启动 OpenCode              |
+| `ai-sidebar-terminal.autoStartOnOpen` | boolean | `true`            | 侧边栏打开时自动启动 OpenCode            |
+| `ai-sidebar-terminal.fontSize`        | number  | `14`              | 终端字号（像素，6-25）                    |
+| `ai-sidebar-terminal.fontFamily`      | string  | Nerd Font 字体栈* | 终端字体族                                |
+| `ai-sidebar-terminal.cursorBlink`     | boolean | `true`            | 启用光标闪烁                              |
+| `ai-sidebar-terminal.cursorStyle`     | string  | `"block"`         | 光标样式：`block`、`underline`、`bar`     |
+| `ai-sidebar-terminal.scrollback`      | number  | `10000`           | 回滚缓冲区最大行数（0-100000）            |
+| `ai-sidebar-terminal.autoFocusOnSend` | boolean | `true`            | 发送文件引用后自动聚焦侧边栏              |
+| `ai-sidebar-terminal.shellPath`       | string  | `""`              | 自定义 Shell 路径（空 = VS Code 默认）    |
+| `ai-sidebar-terminal.shellArgs`       | array   | `[]`              | 自定义 Shell 参数                         |
 
 \* 默认：`'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace`
 
@@ -227,49 +228,49 @@ npx @vscode/vsce package
 
 | 设置                             | 类型    | 默认值  | 描述                                        |
 | -------------------------------- | ------- | ------- | ------------------------------------------- |
-| `ost.enableHttpApi`     | boolean | `true`  | 启用 OpenCode 通信的 HTTP API               |
-| `ost.httpTimeout`       | number  | `5000`  | HTTP API 请求超时（毫秒，1000-30000）        |
-| `ost.autoShareContext`  | boolean | `true`  | 自动共享编辑器上下文给 OpenCode             |
-| `ost.contextDebounceMs` | number  | `500`   | 上下文更新防抖延迟（毫秒，100-5000）        |
+| `ai-sidebar-terminal.enableHttpApi`     | boolean | `true`  | 启用 OpenCode 通信的 HTTP API               |
+| `ai-sidebar-terminal.httpTimeout`       | number  | `5000`  | HTTP API 请求超时（毫秒，1000-30000）        |
+| `ai-sidebar-terminal.autoShareContext`  | boolean | `true`  | 自动共享编辑器上下文给 OpenCode             |
+| `ai-sidebar-terminal.contextDebounceMs` | number  | `500`   | 上下文更新防抖延迟（毫秒，100-5000）        |
 
 ### AI 工具设置
 
 | 设置                          | 类型    | 默认值                        | 描述                                      |
 | ----------------------------- | ------- | ----------------------------- | ----------------------------------------- |
-| `ost.aiTools`         | array   | `[{opencode, claude, codex}]` | 配置 AI 工具及其自定义路径和参数          |
-| `ost.defaultAiTool`   | string  | `"opencode"`                  | 新 tmux 会话的默认 AI 工具                |
-| `ost.enableAutoSpawn` | boolean | `true`                        | OpenCode 未运行时自动拉起                 |
+| `ai-sidebar-terminal.aiTools`         | array   | `[{opencode, claude, codex}]` | 配置 AI 工具及其自定义路径和参数          |
+| `ai-sidebar-terminal.defaultAiTool`   | string  | `"opencode"`                  | 新 tmux 会话的默认 AI 工具                |
+| `ai-sidebar-terminal.enableAutoSpawn` | boolean | `true`                        | OpenCode 未运行时自动拉起                 |
 
 ### Tmux 设置
 
 | 设置                               | 类型    | 默认值  | 描述                                                            |
 | ---------------------------------- | ------- | ------- | --------------------------------------------------------------- |
-| `ost.nativeShellDefault`  | string  | `""`    | 原生 Shell 切换默认行为（`""`、`"opencode"`、`"shell"`）        |
-| `ost.tmuxSessionDefault`  | string  | `""`    | 新 tmux 会话默认行为（`""`、`"opencode"`、`"shell"`）           |
-| `ost.showTmuxWindowControls` | boolean | `true` | 在终端工具栏中显示直接 tmux 会话/窗口控制                        |
+| `ai-sidebar-terminal.nativeShellDefault`  | string  | `""`    | 原生 Shell 切换默认行为（`""`、`"opencode"`、`"shell"`）        |
+| `ai-sidebar-terminal.tmuxSessionDefault`  | string  | `""`    | 新 tmux 会话默认行为（`""`、`"opencode"`、`"shell"`）           |
+| `ai-sidebar-terminal.showTmuxWindowControls` | boolean | `true` | 在终端工具栏中显示直接 tmux 会话/窗口控制                        |
 
 ### 高级设置
 
 | 设置                               | 类型   | 默认值                 | 描述                                     |
 | ---------------------------------- | ------ | ---------------------- | ---------------------------------------- |
-| `ost.logLevel`            | string | `"info"`               | 日志级别：`debug`、`info`、`warn`、`error` |
-| `ost.maxDiagnosticLength` | number | `500`                  | 诊断消息最大长度（100-2000）              |
-| `ost.codeActionSeverities` | array  | `["error", "warning"]` | 触发代码操作的诊断严重级别                |
+| `ai-sidebar-terminal.logLevel`            | string | `"info"`               | 日志级别：`debug`、`info`、`warn`、`error` |
+| `ai-sidebar-terminal.maxDiagnosticLength` | number | `500`                  | 诊断消息最大长度（100-2000）              |
+| `ai-sidebar-terminal.codeActionSeverities` | array  | `["error", "warning"]` | 触发代码操作的诊断严重级别                |
 
 ### 示例配置
 
 ```json
 {
-  "ost.autoStart": true,
-  "ost.fontSize": 14,
-  "ost.fontFamily": "'JetBrainsMono Nerd Font', monospace",
-  "ost.cursorBlink": true,
-  "ost.cursorStyle": "block",
-  "ost.scrollback": 10000,
-  "ost.enableHttpApi": true,
-  "ost.httpTimeout": 5000,
-  "ost.autoShareContext": true,
-  "ost.defaultAiTool": "opencode"
+  "ai-sidebar-terminal.autoStart": true,
+  "ai-sidebar-terminal.fontSize": 14,
+  "ai-sidebar-terminal.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+  "ai-sidebar-terminal.cursorBlink": true,
+  "ai-sidebar-terminal.cursorStyle": "block",
+  "ai-sidebar-terminal.scrollback": 10000,
+  "ai-sidebar-terminal.enableHttpApi": true,
+  "ai-sidebar-terminal.httpTimeout": 5000,
+  "ai-sidebar-terminal.autoShareContext": true,
+  "ai-sidebar-terminal.defaultAiTool": "opencode"
 }
 ```
 
@@ -354,7 +355,7 @@ src/
 
 ## 实现细节
 
-基于 vscode-sidebar-terminal 扩展，针对 Open Sidebar Terminal 进行精简：
+基于 vscode-sidebar-terminal 扩展，针对 AI 侧边栏终端 进行精简：
 
 - **终端后端**: node-pty PTY 支持
 - **终端前端**: xterm.js + WebGL 渲染

@@ -41,10 +41,10 @@ Option B: Via VS Code UI
 
 2. **Verify auto-start**
    - OpenCode should start automatically
-   - You should see the Open Sidebar Terminal interface
+   - You should see the AI Sidebar Terminal interface
 
 3. **Test commands**
-   - Try: `Open Sidebar Terminal: Clear Terminal`
+   - Try: `AI Sidebar Terminal: Clear Terminal`
 
 4. **Test terminal interaction**
    - Type commands in the terminal
@@ -82,7 +82,7 @@ For rapid testing during development:
 **Terminal not starting?**
 
 - Check if your configured AI tool command is in PATH
-- Try configuring the tool path under `ost.aiTools`
+- Try configuring the tool path under `ai-sidebar-terminal.aiTools`
 
 **Rendering issues?**
 

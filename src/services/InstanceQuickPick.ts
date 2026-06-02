@@ -275,7 +275,7 @@ export class InstanceQuickPick {
       }
 
       case "spawn": {
-        vscode.commands.executeCommand("ost.start");
+        vscode.commands.executeCommand("ai-sidebar-terminal.start");
         break;
       }
 

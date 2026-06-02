@@ -35,7 +35,7 @@ describe("tmux command dropdown", () => {
     expect(handled).toBe(true);
     expect(postMessageMock).toHaveBeenCalledWith({
       type: "executeTmuxCommand",
-      commandId: "ost.browseTmuxSessions",
+      commandId: "ai-sidebar-terminal.browseTmuxSessions",
     });
   });
 

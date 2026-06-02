@@ -215,10 +215,10 @@ describe("dashboardCommands", () => {
     expect(disposables).toHaveLength(3);
     expect(vscode.commands.registerCommand).toHaveBeenCalledTimes(3);
 
-    getRegisteredCommand("ost.toggleDashboard")();
+    getRegisteredCommand("ai-sidebar-terminal.toggleDashboard")();
     expect(deps.provider?.toggleDashboard).toHaveBeenCalledTimes(1);
 
-    getRegisteredCommand("ost.toggleTmuxCommandToolbar")();
+    getRegisteredCommand("ai-sidebar-terminal.toggleTmuxCommandToolbar")();
     expect(deps.provider?.toggleTmuxCommandToolbar).toHaveBeenCalledTimes(1);
 
     vi.clearAllMocks();
@@ -234,10 +234,10 @@ describe("dashboardCommands", () => {
     registerDashboardCommands(noProviderDeps);
 
     expect(() =>
-      getRegisteredCommand("ost.toggleDashboard")(),
+      getRegisteredCommand("ai-sidebar-terminal.toggleDashboard")(),
     ).not.toThrow();
 
-    getRegisteredCommand("ost.openDashboardInEditor")();
+    getRegisteredCommand("ai-sidebar-terminal.openDashboardInEditor")();
     await flushAsyncWork();
 
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledTimes(1);
@@ -246,7 +246,7 @@ describe("dashboardCommands", () => {
   it("shows an error when opening the dashboard editor without a tmux manager", async () => {
     registerDashboardCommands(createDependencies({ tmuxManager: undefined }));
 
-    getRegisteredCommand("ost.openDashboardInEditor")();
+    getRegisteredCommand("ai-sidebar-terminal.openDashboardInEditor")();
     await flushAsyncWork();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -372,7 +372,7 @@ describe("dashboardCommands", () => {
     );
 
     registerDashboardCommands(actualDeps);
-    getRegisteredCommand("ost.openDashboardInEditor")();
+    getRegisteredCommand("ai-sidebar-terminal.openDashboardInEditor")();
     await flushAsyncWork();
 
     expect(actualDeps.outputChannel?.error).toHaveBeenCalledWith(
@@ -391,7 +391,7 @@ describe("dashboardCommands", () => {
     );
 
     registerDashboardCommands(stringErrorDeps);
-    getRegisteredCommand("ost.openDashboardInEditor")();
+    getRegisteredCommand("ai-sidebar-terminal.openDashboardInEditor")();
     await flushAsyncWork();
 
     expect(stringErrorDeps.outputChannel?.error).toHaveBeenCalledWith(
@@ -419,11 +419,11 @@ describe("dashboardCommands", () => {
     ] as typeof vscode.workspace.workspaceFolders;
 
     registerDashboardCommands(deps);
-    getRegisteredCommand("ost.openDashboardInEditor")();
+    getRegisteredCommand("ai-sidebar-terminal.openDashboardInEditor")();
     await flushAsyncWork();
 
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
-      "ost.dashboardEditor",
+      "ai-sidebar-terminal.dashboardEditor",
       "Terminal Managers",
       vscode.ViewColumn.One,
       {
@@ -461,15 +461,15 @@ describe("dashboardCommands", () => {
     deps.tmuxManager = originalTmuxManager;
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.switchTmuxSession",
+      "ai-sidebar-terminal.switchTmuxSession",
       "s-1",
     );
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.killTmuxSession",
+      "ai-sidebar-terminal.killTmuxSession",
       "s-1",
     );
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.createTmuxSession",
+      "ai-sidebar-terminal.createTmuxSession",
     );
 
     const postMessageCountAfterActions = vi.mocked(harness.webview.postMessage)

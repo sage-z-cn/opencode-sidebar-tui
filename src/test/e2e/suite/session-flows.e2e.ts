@@ -24,9 +24,9 @@ suite("Session flows", () => {
   test("registers tmux-related commands", async () => {
     const commands = await getRegisteredCommands();
 
-    assertCommandRegistered(commands, "ost.switchTmuxSession");
-    assertCommandRegistered(commands, "ost.spawnForWorkspace");
-    assertCommandRegistered(commands, "ost.browseTmuxSessions");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.switchTmuxSession");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.spawnForWorkspace");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.browseTmuxSessions");
   });
 
   test("registers zellij-capable session controls", async () => {
@@ -46,15 +46,15 @@ suite("Session flows", () => {
     };
     const terminalBackend =
       packageJSON.contributes?.configuration?.properties?.[
-        "ost.terminalBackend"
+        "ai-sidebar-terminal.terminalBackend"
       ];
 
     assert.ok(
       terminalBackend?.enum?.includes("zellij"),
       "terminalBackend should support zellij",
     );
-    assertCommandRegistered(commands, "ost.browseTmuxSessions");
-    assertCommandRegistered(commands, "ost.switchTmuxSession");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.browseTmuxSessions");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.switchTmuxSession");
   });
 
   test("executes switchTmuxSession command without requiring tmux", async () => {
@@ -62,17 +62,17 @@ suite("Session flows", () => {
 
     await assert.doesNotReject(
       async () =>
-        vscode.commands.executeCommand("ost.switchTmuxSession"),
+        vscode.commands.executeCommand("ai-sidebar-terminal.switchTmuxSession"),
     );
   });
 
   test("executes switchNativeShell command", async () => {
     const commands = await getRegisteredCommands();
-    assertCommandRegistered(commands, "ost.switchNativeShell");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.switchNativeShell");
 
     await assert.doesNotReject(
       async () =>
-        vscode.commands.executeCommand("ost.switchNativeShell"),
+        vscode.commands.executeCommand("ai-sidebar-terminal.switchNativeShell"),
     );
   });
 });

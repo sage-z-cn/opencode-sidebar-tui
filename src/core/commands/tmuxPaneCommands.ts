@@ -268,7 +268,7 @@ export function registerTmuxPaneCommands(
   }
 
   const tmuxSwitchPaneCommand = vscode.commands.registerCommand(
-    "ost.tmuxSwitchPane",
+    "ai-sidebar-terminal.tmuxSwitchPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -333,7 +333,7 @@ export function registerTmuxPaneCommands(
   }
 
   const tmuxSplitPaneHCommand = vscode.commands.registerCommand(
-    "ost.tmuxSplitPaneH",
+    "ai-sidebar-terminal.tmuxSplitPaneH",
     async (item?: { paneId?: string; sessionId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -356,7 +356,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSplitPaneVCommand = vscode.commands.registerCommand(
-    "ost.tmuxSplitPaneV",
+    "ai-sidebar-terminal.tmuxSplitPaneV",
     async (item?: { paneId?: string; sessionId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -379,7 +379,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSplitPaneWithCommandCommand = vscode.commands.registerCommand(
-    "ost.tmuxSplitPaneWithCommand",
+    "ai-sidebar-terminal.tmuxSplitPaneWithCommand",
     async (item?: { paneId?: string; sessionId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -409,7 +409,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSendTextToPaneCommand = vscode.commands.registerCommand(
-    "ost.tmuxSendTextToPane",
+    "ai-sidebar-terminal.tmuxSendTextToPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -441,7 +441,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxResizePaneCommand = vscode.commands.registerCommand(
-    "ost.tmuxResizePane",
+    "ai-sidebar-terminal.tmuxResizePane",
     async (item?: { paneId: string }) => {
       if (!resolvePaneManager()) {
         return;
@@ -487,7 +487,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSwapPaneCommand = vscode.commands.registerCommand(
-    "ost.tmuxSwapPane",
+    "ai-sidebar-terminal.tmuxSwapPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -549,7 +549,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxKillPaneCommand = vscode.commands.registerCommand(
-    "ost.tmuxKillPane",
+    "ai-sidebar-terminal.tmuxKillPane",
     async (item?: { paneId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) {
@@ -621,7 +621,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxNextWindowCommand = vscode.commands.registerCommand(
-    "ost.tmuxNextWindow",
+    "ai-sidebar-terminal.tmuxNextWindow",
     async () => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -640,7 +640,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxPrevWindowCommand = vscode.commands.registerCommand(
-    "ost.tmuxPrevWindow",
+    "ai-sidebar-terminal.tmuxPrevWindow",
     async () => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -659,7 +659,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxCreateWindowCommand = vscode.commands.registerCommand(
-    "ost.tmuxCreateWindow",
+    "ai-sidebar-terminal.tmuxCreateWindow",
     async () => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -683,7 +683,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxKillWindowCommand = vscode.commands.registerCommand(
-    "ost.tmuxKillWindow",
+    "ai-sidebar-terminal.tmuxKillWindow",
     async (item?: { windowId: string }) => {
       if (!resolvePaneManager()) return;
       const sessionId = await resolveFocusedSessionId();
@@ -713,7 +713,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxSelectWindowCommand = vscode.commands.registerCommand(
-    "ost.tmuxSelectWindow",
+    "ai-sidebar-terminal.tmuxSelectWindow",
     async (item?: { windowId: string }) => {
       if (!resolvePaneManager()) return;
       const sessionId = await resolveFocusedSessionId();
@@ -737,7 +737,7 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxKillSessionCommand = vscode.commands.registerCommand(
-    "ost.tmuxKillSession",
+    "ai-sidebar-terminal.tmuxKillSession",
     async (item?: { sessionId: string }) => {
       const paneManager = resolvePaneManager();
       if (!paneManager) return;
@@ -758,9 +758,9 @@ export function registerTmuxPaneCommands(
   );
 
   const tmuxRefreshCommand = vscode.commands.registerCommand(
-    "ost.tmuxRefresh",
+    "ai-sidebar-terminal.tmuxRefresh",
     async () => {
-      await vscode.commands.executeCommand("ost.openTerminalManager");
+      await vscode.commands.executeCommand("ai-sidebar-terminal.openTerminalManager");
     },
   );
 

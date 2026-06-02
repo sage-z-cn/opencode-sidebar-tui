@@ -143,10 +143,10 @@ export function setupTmuxCommandButton(
 // ── Tmux window buttons ──
 
 export function setupTmuxWindowButtons(): void {
-  bindTmuxCommandButton("btn-tmux-new-session", "ost.createTmuxSession");
-  bindTmuxCommandButton("btn-tmux-prev-window", "ost.tmuxPrevWindow");
-  bindTmuxCommandButton("btn-tmux-new-window", "ost.tmuxCreateWindow");
-  bindTmuxCommandButton("btn-tmux-next-window", "ost.tmuxNextWindow");
+  bindTmuxCommandButton("btn-tmux-new-session", "ai-sidebar-terminal.createTmuxSession");
+  bindTmuxCommandButton("btn-tmux-prev-window", "ai-sidebar-terminal.tmuxPrevWindow");
+  bindTmuxCommandButton("btn-tmux-new-window", "ai-sidebar-terminal.tmuxCreateWindow");
+  bindTmuxCommandButton("btn-tmux-next-window", "ai-sidebar-terminal.tmuxNextWindow");
 }
 
 function bindTmuxCommandButton(

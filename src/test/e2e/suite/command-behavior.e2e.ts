@@ -13,7 +13,7 @@ async function activateExtension(): Promise<vscode.Extension<unknown>> {
 
 async function executeCommandWithoutUserInput(commandId: string): Promise<void> {
   const closeQuickPick =
-    commandId === "ost.browseTmuxSessions"
+    commandId === "ai-sidebar-terminal.browseTmuxSessions"
       ? setTimeout(() => {
           void vscode.commands.executeCommand("workbench.action.closeQuickOpen");
         }, 250)
@@ -30,12 +30,12 @@ async function executeCommandWithoutUserInput(commandId: string): Promise<void> 
 
 suite("Command behavior", () => {
   const safeCommands = [
-    "ost.start",
-    "ost.toggleDashboard",
-    "ost.openTerminalManager",
-    "ost.browseTmuxSessions",
-    "ost.switchTmuxSession",
-    "ost.switchNativeShell",
+    "ai-sidebar-terminal.start",
+    "ai-sidebar-terminal.toggleDashboard",
+    "ai-sidebar-terminal.openTerminalManager",
+    "ai-sidebar-terminal.browseTmuxSessions",
+    "ai-sidebar-terminal.switchTmuxSession",
+    "ai-sidebar-terminal.switchNativeShell",
   ];
 
   for (const commandId of safeCommands) {

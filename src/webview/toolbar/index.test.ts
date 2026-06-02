@@ -188,19 +188,19 @@ describe("tmux window buttons", () => {
 
     expect(postMessageMock).toHaveBeenNthCalledWith(1, {
       type: "executeTmuxCommand",
-      commandId: "ost.createTmuxSession",
+      commandId: "ai-sidebar-terminal.createTmuxSession",
     });
     expect(postMessageMock).toHaveBeenNthCalledWith(2, {
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxPrevWindow",
+      commandId: "ai-sidebar-terminal.tmuxPrevWindow",
     });
     expect(postMessageMock).toHaveBeenNthCalledWith(3, {
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxCreateWindow",
+      commandId: "ai-sidebar-terminal.tmuxCreateWindow",
     });
     expect(postMessageMock).toHaveBeenNthCalledWith(4, {
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxNextWindow",
+      commandId: "ai-sidebar-terminal.tmuxNextWindow",
     });
   });
 

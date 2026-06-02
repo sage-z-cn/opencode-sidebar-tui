@@ -19,14 +19,14 @@ export function registerDashboardCommands(
   const disposables: vscode.Disposable[] = [];
 
   disposables.push(
-    vscode.commands.registerCommand("ost.toggleDashboard", () => {
+    vscode.commands.registerCommand("ai-sidebar-terminal.toggleDashboard", () => {
       deps.provider?.toggleDashboard();
     }),
   );
 
   disposables.push(
     vscode.commands.registerCommand(
-      "ost.toggleTmuxCommandToolbar",
+      "ai-sidebar-terminal.toggleTmuxCommandToolbar",
       () => {
         deps.provider?.toggleTmuxCommandToolbar();
       },
@@ -34,7 +34,7 @@ export function registerDashboardCommands(
   );
 
   disposables.push(
-    vscode.commands.registerCommand("ost.openDashboardInEditor", () => {
+    vscode.commands.registerCommand("ai-sidebar-terminal.openDashboardInEditor", () => {
       void openDashboardInEditor(deps);
     }),
   );
@@ -51,7 +51,7 @@ async function openDashboardInEditor(
   }
 
   const panel = vscode.window.createWebviewPanel(
-    "ost.dashboardEditor",
+    "ai-sidebar-terminal.dashboardEditor",
     l10n.t("Terminal Managers"),
     vscode.ViewColumn.One,
     {
@@ -71,7 +71,7 @@ async function openDashboardInEditor(
       case "activate":
         if (message.sessionId) {
           await vscode.commands.executeCommand(
-            "ost.switchTmuxSession",
+            "ai-sidebar-terminal.switchTmuxSession",
             message.sessionId,
           );
         }
@@ -79,14 +79,14 @@ async function openDashboardInEditor(
       case "killSession":
         if (message.sessionId) {
           await vscode.commands.executeCommand(
-            "ost.killTmuxSession",
+            "ai-sidebar-terminal.killTmuxSession",
             message.sessionId,
           );
           await updateDashboardWebview(panel.webview, deps);
         }
         break;
       case "create":
-        await vscode.commands.executeCommand("ost.createTmuxSession");
+        await vscode.commands.executeCommand("ai-sidebar-terminal.createTmuxSession");
         await updateDashboardWebview(panel.webview, deps);
         break;
     }

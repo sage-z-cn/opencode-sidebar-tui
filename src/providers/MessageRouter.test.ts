@@ -98,8 +98,10 @@ describe("MessageRouter", () => {
       toggleDashboard: vi.fn(),
       toggleEditorAttachment: vi.fn(async () => undefined),
       restart: vi.fn(),
+      openSettings: vi.fn(),
       switchToNativeShell: vi.fn(async () => undefined),
       selectTerminalBackend: vi.fn(async () => undefined),
+      switchToBackend: vi.fn(async () => undefined),
       cycleTerminalBackend: vi.fn(async () => undefined),
       pasteText: vi.fn(),
       getActiveInstanceId: vi.fn(() => "instance-1"),
@@ -346,7 +348,7 @@ describe("MessageRouter", () => {
     await router.handleMessage({ type: "requestAiToolSelector" });
     await router.handleMessage({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxCreateWindow",
+      commandId: "ai-sidebar-terminal.tmuxCreateWindow",
     });
     await router.handleMessage({ type: "toggleDashboard" });
     await router.handleMessage({ type: "toggleEditorAttachment" });
@@ -381,7 +383,7 @@ describe("MessageRouter", () => {
       true,
     );
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.tmuxCreateWindow",
+      "ai-sidebar-terminal.tmuxCreateWindow",
     );
     expect(provider.toggleDashboard).toHaveBeenCalledTimes(1);
     expect(provider.toggleEditorAttachment).toHaveBeenCalledTimes(1);
@@ -734,7 +736,7 @@ describe("MessageRouter", () => {
     expect(terminal.sendText).toHaveBeenNthCalledWith(2, "npm lint");
     expect(terminal.sendText).toHaveBeenNthCalledWith(3, "npm build");
     expect(context.globalState.update).toHaveBeenCalledWith(
-      "ost.allowTerminalCommands",
+      "ai-sidebar-terminal.allowTerminalCommands",
       true,
     );
     expect(terminal.sendText).toHaveBeenCalledTimes(3);
@@ -861,20 +863,20 @@ describe("MessageRouter", () => {
 
     await router.handleMessage({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxNextWindow",
+      commandId: "ai-sidebar-terminal.tmuxNextWindow",
     });
     await router.handleMessage({
       type: "executeTmuxCommand",
-      commandId: "ost.invalidCommand" as never,
+      commandId: "ai-sidebar-terminal.invalidCommand" as never,
     });
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.tmuxNextWindow",
+      "ai-sidebar-terminal.tmuxNextWindow",
     );
     expect(vscode.commands.executeCommand).toHaveBeenCalledTimes(1);
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining(
-        "executeTmuxCommand failed for ost.tmuxNextWindow: command boom",
+        "executeTmuxCommand failed for ai-sidebar-terminal.tmuxNextWindow: command boom",
       ),
     );
   });
@@ -1064,7 +1066,7 @@ describe("MessageRouter", () => {
 
     await router.handleMessage({
       type: "executeTmuxCommand",
-      commandId: "ost.tmuxCreateWindow",
+      commandId: "ai-sidebar-terminal.tmuxCreateWindow",
     });
     await router.handleMessage({
       type: "executeTmuxRawCommand",

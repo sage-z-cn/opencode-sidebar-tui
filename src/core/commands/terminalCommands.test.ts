@@ -129,15 +129,15 @@ describe("registerTerminalCommands", () => {
 
     expect(Array.from(commands.keys())).toEqual(
       expect.arrayContaining([
-        "ost.start",
-        "ost.sendToTerminal",
-        "ost.sendAtMention",
-        "ost.sendAllOpenFiles",
-        "ost.sendFileToTerminal",
-        "ost.paste",
-        "ost.focus",
-        "ost.openTerminalInEditor",
-        "ost.restoreTerminalToSidebar",
+        "ai-sidebar-terminal.start",
+        "ai-sidebar-terminal.sendToTerminal",
+        "ai-sidebar-terminal.sendAtMention",
+        "ai-sidebar-terminal.sendAllOpenFiles",
+        "ai-sidebar-terminal.sendFileToTerminal",
+        "ai-sidebar-terminal.paste",
+        "ai-sidebar-terminal.focus",
+        "ai-sidebar-terminal.openTerminalInEditor",
+        "ai-sidebar-terminal.restoreTerminalToSidebar",
       ]),
     );
     expect(commands.size).toBe(9);
@@ -147,7 +147,7 @@ describe("registerTerminalCommands", () => {
     const deps = createDependencies();
     const commands = registerAndGetCommands(deps);
 
-    getCommand(commands, "ost.start")();
+    getCommand(commands, "ai-sidebar-terminal.start")();
 
     expect(deps.provider?.startOpenCode).toHaveBeenCalledTimes(1);
   });
@@ -163,7 +163,7 @@ describe("registerTerminalCommands", () => {
     vscode.window.activeTextEditor = editor;
 
     const commands = registerAndGetCommands(deps);
-    getCommand(commands, "ost.sendToTerminal")();
+    getCommand(commands, "ai-sidebar-terminal.sendToTerminal")();
 
     expect(document.getText).toHaveBeenCalledWith(selection);
     expect(deps.getActiveTerminalId).toHaveBeenCalledTimes(1);
@@ -172,7 +172,7 @@ describe("registerTerminalCommands", () => {
     );
     expect(deps.sendPrompt).toHaveBeenCalledWith("selected text\n");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.focus",
+      "ai-sidebar-terminal.focus",
     );
 
     vi.advanceTimersByTime(100);
@@ -184,7 +184,7 @@ describe("registerTerminalCommands", () => {
     const noEditorDeps = createDependencies();
     const noEditorCommands = registerAndGetCommands(noEditorDeps);
 
-    getCommand(noEditorCommands, "ost.sendToTerminal")();
+    getCommand(noEditorCommands, "ai-sidebar-terminal.sendToTerminal")();
 
     expect(noEditorDeps.sendPrompt).not.toHaveBeenCalled();
     expect(noEditorDeps.outputChannel?.info).not.toHaveBeenCalled();
@@ -204,7 +204,7 @@ describe("registerTerminalCommands", () => {
     );
 
     const emptySelectionCommands = registerAndGetCommands(emptySelectionDeps);
-    getCommand(emptySelectionCommands, "ost.sendToTerminal")();
+    getCommand(emptySelectionCommands, "ai-sidebar-terminal.sendToTerminal")();
 
     expect(emptySelectionDeps.sendPrompt).not.toHaveBeenCalled();
     expect(emptySelectionDeps.outputChannel?.info).not.toHaveBeenCalled();
@@ -222,11 +222,11 @@ describe("registerTerminalCommands", () => {
     vscode.window.activeTextEditor = new vscode.TextEditor(document, selection);
 
     const commands = registerAndGetCommands(deps);
-    getCommand(commands, "ost.sendToTerminal")();
+    getCommand(commands, "ai-sidebar-terminal.sendToTerminal")();
 
     expect(deps.sendPrompt).toHaveBeenCalledWith("text\n");
     expect(vscode.commands.executeCommand).not.toHaveBeenCalledWith(
-      "ost.focus",
+      "ai-sidebar-terminal.focus",
     );
 
     vi.runAllTimers();
@@ -249,7 +249,7 @@ describe("registerTerminalCommands", () => {
     vscode.window.activeTextEditor = editor;
 
     const successCommands = registerAndGetCommands(successDeps);
-    getCommand(successCommands, "ost.sendAtMention")();
+    getCommand(successCommands, "ai-sidebar-terminal.sendAtMention")();
 
     expect(successDeps.outputChannel?.info).toHaveBeenCalledWith(
       '[DIAG:sendAtMention] terminalId="terminal-1" fileRef="@src/file.ts#L1"',
@@ -267,7 +267,7 @@ describe("registerTerminalCommands", () => {
     vscode.window.activeTextEditor = editor;
     const noProviderCommands = registerAndGetCommands(noProviderDeps);
 
-    getCommand(noProviderCommands, "ost.sendAtMention")();
+    getCommand(noProviderCommands, "ai-sidebar-terminal.sendAtMention")();
 
     expect(noProviderDeps.outputChannel?.warn).toHaveBeenCalledWith(
       "[DIAG:sendAtMention] skipped — provider=false",
@@ -282,7 +282,7 @@ describe("registerTerminalCommands", () => {
     vscode.window.activeTextEditor = undefined;
     const noEditorCommands = registerAndGetCommands(noEditorDeps);
 
-    getCommand(noEditorCommands, "ost.sendAtMention")();
+    getCommand(noEditorCommands, "ai-sidebar-terminal.sendAtMention")();
 
     expect(noEditorDeps.outputChannel?.warn).toHaveBeenCalledWith(
       "[DIAG:sendAtMention] skipped — editor missing",
@@ -315,7 +315,7 @@ describe("registerTerminalCommands", () => {
     ];
 
     const commands = registerAndGetCommands(deps);
-    getCommand(commands, "ost.sendAllOpenFiles")();
+    getCommand(commands, "ai-sidebar-terminal.sendAllOpenFiles")();
 
     expect(deps.provider?.formatUriReference).toHaveBeenCalledTimes(2);
     expect(deps.outputChannel?.info).toHaveBeenCalledWith(
@@ -342,7 +342,7 @@ describe("registerTerminalCommands", () => {
     ];
 
     const commands = registerAndGetCommands(deps);
-    getCommand(commands, "ost.sendAllOpenFiles")();
+    getCommand(commands, "ai-sidebar-terminal.sendAllOpenFiles")();
 
     expect(deps.sendPrompt).not.toHaveBeenCalled();
     expect(deps.getActiveTerminalId).not.toHaveBeenCalled();
@@ -361,7 +361,7 @@ describe("registerTerminalCommands", () => {
     const commands = registerAndGetCommands(deps);
     const sendFileToTerminal = getCommand(
       commands,
-      "ost.sendFileToTerminal",
+      "ai-sidebar-terminal.sendFileToTerminal",
     );
 
     sendFileToTerminal("ignored", [firstUri]);
@@ -388,7 +388,7 @@ describe("registerTerminalCommands", () => {
   it("ignores file sends without context sharing or usable uri arguments", () => {
     const noContextDeps = createDependencies({ contextSharingService: undefined });
     const noContextCommands = registerAndGetCommands(noContextDeps);
-    getCommand(noContextCommands, "ost.sendFileToTerminal")(
+    getCommand(noContextCommands, "ai-sidebar-terminal.sendFileToTerminal")(
       vscode.Uri.file("/workspace/a.ts"),
     );
     vi.advanceTimersByTime(100);
@@ -400,8 +400,8 @@ describe("registerTerminalCommands", () => {
 
     const invalidArgsDeps = createDependencies();
     const invalidArgsCommands = registerAndGetCommands(invalidArgsDeps);
-    getCommand(invalidArgsCommands, "ost.sendFileToTerminal")("ignored");
-    getCommand(invalidArgsCommands, "ost.sendFileToTerminal")();
+    getCommand(invalidArgsCommands, "ai-sidebar-terminal.sendFileToTerminal")("ignored");
+    getCommand(invalidArgsCommands, "ai-sidebar-terminal.sendFileToTerminal")();
     vi.advanceTimersByTime(100);
 
     expect(invalidArgsDeps.sendPrompt).not.toHaveBeenCalled();
@@ -414,7 +414,7 @@ describe("registerTerminalCommands", () => {
     );
     const commands = registerAndGetCommands(deps);
 
-    getCommand(commands, "ost.sendFileToTerminal")(
+    getCommand(commands, "ai-sidebar-terminal.sendFileToTerminal")(
       vscode.Uri.file("/workspace/direct.ts"),
     );
     vi.advanceTimersByTime(100);
@@ -427,7 +427,7 @@ describe("registerTerminalCommands", () => {
     const deps = createDependencies();
     const commands = registerAndGetCommands(deps);
 
-    getCommand(commands, "ost.sendFileToTerminal")([]);
+    getCommand(commands, "ai-sidebar-terminal.sendFileToTerminal")([]);
     vi.advanceTimersByTime(100);
 
     expect(deps.provider?.formatUriReference).not.toHaveBeenCalled();
@@ -439,7 +439,7 @@ describe("registerTerminalCommands", () => {
     const commands = registerAndGetCommands(deps);
     const sendFileToTerminal = getCommand(
       commands,
-      "ost.sendFileToTerminal",
+      "ai-sidebar-terminal.sendFileToTerminal",
     );
 
     sendFileToTerminal("ignored", [vscode.Uri.file("/workspace/a.ts")]);
@@ -458,7 +458,7 @@ describe("registerTerminalCommands", () => {
     const successDeps = createDependencies();
 
     const successCommands = registerAndGetCommands(successDeps);
-    await getCommand(successCommands, "ost.paste")();
+    await getCommand(successCommands, "ai-sidebar-terminal.paste")();
 
     expect(successDeps.provider?.requestPaste).toHaveBeenCalledTimes(1);
     expect(successDeps.outputChannel?.error).not.toHaveBeenCalled();
@@ -472,7 +472,7 @@ describe("registerTerminalCommands", () => {
     });
 
     const errorCommands = registerAndGetCommands(errorDeps);
-    await getCommand(errorCommands, "ost.paste")();
+    await getCommand(errorCommands, "ai-sidebar-terminal.paste")();
 
     expect(errorDeps.outputChannel?.error).toHaveBeenCalledWith(
       "[TerminalProvider] Failed to paste: webview unavailable",
@@ -486,7 +486,7 @@ describe("registerTerminalCommands", () => {
 
     const noProviderDeps = createDependencies({ provider: undefined });
     const noProviderCommands = registerAndGetCommands(noProviderDeps);
-    await getCommand(noProviderCommands, "ost.paste")();
+    await getCommand(noProviderCommands, "ai-sidebar-terminal.paste")();
 
     expect(noProviderDeps.outputChannel?.error).not.toHaveBeenCalled();
 
@@ -501,7 +501,7 @@ describe("registerTerminalCommands", () => {
     );
 
     const stringErrorCommands = registerAndGetCommands(stringErrorDeps);
-    await getCommand(stringErrorCommands, "ost.paste")();
+    await getCommand(stringErrorCommands, "ai-sidebar-terminal.paste")();
 
     expect(stringErrorDeps.outputChannel?.error).toHaveBeenCalledWith(
       "[TerminalProvider] Failed to paste: paste failed",
@@ -512,9 +512,9 @@ describe("registerTerminalCommands", () => {
     const deps = createDependencies();
     const commands = registerAndGetCommands(deps);
 
-    getCommand(commands, "ost.focus")();
-    getCommand(commands, "ost.openTerminalInEditor")();
-    getCommand(commands, "ost.restoreTerminalToSidebar")();
+    getCommand(commands, "ai-sidebar-terminal.focus")();
+    getCommand(commands, "ai-sidebar-terminal.openTerminalInEditor")();
+    getCommand(commands, "ai-sidebar-terminal.restoreTerminalToSidebar")();
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
       "workbench.view.focus",
@@ -527,7 +527,7 @@ describe("registerTerminalCommands", () => {
   it("returns the executeCommand promise from ost.focus", () => {
     const deps = createDependencies();
     const commands = registerAndGetCommands(deps);
-    const focusCommand = getCommand(commands, "ost.focus");
+    const focusCommand = getCommand(commands, "ai-sidebar-terminal.focus");
 
     vi.mocked(vscode.commands.executeCommand).mockResolvedValueOnce(true);
 

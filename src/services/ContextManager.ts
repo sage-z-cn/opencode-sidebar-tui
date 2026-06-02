@@ -18,7 +18,7 @@ export class ContextManager implements vscode.Disposable {
   ) {
     this.outputChannel = outputChannel;
 
-    const config = vscode.workspace.getConfiguration("ost");
+    const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
     this.debounceMs = config.get<number>("contextDebounceMs", 500);
 
     this.activeEditor = vscode.window.activeTextEditor;

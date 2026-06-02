@@ -17,10 +17,10 @@ suite("Command registration", () => {
 
     const commands = await vscode.commands.getCommands(true);
 
-    assert.ok(commands.includes("ost.start"));
-    assert.ok(commands.includes("ost.focus"));
-    assert.ok(commands.includes("ost.openTerminalInEditor"));
-    assert.ok(commands.includes("ost.toggleDashboard"));
+    assert.ok(commands.includes("ai-sidebar-terminal.start"));
+    assert.ok(commands.includes("ai-sidebar-terminal.focus"));
+    assert.ok(commands.includes("ai-sidebar-terminal.openTerminalInEditor"));
+    assert.ok(commands.includes("ai-sidebar-terminal.toggleDashboard"));
   });
 
   test("registers focus command without relying on internal workbench commands", async () => {
@@ -28,8 +28,8 @@ suite("Command registration", () => {
 
     const commands = await vscode.commands.getCommands(true);
     assert.ok(
-      commands.includes("ost.focus"),
-      "ost.focus should be registered",
+      commands.includes("ai-sidebar-terminal.focus"),
+      "ai-sidebar-terminal.focus should be registered",
     );
   });
 
@@ -39,9 +39,9 @@ suite("Command registration", () => {
     const properties = extension.packageJSON.contributes.configuration
       .properties as Record<string, { default: unknown }>;
 
-    assert.strictEqual(properties["ost.autoStartOnOpen"].default, true);
+    assert.strictEqual(properties["ai-sidebar-terminal.autoStartOnOpen"].default, true);
     assert.strictEqual(
-      properties["ost.defaultAiTool"].default,
+      properties["ai-sidebar-terminal.defaultAiTool"].default,
       "opencode",
     );
   });

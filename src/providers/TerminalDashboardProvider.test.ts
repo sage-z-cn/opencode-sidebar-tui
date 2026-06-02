@@ -355,14 +355,14 @@ describe("TerminalDashboardProvider", () => {
     await flushPromises();
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.switchTmuxSession",
+      "ai-sidebar-terminal.switchTmuxSession",
       "repo-a",
     );
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.createTmuxSession",
+      "ai-sidebar-terminal.createTmuxSession",
     );
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.switchNativeShell",
+      "ai-sidebar-terminal.switchNativeShell",
     );
     expect(discoverSessions).toHaveBeenCalledTimes(4);
     expect(view.webview.postMessage).toHaveBeenCalledWith(
@@ -545,7 +545,7 @@ describe("TerminalDashboardProvider", () => {
     await flushPromises();
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.createTmuxSession",
+      "ai-sidebar-terminal.createTmuxSession",
     );
     expect(vi.mocked(tmuxSessionManager.createWindow)).toHaveBeenCalledWith(
       "repo-a",
@@ -571,7 +571,7 @@ describe("TerminalDashboardProvider", () => {
 
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledTimes(1);
     expect(vscode.window.createWebviewPanel).toHaveBeenCalledWith(
-      "ost.terminalDashboard",
+      "ai-sidebar-terminal.terminalDashboard",
       "Terminal Manager",
       {
         preserveFocus: true,
@@ -836,7 +836,7 @@ describe("TerminalDashboardProvider", () => {
     );
     expect(instanceStore.setActive).toHaveBeenCalledWith("shell-1");
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.killNativeShell",
+      "ai-sidebar-terminal.killNativeShell",
       "shell-1",
     );
   });
@@ -867,7 +867,7 @@ describe("TerminalDashboardProvider", () => {
     });
 
     expect(vscode.commands.executeCommand).not.toHaveBeenCalledWith(
-      "ost.switchNativeShell",
+      "ai-sidebar-terminal.switchNativeShell",
     );
   });
 
@@ -1285,12 +1285,12 @@ describe("TerminalDashboardProvider", () => {
     ).handleWebviewMessage({ action: "killSession", sessionId: "repo-a-1" });
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.killTmuxSession",
+      "ai-sidebar-terminal.killTmuxSession",
       "repo-a-1",
     );
     expect(vscode.commands.executeCommand).toHaveBeenNthCalledWith(
       2,
-      "ost.switchTmuxSession",
+      "ai-sidebar-terminal.switchTmuxSession",
       expect.any(String),
     );
   });
@@ -1805,7 +1805,7 @@ describe("TerminalDashboardProvider", () => {
     await messageHandler({ action: "activateNativeShell", instanceId: "missing" });
 
     expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ost.switchNativeShell",
+      "ai-sidebar-terminal.switchNativeShell",
     );
   });
 

@@ -686,7 +686,7 @@ export class MessageRouter {
     terminal: vscode.Terminal,
     command: string,
   ): Promise<void> {
-    const configKey = "ost.allowTerminalCommands";
+    const configKey = "ai-sidebar-terminal.allowTerminalCommands";
     const allowed = this.context.globalState.get<boolean>(configKey);
 
     if (allowed) {

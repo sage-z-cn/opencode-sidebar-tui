@@ -32,7 +32,7 @@ interface DashboardSessionSource {
 export class TerminalDashboardProvider
   implements vscode.WebviewViewProvider, vscode.Disposable
 {
-  public static readonly viewType = "ost.terminalDashboard";
+  public static readonly viewType = "ai-sidebar-terminal.terminalDashboard";
 
   private view?: vscode.WebviewView;
   private panel?: vscode.WebviewPanel;
@@ -162,7 +162,7 @@ export class TerminalDashboardProvider
 
       const panesMap: Record<string, TmuxDashboardPaneDto[]> = {};
       const windowsMap: Record<string, TmuxDashboardWindowDto[]> = {};
-      const config = vscode.workspace.getConfiguration("ost");
+      const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
       const tools: AiToolConfig[] = resolveAiToolConfigs(
         config.get("aiTools", []),
       );
@@ -390,18 +390,18 @@ export class TerminalDashboardProvider
           await this.terminalProvider?.switchToZellijSession(message.sessionId);
         } else {
           await vscode.commands.executeCommand(
-            "ost.switchTmuxSession",
+            "ai-sidebar-terminal.switchTmuxSession",
             message.sessionId,
           );
         }
         await this.postSessionsToWebview();
         return;
       case "create":
-        await vscode.commands.executeCommand("ost.createTmuxSession");
+        await vscode.commands.executeCommand("ai-sidebar-terminal.createTmuxSession");
         await this.postSessionsToWebview();
         return;
       case "switchNativeShell":
-        await vscode.commands.executeCommand("ost.switchNativeShell");
+        await vscode.commands.executeCommand("ai-sidebar-terminal.switchNativeShell");
         await this.postSessionsToWebview();
         return;
       case "createNativeShell":
@@ -429,7 +429,7 @@ export class TerminalDashboardProvider
             this.instanceStore.setActive(newId);
           }
 
-          await vscode.commands.executeCommand("ost.switchNativeShell");
+          await vscode.commands.executeCommand("ai-sidebar-terminal.switchNativeShell");
           await this.postSessionsToWebview();
         }
         return;
@@ -438,7 +438,7 @@ export class TerminalDashboardProvider
           try {
             this.instanceStore.setActive(message.instanceId);
           await vscode.commands.executeCommand(
-            "ost.switchNativeShell",
+            "ai-sidebar-terminal.switchNativeShell",
           );
         } catch {
           }
@@ -674,7 +674,7 @@ export class TerminalDashboardProvider
         return;
       case "killNativeShell": {
         await vscode.commands.executeCommand(
-          "ost.killNativeShell",
+          "ai-sidebar-terminal.killNativeShell",
           message.instanceId,
         );
         await this.postSessionsToWebview();
@@ -693,7 +693,7 @@ export class TerminalDashboardProvider
           await this.terminalProvider.killTmuxSession(message.sessionId);
         } else {
           await vscode.commands.executeCommand(
-            "ost.killTmuxSession",
+            "ai-sidebar-terminal.killTmuxSession",
             message.sessionId,
           );
         }
@@ -708,7 +708,7 @@ export class TerminalDashboardProvider
               await this.terminalProvider?.switchToZellijSession(nextSession.id);
             } else {
               await vscode.commands.executeCommand(
-                "ost.switchTmuxSession",
+                "ai-sidebar-terminal.switchTmuxSession",
                 nextSession.id,
               );
             }
@@ -768,7 +768,7 @@ export class TerminalDashboardProvider
   ): Promise<void> {
     const webview = this.getActiveWebview();
     if (webview) {
-      const config = vscode.workspace.getConfiguration("ost");
+      const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
       const tools: AiToolConfig[] = resolveAiToolConfigs(
         config.get("aiTools", []),
       );
