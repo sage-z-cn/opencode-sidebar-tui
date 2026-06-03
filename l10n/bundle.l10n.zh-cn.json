@@ -129,7 +129,7 @@
   "Tmux commands": "Tmux 命令",
   "Cycle terminal backend": "切换终端后端",
   "Toggle editor mode": "切换编辑器模式",
-  "Re-render terminal": "重新渲染终端",
+  "Refresh terminal": "刷新终端",
   "Restart terminal": "重启终端",
   "Open extension settings": "打开扩展设置",
   "No other terminal backend is available": "没有其他可用的终端后端",

@@ -9,7 +9,7 @@ const titleL10nMap: Record<string, string> = {
   tmuxCommands: l10n.t("Tmux commands"),
   toggleBackend: l10n.t("Cycle terminal backend"),
   toggleEditor: l10n.t("Toggle editor mode"),
-  rerender: l10n.t("Re-render terminal"),
+  rerender: l10n.t("Refresh terminal"),
   restart: l10n.t("Restart terminal"),
   settings: l10n.t("Open extension settings"),
   noOtherBackend: l10n.t("No other terminal backend is available"),

@@ -215,17 +215,16 @@ export function setupReloadButton(): void {
 
 export function setupRerenderButton(): void {
   document.getElementById("btn-rerender")?.addEventListener("click", () => {
-    const container = document.getElementById("terminal-container");
-    if (!container) return;
+    const currentHeight = document.body.offsetHeight;
 
-    const currentHeight = container.offsetHeight;
-
-    // Use maxHeight to actually constrain the flex:1 element,
-    // triggering ResizeObserver → fitAddon.fit() + terminal.refresh()
-    container.style.maxHeight = `${currentHeight - 10}px`;
+    // Briefly constrain body dimensions to trigger
+    // ResizeObserver → fitAddon.fit() + terminal.refresh()
+    document.body.style.maxHeight = `${currentHeight - 10}px`;
+    document.body.style.width = "99%";
 
     setTimeout(() => {
-      container.style.maxHeight = "";
+      document.body.style.maxHeight = "";
+      document.body.style.width = "";
     }, 500);
   });
 }
