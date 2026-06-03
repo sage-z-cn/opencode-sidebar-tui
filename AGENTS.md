@@ -1,127 +1,140 @@
 # PROJECT KNOWLEDGE BASE
 
-**Updated:** 2026-04-20 Asia/Seoul
-**Commit:** 00cab61 | **Branch:** improve/windows-compatibility
+**Updated:** 2026-06-03 Asia/Shanghai
+**Commit:** 464b563 | **Branch:** main
 
 ## OVERVIEW
 
-VS Code extension — embeds AI Sidebar Terminal in the sidebar. PTY + HTTP communication + tmux session management.
+VS Code extension — AI Sidebar Terminal. Embeds multiple AI coding tools (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, custom) in the sidebar with full PTY, HTTP API, and multi-backend terminal management (native / tmux / zellij).
+
+## BUILD & TEST
+
+```bash
+npm run compile          # dev build (webpack) — two bundles: extension.js + webview.js/dashboard.js
+npm run watch            # watch mode
+npm run package          # production build + vsce package → build/extension.vsix
+npm run test             # vitest run
+npm run test:coverage    # vitest + coverage (lines 80%, functions 80%, branches 70%, statements 80%)
+npm run build-and-install # compile → package → install to VS Code
+```
+
+- Webpack produces 3 outputs: `extension.js` (node target), `webview.js` + `dashboard.js` (web target)
+- `vitest.config.ts` aliases `vscode` → `./src/test/mocks/vscode.ts` (no `@vscode/test-electron` for unit tests)
+- Webview code (`src/webview/**`) excluded from coverage
+- `dist/` is the build output; `out/` is unused (tsconfig `outDir` is historical)
 
 ## STRUCTURE
 
 ```
-./
-├── src/                     # extension host + webview source
-│   ├── extension.ts         # VS Code entry (activate/deactivate)
-│   ├── types.ts             # shared host↔webview message contracts
-│   ├── core/                # lifecycle orchestration + command registration
-│   ├── providers/           # VS Code webview providers (extension host side)
-│   ├── services/            # stateful backend: instances, tmux, HTTP, context
-│   ├── terminals/           # node-pty process management
-│   ├── webview/             # browser-only code (xterm.js bundles)
-│   ├── test/mocks/          # manual vscode + node-pty mocks
-│   ├── utils/               # shared utilities
-│   └── __tests__/           # vitest setup
-├── dist/                    # webpack output (extension.js, webview.js, dashboard.js)
-├── resources/               # activity bar icon
-├── docs/, memories/         # ULW notes
-└── package.json             # contribution points, scripts, config keys
+src/
+├── extension.ts              # VS Code entry: activate/deactivate → ExtensionLifecycle
+├── types.ts                  # shared host↔webview message contracts (WebviewMessage, HostMessage, TmuxDashboardActionMessage)
+├── i18n.ts                   # thin wrapper around vscode.l10n.t
+├── core/
+│   ├── ExtensionLifecycle.ts # activate(): creates all services, registers providers + commands
+│   └── commands/             # domain-split command registration
+│       ├── index.ts          # registerCommands(context, deps) orchestrator
+│       ├── terminalCommands.ts
+│       ├── tmuxSessionCommands.ts
+│       ├── tmuxPaneCommands.ts
+│       └── dashboardCommands.ts
+├── providers/                # extension host webview providers
+│   ├── TerminalProvider.ts   # webview lifecycle shell + HTML generation
+│   ├── MessageRouter.ts      # message dispatch (20+ handlers)
+│   ├── SessionRuntime.ts     # start/restart/tmux/instance switching
+│   ├── TerminalDashboardProvider.ts  # tmux dashboard (inline HTML)
+│   └── CodeActionProvider.ts
+├── services/                 # stateful backend
+│   ├── InstanceStore.ts      # in-memory instance state hub (Node EventEmitter)
+│   ├── InstanceController.ts # spawn/connect/disconnect/kill lifecycle
+│   ├── InstanceDiscoveryService.ts # process scan, auto-spawn
+│   ├── InstanceRegistry.ts   # persistence (globalState/workspaceState)
+│   ├── ConnectionResolver.ts # 4-tier: stored → discovered → spawned + client pool
+│   ├── OpenCodeApiClient.ts  # HTTP client with retry/backoff
+│   ├── PortManager.ts        # singleton ephemeral port allocation (16384-65535)
+│   ├── NativeTerminalManager.ts # native backend (no tmux/zellij dependency)
+│   ├── TmuxSessionManager.ts # tmux CLI wrapper (standalone, no service deps)
+│   ├── ZellijSessionManager.ts
+│   ├── terminalBackends.ts   # TerminalBackend interface + TerminalBackendRegistry
+│   ├── PaneStore.ts          # pane state (tabs, panes, layout snapshots)
+│   ├── DataThrottleService.ts # batched pane data delivery
+│   ├── TmuxPaneSyncService.ts / ZellijPaneSyncService.ts
+│   ├── aiTools/              # extensible AI tool operator system
+│   │   ├── AiToolOperator.ts
+│   │   ├── AiToolOperatorRegistry.ts
+│   │   └── operators/        # OpenCode, Claude, Codex, Gemini, Kimi operators
+│   ├── ContextManager.ts / ContextSharingService.ts
+│   ├── FileReferenceManager.ts
+│   ├── InstanceQuickPick.ts
+│   ├── OutputChannelService.ts # singleton logger
+│   └── OutputCaptureManager.ts
+├── terminals/                # node-pty process management
+├── webview/                  # browser-only code (xterm.js, Preact dashboard)
+│   ├── main.ts               # terminal bootstrap (xterm + WebGL + fit/resize)
+│   ├── dashboard-manager.tsx # Preact dashboard entry
+│   ├── layout/               # layout engine (multi-pane)
+│   ├── terminal/             # terminal container, toolbar, keyboard, AI selector
+│   ├── toolbar/              # toolbar buttons including refresh terminal
+│   ├── pane-manager.ts       # pane lifecycle management
+│   ├── pane-message-router.ts
+│   └── ...                   # focus, clipboard, dragdrop, links, messages, etc.
+├── utils/
+├── test/mocks/               # manual vscode.ts + node-pty.ts mocks
+└── __tests__/                # vitest setup
 ```
 
 ## ARCHITECTURE
 
 ```
 extension.ts → ExtensionLifecycle.activate()
-  ├── 13 services created (manual DI, no container)
+  ├── ~15 services created (manual DI, no container)
   ├── 2 providers registered (TerminalProvider, TerminalDashboardProvider)
   ├── CodeActionProvider registered
+  ├── TerminalBackendRegistry (native + tmux + zellij)
   └── command groups under core/commands/
 ```
 
-**Webpack outputs:** extension.js, webview.js, dashboard.js
+**Terminal backends:** native (default), tmux, zellij — user-selectable via `ai-sidebar-terminal.terminalBackend` config.
 
-**Host↔Webview messages:** discriminated unions in `src/types.ts`
+**AI tool operators:** extensible via `AiToolOperatorRegistry` + `operators/` directory. Each operator handles tool-specific behavior.
 
-- `WebviewMessage` — webview→host (input, resize, file refs, tmux actions)
-- `HostMessage` — host→webview (output, clipboard, visibility, platform)
-- `TmuxDashboardActionMessage` — tmux dashboard actions
+**i18n:** Uses VS Code's built-in `l10n` API. Strings via `src/i18n.ts` → `l10n.t()`. Translations in `l10n/bundle.l10n.zh-cn.json`. Webview uses the same `l10n` import.
 
-## WHERE TO LOOK
-
-| Task                  | Location                                         | Notes                                                     |
-| --------------------- | ------------------------------------------------ | --------------------------------------------------------- |
-| Activation / wiring   | `src/core/ExtensionLifecycle.ts`                 | service creation + provider registration      |
-| Command registration  | `src/core/commands/`                             | terminalCommands, tmuxSessionCommands, tmuxPaneCommands, dashboardCommands |
-| Main sidebar terminal | `src/providers/TerminalProvider.ts`              | Shell + MessageRouter + SessionRuntime                    |
-| Terminal dashboard    | `src/providers/TerminalDashboardProvider.ts`     | Terminal Manager dashboard (inline HTML)                  |
-| Instance state        | `src/services/InstanceStore.ts`                  | EventEmitter hub, all services depend here                |
-| Tmux CLI wrapper      | `src/services/TmuxSessionManager.ts`             | Standalone, used by both providers                        |
-| HTTP API              | `src/services/OpenCodeApiClient.ts`              | Retry/backoff, prompt append                              |
-| Browser terminal UI   | `src/webview/main.ts`                            | xterm.js + drag/drop + links                   |
-| Shared contracts      | `src/types.ts`                                   | Message types, DTOs, ExtensionConfig                      |
-| Test mocks            | `src/test/mocks/`                                | Manual vscode.ts + node-pty.ts (no @vscode/test-electron) |
-
-## CODE MAP
-
-| Symbol                 | Type     | Location                               | Role                                   |
-| ---------------------- | -------- | -------------------------------------- | -------------------------------------- |
-| `activate`             | function | `src/extension.ts`                     | VS Code extension entry                |
-| `ExtensionLifecycle`   | class    | `src/core/ExtensionLifecycle.ts`       | Service creation, command registration |
-| `TerminalProvider`     | class    | `src/providers/TerminalProvider.ts`    | Main sidebar webview provider          |
-| `TmuxSessionManager`   | class    | `src/services/TmuxSessionManager.ts`   | tmux CLI: sessions, panes, attach      |
-| `InstanceStore`        | class    | `src/services/InstanceStore.ts`        | In-memory instance state + events      |
-| `TerminalManager`      | class    | `src/terminals/TerminalManager.ts`     | node-pty process lifecycle             |
-| `OutputChannelService` | class    | `src/services/OutputChannelService.ts` | Singleton logger (`getInstance()`)     |
+**Host↔Webview messages:** discriminated unions in `src/types.ts` — all message shapes must be updated there.
 
 ## SINGLETONS
 
-- `OutputChannelService` — `getInstance()` static method + `resetInstance()` for tests
+- `OutputChannelService` — `getInstance()` + `resetInstance()` for tests
 - `portManager` — module-level export in `PortManager.ts`
 
 ## EVENT PATTERNS
 
 - `InstanceStore` — Node `EventEmitter`: `change`, `setActive`, `add`, `remove`
-- `TerminalManager` — VS Code `EventEmitter`: `onData`, `onExit`
+- `TerminalManager` / `NativeTerminalManager` — VS Code `EventEmitter`: `onData`, `onExit`
 - `FileReferenceManager` — VS Code `EventEmitter`: `onDidAddReference`, `onDidRemoveReference`
+- `PaneStore` — Node `EventEmitter`
 
 ## CONVENTIONS
 
 - TypeScript `strict: true`; diagnostics must stay clean on changed files
 - PascalCase classes; lowercase entrypoints (`extension.ts`, `main.ts`)
 - Tests colocated as `*.test.ts`; manual mocks in `src/test/mocks/`
+- Commands split by domain in `core/commands/` — never register directly in lifecycle or providers
+- `l10n.t()` for all user-visible strings (extension host + webview)
 - Webview code = browser-only; extension host code = `providers/`, `services/`, `core/`
-- `dist/` is the build output; never `out/`
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
 - No Node APIs in `src/webview` (`fs`, `path`, `os` are not available)
 - No duplicating instance state outside `InstanceStore`
-- No tmux logic in providers — use `TmuxSessionManager`
+- No tmux/zellij logic in providers — use `TmuxSessionManager` / `ZellijSessionManager`
 - New message shapes must update `src/types.ts`
 - Never `new OutputChannelService()` — use `getInstance()`
 - Never bypass mocks — follow existing patterns in `src/test/mocks/`
+- No ad hoc port allocation — use `PortManager`
+- No arbitrary message shapes in providers — must go through `MessageRouter`
 
 ## KNOWN DEBT
 
 - `TerminalDashboardProvider.ts` — inline HTML, needs split
 - `PortManager` — created separately in provider and lifecycle (needs singleton consolidation)
-
-## BUILD & TEST
-
-```bash
-npm run compile          # dev build (webpack)
-npm run watch            # watch mode
-npm run package          # production build (--mode production)
-npm run test             # vitest
-npm run test:coverage    # vitest + coverage (80/80/70/80 thresholds)
-npm run build-and-install # package → install to VS Code
-```
-
-**Coverage:** lines 80%, functions 80%, branches 70%, statements 80%
-**Webview excluded:** `src/webview/**` is excluded from coverage
-
-## NOTES
-
-- `vitest.config.ts` aliases `vscode` to `./src/test/mocks/vscode.ts`
-- `.vscodeignore` excludes all agent artifacts (`.sisyphus/`, `.claude/`, `.opencode/`, etc.)
-- Publish flow: tag-triggered (`v*`) → VS Code Marketplace + Open VSX dual publish
