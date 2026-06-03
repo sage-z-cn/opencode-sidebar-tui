@@ -44,7 +44,7 @@ For VSCodium, Gitpod, Eclipse Theia, and other compatible IDEs:
 2. Search for **ULW**.
 3. Click **Install**.
 
-You can also use the [OpenVSX page](https://open-vsx.org/extension/islee23520/ulwcode).
+You can also use the [OpenVSX page](https://open-vsx.org/extension/islee23520/opencode-sidebar-tui).
 
 ### Install from Source
 
