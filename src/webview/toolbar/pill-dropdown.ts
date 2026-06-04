@@ -34,6 +34,10 @@ function closeAllExcept(instance?: PillDropdown): void {
       inst.close();
     }
   }
+  // When opening a new pill, also close external dropdowns
+  if (instance) {
+    externalDropdownClose?.();
+  }
 }
 
 // ── Click-outside handler (singleton) ──
@@ -44,7 +48,7 @@ function ensureDocumentListener(): void {
   if (documentListenerAttached) return;
   documentListenerAttached = true;
   document.addEventListener("click", (e) => {
-    if (openInstances.size === 0) return;
+    if (openInstances.size === 0 && !externalDropdownClose) return;
     const target = e.target as Node;
     let clickedInside = false;
     for (const inst of openInstances) {
@@ -55,8 +59,21 @@ function ensureDocumentListener(): void {
     }
     if (!clickedInside) {
       closeAllExcept();
+      externalDropdownClose?.();
     }
   });
+}
+
+/** External dropdown close callback – used for settings dropdown mutex. */
+let externalDropdownClose: (() => void) | null = null;
+
+export function registerExternalDropdownClose(close: () => void): void {
+  externalDropdownClose = close;
+  ensureDocumentListener();
+}
+
+export function closeAllPillDropdowns(): void {
+  closeAllExcept();
 }
 
 // ── PillDropdown class ──

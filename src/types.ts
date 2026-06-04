@@ -150,7 +150,8 @@ export type WebviewMessage =
   | { type: "requestRestart"; paneId?: string }
   | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
   | { type: "paneDelete"; paneId?: string }
-  | { type: "openSettings"; paneId?: string };
+  | { type: "openSettings"; paneId?: string }
+  | { type: "openKeyboardShortcuts"; paneId?: string };
 
 export type AiTool = string;
 

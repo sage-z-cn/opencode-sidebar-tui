@@ -35,6 +35,7 @@ export interface MessageRouterProviderBridge {
   toggleEditorAttachment(): Promise<void>;
   restart(): void;
   openSettings(): void;
+  openKeyboardShortcuts(): void;
   switchToNativeShell(): Promise<void>;
   selectTerminalBackend(backend: TerminalBackendType): Promise<void>;
   switchToBackend(backend: TerminalBackendType, sessionId?: string): Promise<void>;
@@ -240,6 +241,9 @@ export class MessageRouter {
         break;
       case "openSettings":
         this.provider.openSettings();
+        break;
+      case "openKeyboardShortcuts":
+        this.provider.openKeyboardShortcuts();
         break;
       default:
         break;

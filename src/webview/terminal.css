@@ -123,8 +123,7 @@ html {
   top: 100%;
   left: 0;
   z-index: 2000;
-  min-width: 140px;
-  max-width: 260px;
+  width: max-content;
   max-height: 240px;
   overflow-y: auto;
   background: var(--vscode-dropdown-background, #252526);
@@ -226,6 +225,46 @@ html {
   opacity: 0.3;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* ── Settings Host ── */
+.settings-host {
+  position: relative;
+  display: flex;
+}
+
+/* ── Settings Dropdown ── */
+.settings-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 2000;
+  width: max-content;
+  background: var(--vscode-dropdown-background, #252526);
+  border: 1px solid var(--vscode-dropdown-border, #454545);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  padding: 2px 0;
+  font-size: 11px;
+  font-family: var(--vscode-font-family);
+}
+
+.settings-dropdown.hidden {
+  display: none;
+}
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--vscode-dropdown-foreground, #cccccc);
+}
+
+.settings-option:hover {
+  background: var(--vscode-list-hoverBackground, rgba(255, 255, 255, 0.06));
 }
 
 .pane-controls {

@@ -114,6 +114,7 @@ export class TerminalProvider
       toggleEditorAttachment: () => this.toggleEditorAttachment(),
       restart: () => this.restart(),
       openSettings: () => this.openSettings(),
+      openKeyboardShortcuts: () => this.openKeyboardShortcuts(),
       switchToNativeShell: () => this.switchToNativeShell(),
       selectTerminalBackend: (backend) => this.selectTerminalBackend(backend),
       switchToBackend: (backend, sessionId) => this.switchToBackend(backend, sessionId),
@@ -386,6 +387,13 @@ export class TerminalProvider
 
   public openSettings(): void {
     vscode.commands.executeCommand("workbench.action.openSettings", "ai-sidebar-terminal.");
+  }
+
+  public openKeyboardShortcuts(): void {
+    vscode.commands.executeCommand(
+      "workbench.action.openGlobalKeybindings",
+      "@ext:sagez.ai-sidebar-terminal",
+    );
   }
 
   public async switchToInstance(

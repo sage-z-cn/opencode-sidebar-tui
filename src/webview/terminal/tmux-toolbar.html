@@ -125,14 +125,24 @@
     >
       &#x21BB;
     </button>
-    <button
-      type="button"
-      id="btn-settings"
-      class="tmux-btn"
-      aria-label="Open extension settings"
-      title="{{t:settings}}"
-    >
-      &#x2699;
-    </button>
+    <div class="settings-host">
+      <button
+        type="button"
+        id="btn-settings"
+        class="tmux-btn"
+        aria-label="Open extension settings"
+        title="{{t:settings}}"
+      >
+        &#x2699;
+      </button>
+      <div class="settings-dropdown hidden" id="dropdown-settings" role="menu">
+        <div class="settings-option" role="menuitem" data-action="keyboardShortcuts">
+          &#x2328;&#xFE0E; {{t:keybindSettings}}
+        </div>
+        <div class="settings-option" role="menuitem" data-action="settings">
+          &#x2699;&#xFE0E; {{t:extensionSettings}}
+        </div>
+      </div>
+    </div>
   </div>
 </div>

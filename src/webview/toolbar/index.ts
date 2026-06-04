@@ -7,7 +7,7 @@ import {
 import type { BackendOption } from "../../types";
 
 import * as TmuxCmd from "../tmux-command-dropdown";
-import { PillDropdown, type PillOption } from "./pill-dropdown";
+import { PillDropdown, type PillOption, closeAllPillDropdowns, registerExternalDropdownClose } from "./pill-dropdown";
 
 // ── Pill instances (lazy-initialised) ──
 
@@ -237,8 +237,69 @@ export function setupEditorAttachmentButton(): void {
     });
 }
 
+// ── Settings button (dropdown menu) ──
+
+/** Delay in ms before auto-closing settings dropdown on mouse leave. */
+const SETTINGS_CLOSE_DELAY_MS = 200;
+
 export function setupSettingsButton(): void {
-  document.getElementById("btn-settings")?.addEventListener("click", () => {
-    postMessage({ type: "openSettings" });
+  const btn = document.getElementById("btn-settings");
+  const dropdown = document.getElementById("dropdown-settings");
+  const host = document.querySelector(".settings-host");
+
+  if (!btn || !dropdown) return;
+
+  let leaveTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function closeDropdown(): void {
+    dropdown!.classList.add("hidden");
+    if (leaveTimer !== null) {
+      clearTimeout(leaveTimer);
+      leaveTimer = null;
+    }
+  }
+
+  function scheduleClose(): void {
+    if (leaveTimer !== null) clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(() => closeDropdown(), SETTINGS_CLOSE_DELAY_MS);
+  }
+
+  // Register with pill-dropdown mutex system
+  registerExternalDropdownClose(() => closeDropdown());
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!dropdown.classList.contains("hidden")) {
+      closeDropdown();
+    } else {
+      closeAllPillDropdowns();
+      dropdown.classList.remove("hidden");
+    }
+  });
+
+  // Pointer-leave with delay (matching pill-dropdown behaviour)
+  host?.addEventListener("pointerleave", () => {
+    if (!dropdown.classList.contains("hidden")) scheduleClose();
+  });
+
+  host?.addEventListener("pointerenter", () => {
+    if (leaveTimer !== null) {
+      clearTimeout(leaveTimer);
+      leaveTimer = null;
+    }
+  });
+
+  // Handle menu item clicks
+  dropdown.querySelectorAll(".settings-option").forEach((item) => {
+    item.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const action = (item as HTMLElement).dataset.action;
+      if (action === "keyboardShortcuts") {
+        postMessage({ type: "openKeyboardShortcuts" });
+      } else {
+        postMessage({ type: "openSettings" });
+      }
+      closeDropdown();
+    });
   });
 }
