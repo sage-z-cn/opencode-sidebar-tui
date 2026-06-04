@@ -5,6 +5,17 @@ All notable changes to the "AI Sidebar Terminal" extension will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-06-04
+
+### Added
+
+- **Toolbar**: Add keyboard shortcuts access via merged settings dropdown for quick configuration.
+- **Native terminal**: Auto-restore native terminal without prompting for a smoother switching experience.
+
+### Fixed
+
+- **Toolbar**: Fix terminal refresh by constraining body dimensions to prevent rendering issues.
+
 ## [2.4.3] - 2026-06-02
 
 ### Changed
