@@ -7,7 +7,11 @@ interface Link {
     start: { x: number; y: number };
     end: { x: number; y: number };
   };
-  activate: () => void;
+  decorations: { underline: boolean; pointerCursor: boolean };
+  activate: (event: MouseEvent, text: string) => void;
+  hover?: (event: MouseEvent, text: string) => void;
+  leave?: (event: MouseEvent, text: string) => void;
+  dispose?: () => void;
 }
 
 const MAX_LINE_LENGTH = 10000;
@@ -147,7 +151,9 @@ export function createLinkProvider(terminal: Terminal) {
       bufferLineNumber: number,
       callback: (links: Link[] | undefined) => void,
     ) {
-      const line = terminal.buffer.active.getLine(bufferLineNumber);
+      // xterm.js passes viewport-relative (1-based) bufferLineNumber,
+      // but buffer.active.getLine() expects 0-based absolute indices.
+      const line = terminal.buffer.active.getLine(bufferLineNumber - 1);
       if (!line) {
         callback(undefined);
         return;
@@ -177,7 +183,8 @@ export function createLinkProvider(terminal: Terminal) {
               y: bufferLineNumber,
             },
           },
-          activate: () => {
+          decorations: { underline: true, pointerCursor: true },
+          activate: (_event: MouseEvent, _text: string) => {
             postMessage({
               type: "openFile",
               path: parsedReference.path,

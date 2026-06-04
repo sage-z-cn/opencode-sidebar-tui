@@ -7,23 +7,28 @@ vi.mock("../shared/vscode-api", () => ({
 }));
 
 type ProvidedLink = {
-  readonly activate: () => void;
+  readonly decorations?: { underline: boolean; pointerCursor: boolean };
+  readonly activate: (...args: unknown[]) => void;
 };
 
 const provideLinksForLine = (lineText: string) =>
   new Promise<ReadonlyArray<ProvidedLink> | undefined>((resolve) => {
+    const getLine = vi.fn(() => ({
+      translateToString: () => lineText,
+    }));
     const terminal = {
       buffer: {
         active: {
-          getLine: () => ({
-            translateToString: () => lineText,
-          }),
+          getLine,
         },
       },
     };
 
     createLinkProvider(terminal as never).provideLinks(1, (links) => {
-      resolve(links);
+      // xterm.js passes 1-based bufferLineNumber, our code converts to
+      // 0-based for getLine: getLine(bufferLineNumber - 1) = getLine(0)
+      expect(getLine).toHaveBeenCalledWith(0);
+      resolve(links as unknown as ReadonlyArray<ProvidedLink> | undefined);
     });
   });
 

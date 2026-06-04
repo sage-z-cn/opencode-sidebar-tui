@@ -120,8 +120,6 @@ export function initTerminal(
     }),
   );
 
-  terminal.registerLinkProvider(createLinkProvider(terminal));
-
   terminal.open(container);
   terminal.focus();
 
@@ -137,6 +135,10 @@ export function initTerminal(
       error,
     );
   }
+
+  // Register link provider after renderer is initialized so the link
+  // underline layer is properly set up before any links are provided.
+  terminal.registerLinkProvider(createLinkProvider(terminal));
 
   const refreshTerminal = () => terminal.refresh(0, terminal.rows - 1);
   container.addEventListener("focusin", refreshTerminal);
