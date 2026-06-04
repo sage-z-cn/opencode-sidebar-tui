@@ -5,6 +5,13 @@ All notable changes to the "AI Sidebar Terminal" extension will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.2] - 2026-06-04
+
+### Fixed
+
+- **Webview**: Fix incorrect link underline position caused by off-by-one error in buffer line access (`getLine(bufferLineNumber)` → `getLine(bufferLineNumber - 1)`). Also update `Link` interface and `activate` callback to match xterm.js 6.0 API, and move link provider registration after the WebGL addon initialization.
+- **Webview**: Reduce link detection false positives by rejecting tokens starting with CJK characters (e.g. `因为src/file.ts`), rejecting `label:path` patterns like `Error:`, `Warning:`, `git:` that are not drive letters or `file://` URLs, and adding `SINGLE_FILE_RE` to match standalone filenames like `package.json`, `.eslintrc.json`, `README.md`.
+
 ## [2.5.1] - 2026-06-04
 
 ### Fixed
