@@ -58,10 +58,35 @@ const collectCandidateReferences = (
   return candidates;
 };
 
+const SINGLE_FILE_RE =
+  /^[A-Za-z0-9_.-]+\.(?:c|cc|cpp|cs|css|cts|env|fish|go|h|hpp|html|java|js|json|jsx|kt|lock|lua|md|mjs|mts|php|py|rb|rs|scss|sh|swift|toml|ts|tsx|txt|yaml|yml|zsh)(?::\d+(?::\d+)?)?(?:#L\d+(?:-L?\d+)?)?$/i;
+
 const isLikelyFileReference = (candidate: string): boolean => {
   const withoutAtPrefix = candidate.startsWith("@")
     ? candidate.slice(1)
     : candidate;
+
+  // The first character must be a plausible path-start character to
+  // avoid false positives when CJK text is adjacent to a file path
+  // without a space separator (e.g. "因为some/path.ts").
+  if (!/^[a-zA-Z0-9_\-\.\/\\~]/.test(withoutAtPrefix)) {
+    return false;
+  }
+
+  // Reject label:path patterns where a non-drive-letter word precedes
+  // a slash-containing path (e.g. "Error:src/file.ts", "git:some/branch").
+  const colonIdx = withoutAtPrefix.indexOf(":");
+  if (colonIdx > 0) {
+    const beforeColon = withoutAtPrefix.slice(0, colonIdx);
+    const afterColon = withoutAtPrefix.slice(colonIdx + 1);
+    if (
+      !/^[A-Za-z]$/.test(beforeColon) &&
+      !withoutAtPrefix.startsWith("file://") &&
+      afterColon.includes("/")
+    ) {
+      return false;
+    }
+  }
 
   return (
     withoutAtPrefix.startsWith("file://") ||
@@ -69,6 +94,7 @@ const isLikelyFileReference = (candidate: string): boolean => {
     withoutAtPrefix.startsWith("./") ||
     withoutAtPrefix.startsWith("../") ||
     /^[A-Za-z]:\\/.test(withoutAtPrefix) ||
+    SINGLE_FILE_RE.test(withoutAtPrefix) ||
     (!/^[a-z][a-z0-9+\-.]*:\/\//i.test(withoutAtPrefix) &&
       withoutAtPrefix.includes("/"))
   );
