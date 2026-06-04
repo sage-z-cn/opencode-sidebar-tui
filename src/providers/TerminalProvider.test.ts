@@ -235,7 +235,7 @@ describe("TerminalProvider", () => {
   });
 
   describe("native restore Quick Pick", () => {
-    it("shows Quick Pick for disconnected native instance with selectedAiTool", async () => {
+    it("auto-restores using previous tool without prompt", async () => {
       mockConfiguration({ autoStartOnOpen: false, enableHttpApi: false });
       const instanceStore = new InstanceStore();
       instanceStore.upsert({
@@ -252,28 +252,15 @@ describe("TerminalProvider", () => {
       const startSpy = vi
         .spyOn(provider["sessionRuntime"], "startOpenCode")
         .mockResolvedValue(undefined);
-      vi.mocked(vscode.window.showQuickPick).mockResolvedValueOnce({
-        label: "Claude Code",
-        description: "claude",
-        toolName: "claude",
-      });
 
       resolveProvider(provider);
       await flushAsyncStartup();
 
-      expect(vscode.window.showQuickPick).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            label: "Codex (previously used)",
-            toolName: "codex",
-          }),
-        ]),
-        { placeHolder: "Select AI tool to restore terminal" },
-      );
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
       expect(startSpy).toHaveBeenCalledTimes(1);
       expect(
         instanceStore.get("native-disconnected")?.config.selectedAiTool,
-      ).toBe("claude");
+      ).toBe("codex");
     });
 
     it("does not show Quick Pick for connected native instance", async () => {
@@ -341,7 +328,7 @@ describe("TerminalProvider", () => {
       expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
     });
 
-    it("cancel preserves disconnected state", async () => {
+    it("auto-restores without user interaction", async () => {
       mockConfiguration({ autoStartOnOpen: false, enableHttpApi: false });
       const instanceStore = new InstanceStore();
       instanceStore.upsert({
@@ -358,19 +345,15 @@ describe("TerminalProvider", () => {
       const startSpy = vi
         .spyOn(provider["sessionRuntime"], "startOpenCode")
         .mockResolvedValue(undefined);
-      vi.mocked(vscode.window.showQuickPick).mockResolvedValueOnce(undefined);
 
       resolveProvider(provider);
       await flushAsyncStartup();
 
-      expect(vscode.window.showQuickPick).toHaveBeenCalledTimes(1);
-      expect(startSpy).not.toHaveBeenCalled();
-      expect(instanceStore.get("native-cancelled")?.state).toBe(
-        "disconnected",
-      );
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
+      expect(startSpy).toHaveBeenCalledTimes(1);
     });
 
-    it("shows Quick Pick again when a cancelled native restore is reopened", async () => {
+    it("auto-restore retries on reopen when still disconnected", async () => {
       mockConfiguration({ autoStartOnOpen: false, enableHttpApi: false });
       const instanceStore = new InstanceStore();
       instanceStore.upsert({
@@ -387,15 +370,14 @@ describe("TerminalProvider", () => {
       const startSpy = vi
         .spyOn(provider["sessionRuntime"], "startOpenCode")
         .mockResolvedValue(undefined);
-      vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 
       resolveProvider(provider);
       await flushAsyncStartup();
       resolveProvider(provider);
       await flushAsyncStartup();
 
-      expect(vscode.window.showQuickPick).toHaveBeenCalledTimes(2);
-      expect(startSpy).not.toHaveBeenCalled();
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
+      expect(startSpy).toHaveBeenCalledTimes(2);
       expect(instanceStore.get("native-retry")?.state).toBe("disconnected");
     });
 
@@ -430,16 +412,11 @@ describe("TerminalProvider", () => {
       const startSpy = vi
         .spyOn(provider["sessionRuntime"], "startOpenCode")
         .mockResolvedValue(undefined);
-      vi.mocked(vscode.window.showQuickPick).mockResolvedValueOnce({
-        label: "Codex (previously used)",
-        description: "codex",
-        toolName: "codex",
-      });
 
       resolveProvider(provider);
       await flushAsyncStartup();
 
-      expect(vscode.window.showQuickPick).toHaveBeenCalledTimes(1);
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
       expect(startSpy).toHaveBeenCalledTimes(1);
       expect(instanceStore.get("native-with-state")?.runtime.backendState).toEqual(
         expect.objectContaining({
@@ -449,7 +426,7 @@ describe("TerminalProvider", () => {
       );
     });
 
-    it("selected AI tool no longer in config falls back gracefully", async () => {
+    it("selected AI tool no longer in config falls back to default tool", async () => {
       mockConfiguration({
         autoStartOnOpen: false,
         enableHttpApi: false,
@@ -478,28 +455,15 @@ describe("TerminalProvider", () => {
       const startSpy = vi
         .spyOn(provider["sessionRuntime"], "startOpenCode")
         .mockResolvedValue(undefined);
-      vi.mocked(vscode.window.showQuickPick).mockResolvedValueOnce({
-        label: "Codex",
-        description: "codex",
-        toolName: "codex",
-      });
 
       resolveProvider(provider);
       await flushAsyncStartup();
 
-      expect(vscode.window.showQuickPick).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            label: "Codex",
-            toolName: "codex",
-          }),
-        ]),
-        { placeHolder: "Select AI tool to restore terminal" },
-      );
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
     expect(startSpy).toHaveBeenCalledTimes(1);
     });
 
-    it("multiple disconnected instances only prompts for active", async () => {
+    it("multiple disconnected instances only restores active", async () => {
       mockConfiguration({ autoStartOnOpen: false, enableHttpApi: false });
 
       const instanceStore = new InstanceStore();
@@ -524,32 +488,18 @@ describe("TerminalProvider", () => {
       instanceStore.setActive("native-active");
 
       provider = createProvider({ instanceStore });
-      vi.mocked(vscode.window.showQuickPick).mockResolvedValueOnce({
-        label: "Claude Code",
-        description: "claude",
-        toolName: "claude",
-      });
+      const startSpy = vi
+        .spyOn(provider["sessionRuntime"], "startOpenCode")
+        .mockResolvedValue(undefined);
 
       resolveProvider(provider);
       await flushAsyncStartup();
 
-      const quickPickItems = vi.mocked(vscode.window.showQuickPick).mock
-        .calls[0]?.[0];
-
-      expect(quickPickItems).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            label: "Codex (previously used)",
-            toolName: "codex",
-          }),
-        ]),
-      );
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
+      expect(startSpy).toHaveBeenCalledTimes(1);
       expect(
-        quickPickItems?.some(
-          (item: { label?: string }) =>
-            item.label === "Claude Code (previously used)",
-        ),
-      ).toBe(false);
+        instanceStore.get("native-active")?.config.selectedAiTool,
+      ).toBe("codex");
     });
 
     it("empty instance store does not trigger Quick Pick", async () => {
@@ -2701,7 +2651,7 @@ describe("TerminalProvider", () => {
     });
   });
 
-  it("handles auto-start visibility paths with restore acceptance and cancellation", async () => {
+  it("handles auto-start visibility paths with auto-restore", async () => {
     mockConfiguration({ autoStartOnOpen: true });
     const instanceStore = new InstanceStore();
     instanceStore.upsert({
@@ -2717,7 +2667,6 @@ describe("TerminalProvider", () => {
     const startSpy = vi
       .spyOn(provider["sessionRuntime"], "startOpenCode")
       .mockResolvedValue(undefined);
-    vi.mocked(vscode.window.showQuickPick).mockResolvedValueOnce(undefined);
 
     const view = vscode.WebviewView() as never as ReturnType<typeof vscode.WebviewView>;
     view.visible = false;
@@ -2729,18 +2678,13 @@ describe("TerminalProvider", () => {
     visibilityListener();
     await flushAsyncStartup();
 
-    expect(vscode.window.showQuickPick).toHaveBeenCalledTimes(1);
-    expect(startSpy).not.toHaveBeenCalled();
+    expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
+    expect(startSpy).toHaveBeenCalledTimes(1);
 
-    vi.mocked(vscode.window.showQuickPick).mockResolvedValueOnce({
-      label: "Codex (previously used)",
-      description: "codex",
-      toolName: "codex",
-    });
     visibilityListener();
     await flushAsyncStartup();
 
-    expect(startSpy).toHaveBeenCalledTimes(1);
+    expect(startSpy).toHaveBeenCalledTimes(2);
   });
 
   it("logs native restore lookup failures and falls back to autostart", () => {

@@ -744,32 +744,20 @@ export class TerminalProvider
     }
 
     const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
-    const selectedAiTool = record.config.selectedAiTool;
-    const items = resolveAiToolConfigs(config.get("aiTools", [])).map((tool) => ({
-      label:
-        tool.name === selectedAiTool
-          ? l10n.t("{label} (previously used)", { label: tool.label })
-          : tool.label,
-      description: tool.name,
-      toolName: tool.name,
-    }));
+    const selectedAiTool = record.config.selectedAiTool!;
+    const aiTools = resolveAiToolConfigs(config.get("aiTools", []));
+    const toolExists = aiTools.some((tool) => tool.name === selectedAiTool);
+    const toolToUse = toolExists
+      ? selectedAiTool
+      : config.get<string>("defaultAiTool", "opencode");
 
     this.logger.info(
-      `[TerminalProvider] Prompting to restore native terminal for ${record.config.id}`,
+      `[TerminalProvider] Auto-restoring native terminal for ${record.config.id} with ${toolToUse}${
+        !toolExists ? ` (previous tool ${selectedAiTool} no longer configured, using default)` : ""
+      }`,
     );
-    const selection = await vscode.window.showQuickPick(items, {
-      placeHolder: l10n.t("Select AI tool to restore terminal"),
-    });
 
-    if (!selection) {
-      this.logger.info("[TerminalProvider] Native terminal restore cancelled");
-      return true;
-    }
-
-    this.sessionRuntime.rememberSelectedTool(
-      selection.toolName,
-      record.config.id,
-    );
+    this.sessionRuntime.rememberSelectedTool(toolToUse, record.config.id);
     await this.sessionRuntime.startOpenCode();
     return true;
   }
