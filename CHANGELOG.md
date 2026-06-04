@@ -5,6 +5,13 @@ All notable changes to the "AI Sidebar Terminal" extension will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.1] - 2026-06-04
+
+### Fixed
+
+- **Webview**: Route paste shortcuts through extension host to prevent paste events being swallowed when `sendKeybindingsToShell` is enabled.
+- **Webview**: Refactor terminal file link handling — extract file opening logic into dedicated `openFile.ts` module with improved validation, add `endLine` support for range selection, and rewrite link parser to correctly handle `file://` URIs, colon-delimited positions, and path traversal rejection.
+
 ## [2.5.0] - 2026-06-04
 
 ### Added
