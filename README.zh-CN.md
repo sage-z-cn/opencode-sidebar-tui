@@ -6,12 +6,6 @@
 
 在 VS Code 侧边栏中嵌入多种 AI 编程助手（OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code 或任意自定义 AI 工具），提供完整终端与 tmux 会话管理。
 
-> 最初 fork 自 [islee23520/opencode-sidebar-tui](https://github.com/islee23520/opencode-sidebar-tui)。现已发展为独立扩展，新增多项功能及 Windows 兼容性改进。
-
-## 与上游的差异
-
-详见 [CHANGELOG.md](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/CHANGELOG.md) 中 v2.0.0 及之后的更新日志。
-
 ## 功能特性
 
 - **自动启动 AI 工具**: 侧边栏激活时自动启动所选 AI 编程助手
