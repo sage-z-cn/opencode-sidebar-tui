@@ -5,6 +5,13 @@ All notable changes to the "AI Sidebar Terminal" extension will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-06-11
+
+### Added
+
+- **Mimo Code**: Add built-in support for Xiaomi Mimo Code (`mimo` command). Supports HTTP API and auto-context sharing via the OpenCode-compatible operator.
+- **Tool resolution**: Merge user-configured `aiTools` with built-in defaults so newly added tools automatically appear in the toolbar selector. Users can hide built-in tools with `"enabled": false`.
+
 ## [2.5.2] - 2026-06-04
 
 ### Fixed
