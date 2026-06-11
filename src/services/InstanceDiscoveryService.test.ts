@@ -911,7 +911,7 @@ describe("InstanceDiscoveryService", () => {
 
     expect(execFile).toHaveBeenCalledWith(
       "opencode",
-      [],
+      ["-c"],
       expect.objectContaining({
         env: expect.objectContaining({ OPENCODE_CALLER: "vscode" }),
       }),

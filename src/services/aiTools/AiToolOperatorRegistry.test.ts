@@ -4,6 +4,7 @@ import { DEFAULT_AI_TOOLS } from "../../types";
 import { OpenCodeToolOperator } from "./operators/OpenCodeToolOperator";
 import { ClaudeCodeToolOperator } from "./operators/ClaudeCodeToolOperator";
 import { CodexToolOperator } from "./operators/CodexToolOperator";
+import { MimoCodeOperator } from "./operators/MimoCodeOperator";
 
 describe("AiToolOperatorRegistry", () => {
   it("resolves aliased tools by name", () => {
@@ -57,6 +58,8 @@ describe("AiToolOperatorRegistry", () => {
       ClaudeCodeToolOperator,
     );
     expect(registry.getByToolName("codex")).toBeInstanceOf(CodexToolOperator);
+    expect(registry.getByToolName("mimo")).toBeInstanceOf(MimoCodeOperator);
+    expect(registry.getByToolName("mimo-code")).toBeInstanceOf(MimoCodeOperator);
     expect(registry.getByToolName("missing")).toBeUndefined();
   });
 
@@ -75,26 +78,43 @@ describe("AiToolOperatorRegistry", () => {
     expect(registry.getForConfig(tool)).toBeInstanceOf(CodexToolOperator);
   });
 
-  it("returns the first configured or default tool when no preference is provided", () => {
+  it("returns the first default tool when no preference is provided (defaults are the base)", () => {
     const registry = new AiToolOperatorRegistry();
 
     expect(registry.resolveTool([], undefined)?.name).toBe("opencode");
     expect(registry.resolveTool([{}], undefined)?.name).toBe("opencode");
-    expect(
-      registry.resolveTool(
-        [
-          {
-            name: "custom",
-            label: "Custom",
-            path: "/opt/custom",
-            args: ["--run"],
-            aliases: ["custom-cli"],
-            operator: "codex",
-          },
-        ],
-        undefined,
-      ),
-    ).toMatchObject({
+
+    // User custom tool is appended after defaults; first tool is still opencode
+    const result = registry.resolveTool(
+      [
+        {
+          name: "custom",
+          label: "Custom",
+          path: "/opt/custom",
+          args: ["--run"],
+          aliases: ["custom-cli"],
+          operator: "codex",
+        },
+      ],
+      undefined,
+    );
+    expect(result?.name).toBe("opencode");
+
+    // Custom tool can be resolved explicitly by name
+    const custom = registry.resolveTool(
+      [
+        {
+          name: "custom",
+          label: "Custom",
+          path: "/opt/custom",
+          args: ["--run"],
+          aliases: ["custom-cli"],
+          operator: "codex",
+        },
+      ],
+      "custom",
+    );
+    expect(custom).toMatchObject({
       name: "custom",
       path: "/opt/custom",
       args: ["--run"],
@@ -127,11 +147,25 @@ describe("AiToolOperatorRegistry", () => {
     expect(registry.resolveTool(userTools, "custom-opencode")?.label).toBe(
       "Custom OpenCode",
     );
-    expect(registry.resolveTool(userTools, "claude")?.name).toBe("assistant");
-    expect(registry.resolveTool(userTools, "claude")?.name).toBe(
+    // "claude" matches the default claude entry (merged from DEFAULT_AI_TOOLS)
+    // because merge strategy puts defaults first; user "assistant" is a separate tool
+    expect(registry.resolveTool(userTools, "claude")?.name).toBe("claude");
+    // User can resolve their custom tool by name
+    expect(registry.resolveTool(userTools, "assistant")?.name).toBe(
       "assistant",
     );
     expect(registry.resolveTool(userTools, "missing")).toBeUndefined();
+  });
+
+  it("resolves mimo and mimo-code alias", () => {
+    const registry = new AiToolOperatorRegistry();
+
+    const resolved = registry.resolveTool(DEFAULT_AI_TOOLS, "mimo");
+    expect(resolved?.name).toBe("mimo");
+    expect(resolved?.label).toBe("Mimo Code");
+
+    const resolvedByAlias = registry.resolveTool(DEFAULT_AI_TOOLS, "mimo-code");
+    expect(resolvedByAlias?.name).toBe("mimo");
   });
 
   it("matches tool names when aliases are omitted", () => {

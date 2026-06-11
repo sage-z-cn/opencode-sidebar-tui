@@ -2809,7 +2809,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
         aiTools: [
           { name: "codex", label: "Codex", path: "", args: [] },
         ],
-        defaultAiTool: "",
+        defaultAiTool: "nonexistent-tool",
       });
       vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
         get: vi.fn(<T,>(key: string, defaultValue?: T): T => {
@@ -2817,6 +2817,9 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
             return [
               { name: "codex", label: "Codex", path: "", args: [] },
             ] as T;
+          }
+          if (key === "defaultAiTool") {
+            return "nonexistent-tool" as T;
           }
           return (defaultValue ?? "") as T;
         }),
@@ -2865,6 +2868,9 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
               { name: "codex", label: "Codex", path: "", args: [] },
             ] as T;
           }
+          if (key === "defaultAiTool") {
+            return "nonexistent-tool" as T;
+          }
           return (defaultValue ?? "") as T;
         }),
         inspect: vi.fn(() => undefined),
@@ -2896,7 +2902,7 @@ describe("SessionRuntime - Workspace Session Resolution", () => {
     it("returns undefined when startup tool selection is dismissed", async () => {
       setConfiguration({
         aiTools: [{ name: "codex", label: "Codex", path: "", args: [] }],
-        defaultAiTool: "",
+        defaultAiTool: "nonexistent-tool",
       });
       vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
 

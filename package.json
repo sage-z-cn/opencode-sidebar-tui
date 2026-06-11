@@ -516,7 +516,8 @@
               "path",
               "args",
               "aliases",
-              "operator"
+              "operator",
+              "enabled"
             ],
             "properties": {
               "name": {
@@ -548,6 +549,11 @@
               "operator": {
                 "type": "string",
                 "description": "%configuration.ai-sidebar-terminal.aiTools.items.operator.description%"
+              },
+              "enabled": {
+                "type": "boolean",
+                "default": true,
+                "description": "Enable or disable this AI tool. Set to false to hide a built-in tool from the selector."
               }
             }
           },

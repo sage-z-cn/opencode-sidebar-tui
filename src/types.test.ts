@@ -523,40 +523,113 @@ describe("Types", () => {
   });
 
   describe("AI tool helpers", () => {
-    it("normalizes configured tools with default path, args, aliases, and operator", () => {
-      expect(
-        resolveAiToolConfigs([
-          null,
-          { name: "missing-label" },
-          {
-            name: "custom",
-            label: "Custom Tool",
-            path: 42,
-            args: ["run", 5],
-            aliases: "custom-alias",
-            operator: false,
-          },
-        ]),
-      ).toEqual([
+    it("returns defaults when user config is empty", () => {
+      expect(resolveAiToolConfigs([])).toEqual([...DEFAULT_AI_TOOLS]);
+      expect(resolveAiToolConfigs(null as unknown as [])).toEqual([
+        ...DEFAULT_AI_TOOLS,
+      ]);
+    });
+
+    it("merges user tools with defaults — user overrides matching defaults, new defaults auto-append", () => {
+      const userTools = [
+        {
+          name: "opencode",
+          label: "My OpenCode",
+          path: "/custom/opencode",
+          args: ["--debug"],
+        },
+      ];
+
+      const result = resolveAiToolConfigs(userTools);
+
+      // User override for opencode
+      const opencode = result.find((t) => t.name === "opencode");
+      expect(opencode?.label).toBe("My OpenCode");
+      expect(opencode?.path).toBe("/custom/opencode");
+      expect(opencode?.args).toEqual(["--debug"]);
+      // Default aliases/operator preserved when user doesn't provide
+      expect(opencode?.operator).toBe("opencode");
+
+      // All other defaults still present
+      expect(result.find((t) => t.name === "claude")).toBeDefined();
+      expect(result.find((t) => t.name === "codex")).toBeDefined();
+      expect(result.find((t) => t.name === "mimo")).toBeDefined();
+    });
+
+    it("appends fully custom user tools not in defaults", () => {
+      const result = resolveAiToolConfigs([
+        { name: "custom-tool", label: "Custom" },
+      ]);
+
+      // All defaults present
+      expect(result.find((t) => t.name === "opencode")).toBeDefined();
+
+      // Custom tool appended at the end
+      const custom = result.find((t) => t.name === "custom-tool");
+      expect(custom?.label).toBe("Custom");
+    });
+
+    it("filters out explicitly disabled tools", () => {
+      const result = resolveAiToolConfigs([
+        { name: "codex", label: "Codex", enabled: false },
+        { name: "custom", label: "Custom", enabled: false },
+      ]);
+
+      expect(result.find((t) => t.name === "codex")).toBeUndefined();
+      expect(result.find((t) => t.name === "custom")).toBeUndefined();
+      // Other defaults still present
+      expect(result.find((t) => t.name === "opencode")).toBeDefined();
+    });
+
+    it("preserves defaults for missing fields when user overrides", () => {
+      const result = resolveAiToolConfigs([
+        { name: "opencode", label: "OpenCode Override" },
+      ]);
+
+      const opencode = result.find((t) => t.name === "opencode");
+      // Default args preserved (user didn't provide any)
+      expect(opencode?.args).toEqual(["-c"]);
+      expect(opencode?.operator).toBe("opencode");
+    });
+
+    it("normalizes invalid entries gracefully", () => {
+      const result = resolveAiToolConfigs([
+        null,
+        { name: "missing-label" },
         {
           name: "custom",
           label: "Custom Tool",
-          path: "",
-          args: ["run", "5"],
-          aliases: undefined,
-          operator: undefined,
+          path: 42,
+          args: ["run", 5],
+          aliases: "custom-alias",
+          operator: false,
         },
       ]);
 
-      expect(
-        resolveAiToolConfigs([
-          {
-            name: "no-args-array",
-            label: "No Args Array",
-            args: "--bad",
-          },
-        ])[0].args,
-      ).toEqual([]);
+      // Only valid entry parsed
+      const custom = result.find((t) => t.name === "custom");
+      expect(custom).toEqual({
+        name: "custom",
+        label: "Custom Tool",
+        path: "",
+        args: ["run", "5"],
+        aliases: undefined,
+        operator: undefined,
+        enabled: undefined,
+      });
+
+      // Defaults still included
+      expect(result.find((t) => t.name === "opencode")).toBeDefined();
+    });
+
+    it("returns default args/path when user provides empty values", () => {
+      const result = resolveAiToolConfigs([
+        { name: "no-args-array", label: "No Args Array", args: "--bad" },
+      ]);
+
+      // Custom tool (not in defaults), args normalized to []
+      const tool = result.find((t) => t.name === "no-args-array");
+      expect(tool?.args).toEqual([]);
     });
 
     it("builds launch commands and detection patterns from optional config fields", () => {

@@ -162,6 +162,7 @@ export interface AiToolConfig {
   args: string[];
   aliases?: string[];
   operator?: string;
+  enabled?: boolean;
 }
 
 export interface BackendOption {
@@ -219,6 +220,14 @@ export const DEFAULT_AI_TOOLS: readonly AiToolConfig[] = [
     aliases: ["kimi-code"],
     operator: "kimi",
   },
+  {
+    name: "mimo",
+    label: "Mimo Code",
+    path: "",
+    args: [],
+    aliases: ["mimo-code"],
+    operator: "mimo",
+  },
 ] as const;
 
 export function resolveAiToolConfigs(
@@ -227,7 +236,8 @@ export function resolveAiToolConfigs(
   if (!Array.isArray(userTools) || userTools.length === 0) {
     return [...DEFAULT_AI_TOOLS];
   }
-  return userTools
+
+  const parsed = userTools
     .filter(
       (t): t is Record<string, unknown> =>
         t !== null &&
@@ -242,7 +252,46 @@ export function resolveAiToolConfigs(
       args: Array.isArray(t.args) ? t.args.map(String) : [],
       aliases: Array.isArray(t.aliases) ? t.aliases.map(String) : undefined,
       operator: typeof t.operator === "string" ? t.operator : undefined,
+      enabled: typeof t.enabled === "boolean" ? t.enabled : undefined,
     }));
+
+  // Merge strategy: DEFAULT_AI_TOOLS as base, user config overrides by name
+  const userByName = new Map(parsed.map((t) => [t.name, t]));
+  const userSeen = new Set<string>();
+
+  const merged: AiToolConfig[] = [];
+
+  for (const defaultTool of DEFAULT_AI_TOOLS) {
+    const userOverride = userByName.get(defaultTool.name);
+    userSeen.add(defaultTool.name);
+
+    if (userOverride) {
+      // User override exists — merge with defaults for missing fields
+      merged.push({
+        ...defaultTool,
+        ...userOverride,
+        // Preserve default aliases/operator if user didn't provide them
+        aliases: userOverride.aliases ?? defaultTool.aliases,
+        operator: userOverride.operator ?? defaultTool.operator,
+        path: userOverride.path || defaultTool.path,
+        args:
+          userOverride.args.length > 0 ? userOverride.args : defaultTool.args,
+      });
+    } else {
+      // No user override — keep default as-is
+      merged.push({ ...defaultTool });
+    }
+  }
+
+  // Append user tools not in defaults (fully custom tools)
+  for (const tool of parsed) {
+    if (!userSeen.has(tool.name)) {
+      merged.push(tool);
+    }
+  }
+
+  // Filter out explicitly disabled tools
+  return merged.filter((t) => t.enabled !== false);
 }
 
 export function getToolLaunchCommand(tool: AiToolConfig): string {
