@@ -4,13 +4,13 @@
 [English](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/README.md)
 
 
-在 VS Code 侧边栏中嵌入多种 AI 编程助手（OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code 或任意自定义 AI 工具），提供完整终端与 tmux 会话管理。
+在 VS Code 侧边栏中嵌入多种 AI 编程助手（OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code、Mimo Code 或任意自定义 AI 工具），提供完整终端与 tmux 会话管理。
 
 ## 功能特性
 
 - **自动启动 AI 工具**: 侧边栏激活时自动启动所选 AI 编程助手
 - **完整 TUI 支持**: xterm.js + WebGL 渲染的终端模拟
-- **多 AI 工具支持**: 内置 OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code，可自定义扩展
+- **多 AI 工具支持**: 内置 OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code、Mimo Code，可自定义扩展
 - **Pill Dropdown 工具栏**: 统一的 pill 式下拉菜单，快速切换 AI 工具和终端后端
 - **终端管理器**: 专用的 tmux 会话管理面板，支持内联窗格和窗口控制
 - **Tmux 集成**: 自动发现 tmux 会话、工作区级过滤、侧边栏中隐藏 tmux 状态栏
@@ -272,7 +272,7 @@ npx @vscode/vsce package
 
 - VS Code 1.106.0 或更高版本
 - Node.js 20.0.0 或更高版本
-- OpenCode 已安装且可通过 `opencode` 命令访问
+- OpenCode（或其他支持的 AI 工具：`claude`、`codex`、`gemini`、`kimi`、`mimo` 等）已安装且可通过命令行访问
 
 ## 开发
 

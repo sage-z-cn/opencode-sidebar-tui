@@ -4,13 +4,13 @@
 
 [中文文档](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/README.zh-CN.md)
 
-Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, or any custom AI tool) in the VS Code sidebar with full terminal and tmux session management.
+Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, Mimo Code, or any custom AI tool) in the VS Code sidebar with full terminal and tmux session management.
 
 ## Features
 
 - **Auto-launch AI Tools**: Automatically start your chosen AI coding agent when the sidebar is activated
 - **Full TUI Support**: Complete terminal emulation with xterm.js and WebGL rendering
-- **Multi-AI Tool Support**: Built-in support for OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code with custom tool configuration
+- **Multi-AI Tool Support**: Built-in support for OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, Mimo Code with custom tool configuration
 - **Pill Dropdown Toolbar**: Unified pill-style dropdowns for quick AI tool and backend switching
 - **Terminal Managers**: Dedicated tmux session management surface with inline pane and window controls
 - **Tmux Integration**: Automatic tmux session discovery, workspace-scoped session filtering, and tmux status bar hidden in sidebar
@@ -282,7 +282,7 @@ Available settings in VS Code settings (`Cmd+,` / `Ctrl+,`):
 
 - VS Code 1.106.0 or higher
 - Node.js 20.0.0 or higher
-- OpenCode installed and accessible via `opencode` command
+- OpenCode (or any supported AI tool: `claude`, `codex`, `gemini`, `kimi`, `mimo`, etc.) installed and accessible via command line
 
 ## Development
 
