@@ -160,12 +160,6 @@ export class ExtensionLifecycle {
         );
         this.tuiProviderRegistration = providerRegistration;
         context.subscriptions.push(providerRegistration);
-        context.subscriptions.push(
-          vscode.window.registerWebviewPanelSerializer(
-            TerminalProvider.panelViewType,
-            this.tuiProvider,
-          ),
-        );
       } catch (err) {
         if (
           err instanceof Error &&
@@ -199,8 +193,8 @@ export class ExtensionLifecycle {
       context.subscriptions.push(codeActionRegistration, explainAndFixCommand);
 
       // Expose that the extension is fully active so editor/title buttons
-      // (openTerminalInEditor, openTerminalManager, etc.) only appear after
-      // commands are registered. This prevents "command not found" errors.
+      // only appear after commands are registered. This prevents
+      // "command not found" errors.
       await vscode.commands.executeCommand("setContext", "ai-sidebar-terminal.active", true);
 
       logger.info("AI Sidebar Terminal activated successfully");

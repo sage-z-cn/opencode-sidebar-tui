@@ -1,6 +1,6 @@
+
 /**
  * Shared AI Tool Selector logic for webviews.
- * Used by both the terminal webview (main.ts) and the dashboard webview (dashboard-manager.ts).
  */
 
 export interface AiToolConfig {
@@ -19,7 +19,6 @@ export interface AiToolSelectorCallbacks {
 let visible = false;
 let focusedIndex = 0;
 let sessionId: string | null = null;
-let targetPaneId: string | null = null;
 let tools: AiToolConfig[] = [];
 
 function escapeHtml(value: string | number | undefined): string {
@@ -36,13 +35,11 @@ export function show(
   sessionName: string,
   defaultTool: string | undefined,
   toolList: AiToolConfig[] | undefined,
-  paneId?: string,
 ): void {
   if (toolList && toolList.length > 0) {
     tools = toolList;
   }
   sessionId = id;
-  targetPaneId = paneId ?? null;
   visible = true;
   focusedIndex = defaultTool
     ? tools.findIndex((t) => t.name === defaultTool)
@@ -80,7 +77,6 @@ export function show(
 export function hide(): void {
   visible = false;
   sessionId = null;
-  targetPaneId = null;
   const backdrop = document.getElementById("ai-selector");
   if (backdrop) {
     backdrop.style.display = "none";
@@ -114,7 +110,6 @@ export function select(callbacks: AiToolSelectorCallbacks): void {
     sessionId,
     tool: tool.name,
     savePreference: savePref,
-    targetPaneId,
   });
   hide();
 }
@@ -157,7 +152,6 @@ export function handleClick(
   if (target.closest(".ai-tool-option")) {
     const toolOption = target.closest(".ai-tool-option");
     if (toolOption instanceof HTMLElement && toolOption.dataset.toolId) {
-      // Find index and select
       const idx = tools.findIndex((t) => t.name === toolOption.dataset.toolId);
       if (idx >= 0) {
         focusedIndex = idx;
@@ -167,7 +161,6 @@ export function handleClick(
     return true;
   }
 
-  // Click on backdrop dismisses
   if (target.id === "ai-selector" && !target.closest(".ai-selector-card")) {
     hide();
     return true;

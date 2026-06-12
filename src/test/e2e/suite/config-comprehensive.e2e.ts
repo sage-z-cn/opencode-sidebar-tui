@@ -111,10 +111,6 @@ const configurationSpecs: Record<string, ConfigurationSpec> = {
     maximum: 2000,
   },
   "ai-sidebar-terminal.enableAutoSpawn": { type: "boolean", defaultValue: true },
-  "ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen": {
-    type: "boolean",
-    defaultValue: true,
-  },
   "ai-sidebar-terminal.codeActionSeverities": {
     type: "array",
     defaultValue: ["error", "warning"],

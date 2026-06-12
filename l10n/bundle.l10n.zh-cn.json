@@ -44,11 +44,11 @@
   "Failed to disconnect: {error}": "断开连接失败：{error}",
   "External": "外部",
   "PID {pid} — {workspace}": "PID {pid} — {workspace}",
-  "Toggle editor mode": "切换编辑器模式",
   "Refresh terminal": "刷新终端",
   "Restart terminal": "重启终端",
   "Settings": "设置",
   "Extension settings": "扩展设置",
-  "Keyboard shortcut settings": "热键设置"
+  "Keyboard shortcut settings": "热键设置",
+  "Toggle editor mode": "切换编辑器模式"
 }
 

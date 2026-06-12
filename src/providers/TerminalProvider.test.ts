@@ -65,7 +65,6 @@ describe("TerminalProvider", () => {
     enableHttpApi?: boolean;
     defaultAiTool?: string;
     aiTools?: readonly unknown[];
-    collapseSecondaryBarOnEditorOpen?: boolean;
     promptAiToolOnSession?: boolean;
   }) {
     const {
@@ -73,7 +72,6 @@ describe("TerminalProvider", () => {
       enableHttpApi = false,
       defaultAiTool = "opencode",
       aiTools = [{ name: "opencode", label: "OpenCode", command: "opencode" }],
-      collapseSecondaryBarOnEditorOpen = false,
       promptAiToolOnSession = true,
     } = options ?? {};
 
@@ -96,9 +94,6 @@ describe("TerminalProvider", () => {
         }
         if (key === "logLevel") {
           return "error";
-        }
-        if (key === "collapseSecondaryBarOnEditorOpen") {
-          return collapseSecondaryBarOnEditorOpen;
         }
         if (key === "promptAiToolOnSession") {
           return promptAiToolOnSession;
@@ -184,7 +179,7 @@ describe("TerminalProvider", () => {
     provider = createProvider();
     const { view, messageHandler } = resolveProvider(provider);
 
-    messageHandler({ type: "ready", cols: 80, rows: 24, paneId: "default" });
+    messageHandler({ type: "ready", cols: 80, rows: 24 });
 
     const call = vi.mocked(view.webview.postMessage).mock.calls.find(
       (c: unknown[]) => c[0] && (c[0] as any).type === "platformInfo",
@@ -209,7 +204,7 @@ describe("TerminalProvider", () => {
       savePreference: true,
     });
 
-    expect(launchSpy).toHaveBeenCalledWith("default", "codex", true, undefined);
+    expect(launchSpy).toHaveBeenCalledWith("default", "codex", true);
   });
 
   it("routes restart messages through provider restart path", () => {
@@ -248,38 +243,6 @@ describe("TerminalProvider", () => {
       "workbench.action.openGlobalKeybindings",
       "@ext:sagez.ai-sidebar-terminal",
     );
-  });
-
-  it("creates a new pane with native backend when receiving paneCreate", async () => {
-    mockConfiguration();
-    provider = createProvider();
-    const { messageHandler } = resolveProvider(provider);
-
-    messageHandler({ type: "paneCreate", paneId: "pane-2", direction: "horizontal" });
-
-    expect(provider["paneStore"].getPane("pane-2")).toBeDefined();
-  });
-
-  it("deletes a non-default pane when receiving paneDelete", async () => {
-    mockConfiguration();
-    provider = createProvider();
-    const { messageHandler } = resolveProvider(provider);
-
-    messageHandler({ type: "paneCreate", paneId: "pane-2" });
-    messageHandler({ type: "paneDelete", paneId: "pane-2" });
-
-    expect(provider["paneStore"].getPane("pane-2")).toBeUndefined();
-  });
-
-  it("does not delete the default pane", async () => {
-    mockConfiguration();
-    provider = createProvider();
-    const { messageHandler } = resolveProvider(provider);
-
-    messageHandler({ type: "paneCreate", paneId: "default" });
-    messageHandler({ type: "paneDelete", paneId: "default" });
-
-    expect(provider["paneStore"].getPane("default")).toBeDefined();
   });
 
   it("saves tool preference via config when saving is requested", async () => {

@@ -17,7 +17,6 @@ describe("renderTerminalHtml", () => {
 
     expect(html).toContain('id="toolbar"');
     expect(html).toContain('id="pill-ai-tool"');
-    expect(html).toContain('id="btn-toggle-editor-attachment"');
     expect(html).toContain('id="terminal-container"');
     expect(html).toContain('id="ai-selector"');
   });

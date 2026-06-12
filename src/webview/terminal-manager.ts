@@ -1,3 +1,4 @@
+
 import { FitAddon } from "@xterm/addon-fit";
 import { WebglAddon } from "@xterm/addon-webgl";
 import { Terminal, type ITerminalAddon, type ITerminalOptions } from "@xterm/xterm";
@@ -30,16 +31,14 @@ class CanvasAddonFallback implements ITerminalAddon {
   dispose(): void {}
 }
 
-export class PaneManager {
-  private readonly instances = new Map<string, TerminalInstance>();
+export class TerminalManager {
+  private instance: TerminalInstance | null = null;
 
-  private readonly backends = new Map<string, TerminalBackendType>();
+  private backend: TerminalBackendType = "native";
 
   private container: HTMLElement | null = null;
 
-  private focusedPaneId: string | null = null;
-
-  private webglCount = 0;
+  private hasWebgl = false;
 
   init(container: HTMLElement): void {
     if (this.container) {
@@ -51,13 +50,12 @@ export class PaneManager {
     container.addEventListener("drop", this.handleDrop);
   }
 
-  createPane(
-    paneId: string,
+  create(
     container: HTMLElement,
     options: ITerminalOptions = {},
     backend: TerminalBackendType = "native",
   ): TerminalInstance {
-    this.disposePane(paneId);
+    this.disposeCurrentInstance();
 
     const terminal = new Terminal({
       ...DEFAULT_TERMINAL_OPTIONS,
@@ -83,159 +81,122 @@ export class PaneManager {
       rendererType,
     };
 
-    this.instances.set(paneId, instance);
-    this.backends.set(paneId, backend);
-
-    if (!this.focusedPaneId) {
-      this.focusedPaneId = paneId;
-    }
+    this.instance = instance;
+    this.backend = backend;
 
     return instance;
   }
 
-  registerPane(
-    paneId: string,
+  register(
     terminal: Terminal | null,
+    fitAddon: FitAddon | null,
     container: HTMLElement,
     backend: TerminalBackendType = "native",
   ): void {
-    if (terminal) {
-      const fitAddon = new FitAddon();
-      terminal.loadAddon(fitAddon);
-      this.instances.set(paneId, {
+    if (terminal && fitAddon) {
+      this.instance = {
         terminal,
         fitAddon,
         container,
         disposed: false,
         rendererType: "webgl",
-      });
-      this.backends.set(paneId, backend);
+      };
+      this.backend = backend;
+    } else if (terminal) {
+      // Terminal exists but no FitAddon — create one
+      const addon = new FitAddon();
+      terminal.loadAddon(addon);
+      this.instance = {
+        terminal,
+        fitAddon: addon,
+        container,
+        disposed: false,
+        rendererType: "webgl",
+      };
+      this.backend = backend;
     } else {
-      this.createPane(paneId, container, {}, backend);
+      this.create(container, {}, backend);
     }
   }
 
-  disposePane(paneId: string): void {
-    const instance = this.instances.get(paneId);
-    if (!instance) {
-      return;
-    }
-
-    instance.disposed = true;
-    instance.terminal.dispose();
-
-    if (instance.rendererType === "webgl") {
-      this.webglCount = Math.max(0, this.webglCount - 1);
-    }
-
-    this.instances.delete(paneId);
-    this.backends.delete(paneId);
-
-    if (this.focusedPaneId === paneId) {
-      this.focusedPaneId = this.getFirstPaneId();
-    }
+  dispose(): void {
+    this.disposeCurrentInstance();
   }
 
-  async switchPaneBackend(
-    paneId: string,
-    newBackend: TerminalBackendType,
-  ): Promise<void> {
-    const instance = this.instances.get(paneId);
-    if (!instance) {
+  async switchBackend(newBackend: TerminalBackendType): Promise<void> {
+    if (!this.instance) {
       return;
     }
 
-    if (instance.terminal) {
-      instance.terminal.dispose();
+    if (this.instance.terminal) {
+      this.instance.terminal.dispose();
     }
 
-    this.backends.set(paneId, newBackend);
-    instance.disposed = true;
+    this.backend = newBackend;
+    this.instance.disposed = true;
   }
 
-  writeData(paneId: string, data: string): void {
-    const instance = this.instances.get(paneId);
-    if (!instance) {
+  write(data: string): void {
+    if (!this.instance) {
       return;
     }
 
-    if (instance.disposed) {
-      this.createPane(paneId, instance.container, {}, this.getBackend(paneId));
-      const newInstance = this.instances.get(paneId);
-      if (newInstance) {
-        newInstance.terminal.write(data);
+    if (this.instance.disposed) {
+      this.create(this.instance.container, {}, this.getBackend());
+      if (this.instance) {
+        this.instance.terminal.write(data);
       }
       return;
     }
 
-    instance.terminal.write(data);
+    this.instance.terminal.write(data);
   }
 
-  resizePane(paneId: string, cols: number, rows: number): void {
-    const instance = this.instances.get(paneId);
-    if (!instance || instance.disposed) {
+  resize(cols: number, rows: number): void {
+    if (!this.instance || this.instance.disposed) {
       return;
     }
 
-    instance.terminal.resize(cols, rows);
+    this.instance.terminal.resize(cols, rows);
   }
 
-  focusPane(paneId: string): void {
-    const instance = this.instances.get(paneId);
-    if (!instance || instance.disposed) {
+  focus(): void {
+    if (!this.instance || this.instance.disposed) {
       return;
     }
 
-    this.focusedPaneId = paneId;
-    instance.terminal.focus();
+    this.instance.terminal.focus();
   }
 
-  showPane(paneId: string): void {
-    const instance = this.instances.get(paneId);
-    if (!instance || instance.disposed) {
+  show(): void {
+    if (!this.instance || this.instance.disposed) {
       return;
     }
 
-    instance.container.style.display = "";
-    instance.fitAddon.fit();
+    this.instance.container.style.display = "";
+    this.instance.fitAddon.fit();
   }
 
-  hidePane(paneId: string): void {
-    const instance = this.instances.get(paneId);
-    if (!instance || instance.disposed) {
+  hide(): void {
+    if (!this.instance || this.instance.disposed) {
       return;
     }
 
-    instance.container.style.display = "none";
+    this.instance.container.style.display = "none";
   }
 
-  getPane(paneId: string): TerminalInstance | undefined {
-    return this.instances.get(paneId);
+  getInstance(): TerminalInstance | undefined {
+    return this.instance ?? undefined;
   }
 
-  getBackend(paneId: string): TerminalBackendType {
-    return this.backends.get(paneId) ?? "native";
+  getBackend(): TerminalBackendType {
+    return this.backend;
   }
 
-  setBackend(paneId: string, backend: TerminalBackendType): void {
-    if (this.instances.has(paneId)) {
-      this.backends.set(paneId, backend);
+  setBackend(backend: TerminalBackendType): void {
+    if (this.instance) {
+      this.backend = backend;
     }
-  }
-
-  getAllPaneIds(): string[] {
-    return Array.from(this.instances.keys());
-  }
-
-  getPaneAtPoint(x: number, y: number): string | null {
-    if (!Number.isFinite(x) || !Number.isFinite(y)) {
-      return null;
-    }
-
-    const element = document.elementFromPoint(x, y);
-    const paneElement = element?.closest<HTMLElement>(".layout-pane[data-pane-id]");
-
-    return paneElement?.dataset.paneId ?? null;
   }
 
   async handleDrop(event: DragEvent): Promise<void> {
@@ -247,15 +208,12 @@ export class PaneManager {
     event.preventDefault();
     event.stopPropagation();
 
-    const paneId = this.getPaneAtPoint(event.clientX, event.clientY) ?? this.focusedPaneId ?? this.getFirstPaneId();
-
     const files = await this.extractDroppedFiles(dataTransfer);
     if (files.length > 0) {
       postMessage({
         type: "filesDropped",
         files,
         shiftKey: event.shiftKey,
-        paneId: paneId ?? undefined,
       });
       return;
     }
@@ -267,24 +225,34 @@ export class PaneManager {
         files: [],
         blobFiles,
         shiftKey: event.shiftKey,
-        paneId: paneId ?? undefined,
       });
     }
   }
 
-  dispose(): void {
+  destroy(): void {
     if (this.container) {
       this.container.removeEventListener("dragover", this.handleDragOver);
       this.container.removeEventListener("drop", this.handleDrop);
     }
 
-    for (const paneId of this.getAllPaneIds()) {
-      this.disposePane(paneId);
-    }
-    this.instances.clear();
+    this.disposeCurrentInstance();
     this.container = null;
-    this.focusedPaneId = null;
-    this.webglCount = 0;
+    this.hasWebgl = false;
+  }
+
+  private disposeCurrentInstance(): void {
+    if (!this.instance) {
+      return;
+    }
+
+    this.instance.disposed = true;
+    this.instance.terminal.dispose();
+
+    if (this.instance.rendererType === "webgl") {
+      this.hasWebgl = false;
+    }
+
+    this.instance = null;
   }
 
   private readonly handleDragOver = (event: DragEvent): void => {
@@ -309,14 +277,14 @@ export class PaneManager {
   };
 
   private loadRendererAddon(terminal: Terminal): "webgl" | "canvas" {
-    if (this.webglCount < 4) {
+    if (!this.hasWebgl) {
       try {
         const webglAddon = new WebglAddon();
         webglAddon.onContextLoss(() => {
           webglAddon.dispose();
         });
         terminal.loadAddon(webglAddon);
-        this.webglCount += 1;
+        this.hasWebgl = true;
         return "webgl";
       } catch (error) {
         console.warn(
@@ -328,11 +296,6 @@ export class PaneManager {
 
     terminal.loadAddon(new CanvasAddonFallback());
     return "canvas";
-  }
-
-  private getFirstPaneId(): string | null {
-    const first = this.instances.keys().next();
-    return first.done ? null : first.value;
   }
 
   private async extractDroppedFiles(dataTransfer: DataTransfer): Promise<string[]> {
@@ -371,7 +334,7 @@ export class PaneManager {
       try {
         consumePayload(dataTransfer.getData(type));
       } catch (error) {
-        console.warn("[PaneManager] Failed to get data for type:", type, error);
+        console.warn("[TerminalManager] Failed to get data for type:", type, error);
       }
     }
 
@@ -477,7 +440,7 @@ export class PaneManager {
         }
       }
     } catch (error) {
-      console.warn("[PaneManager] Failed to parse dropped text payload:", error);
+      console.warn("[TerminalManager] Failed to parse dropped text payload:", error);
     }
 
     return paths;
@@ -504,7 +467,7 @@ export class PaneManager {
         return hasWindowsDrivePrefix ? decodedPath.slice(1) : decodedPath;
       }
     } catch (error) {
-      console.warn('[PaneManager] URI decode failed for drag/drop path:', error);
+      console.warn('[TerminalManager] URI decode failed for drag/drop path:', error);
       const hasWindowsDrivePath =
         candidate.length >= 3 &&
         /[A-Za-z]/.test(candidate[0] ?? "") &&

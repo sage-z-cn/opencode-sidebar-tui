@@ -1,5 +1,4 @@
 
-
 export interface DroppedBlobFile {
   name: string;
   data: string;
@@ -7,60 +6,40 @@ export interface DroppedBlobFile {
 
 export type TerminalBackendType = "native";
 
-export type PaneLayout = {
-  tabId: string;
-  paneId: string;
-  splitDirection?: "horizontal" | "vertical";
-  size?: number;
-  children?: PaneLayout[];
-};
-
-export type PaneConfig = {
-  paneId: string;
-  command?: string;
-  cwd?: string;
-};
-
 export type WebviewMessage =
-  | { type: "terminalInput"; data: string; paneId?: string }
-  | { type: "terminalResize"; cols: number; rows: number; paneId?: string }
-  | { type: "listTerminals"; paneId?: string }
+  | { type: "terminalInput"; data: string }
+  | { type: "terminalResize"; cols: number; rows: number }
+  | { type: "listTerminals" }
   | {
       type: "openFile";
       path: string;
       line?: number;
       endLine?: number;
       column?: number;
-      paneId?: string;
     }
-  | { type: "openUrl"; url: string; paneId?: string }
-  | { type: "ready"; cols: number; rows: number; paneId?: string }
+  | { type: "openUrl"; url: string }
+  | { type: "ready"; cols: number; rows: number }
   | {
       type: "filesDropped";
       files: string[];
       shiftKey: boolean;
       dropCell?: { col: number; row: number };
       blobFiles?: DroppedBlobFile[];
-      paneId?: string;
     }
-  | { type: "setClipboard"; text: string; paneId?: string }
-  | { type: "triggerPaste"; paneId?: string }
-  | { type: "imagePasted"; data: string; paneId?: string }
+  | { type: "setClipboard"; text: string }
+  | { type: "triggerPaste" }
+  | { type: "imagePasted"; data: string }
   | {
       type: "launchAiTool";
       sessionId: string;
       tool: string;
       savePreference: boolean;
-      targetPaneId?: string;
-      paneId?: string;
     }
-  | { type: "toggleEditorAttachment"; paneId?: string }
-  | { type: "requestRestart"; paneId?: string }
-  | { type: "requestAiToolSelector"; paneId?: string }
-  | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
-  | { type: "paneDelete"; paneId?: string }
-  | { type: "openSettings"; paneId?: string }
-  | { type: "openKeyboardShortcuts"; paneId?: string };
+  | { type: "requestRestart" }
+  | { type: "requestAiToolSelector" }
+  | { type: "toggleEditorAttachment" }
+  | { type: "openSettings" }
+  | { type: "openKeyboardShortcuts" };
 
 export type AiTool = string;
 
@@ -157,7 +136,6 @@ export function resolveAiToolConfigs(
       enabled: typeof t.enabled === "boolean" ? t.enabled : undefined,
     }));
 
-  // Merge strategy: DEFAULT_AI_TOOLS as base, user config overrides by name
   const userByName = new Map(parsed.map((t) => [t.name, t]));
   const userSeen = new Set<string>();
 
@@ -168,11 +146,9 @@ export function resolveAiToolConfigs(
     userSeen.add(defaultTool.name);
 
     if (userOverride) {
-      // User override exists — merge with defaults for missing fields
       merged.push({
         ...defaultTool,
         ...userOverride,
-        // Preserve default aliases/operator if user didn't provide them
         aliases: userOverride.aliases ?? defaultTool.aliases,
         operator: userOverride.operator ?? defaultTool.operator,
         path: userOverride.path || defaultTool.path,
@@ -180,19 +156,16 @@ export function resolveAiToolConfigs(
           userOverride.args.length > 0 ? userOverride.args : defaultTool.args,
       });
     } else {
-      // No user override — keep default as-is
       merged.push({ ...defaultTool });
     }
   }
 
-  // Append user tools not in defaults (fully custom tools)
   for (const tool of parsed) {
     if (!userSeen.has(tool.name)) {
       merged.push(tool);
     }
   }
 
-  // Filter out explicitly disabled tools
   return merged.filter((t) => t.enabled !== false);
 }
 
@@ -260,11 +233,11 @@ export type HostMessage =
   | { type: "requestPaste" }
   | { type: "clipboardContent"; text: string }
   | { type: "terminalList"; terminals: Array<{ name: string; cwd: string }> }
-  | { type: "terminalOutput"; data: string; paneId?: string }
-  | { type: "terminalExited"; paneId?: string }
-  | { type: "clearTerminal"; paneId?: string }
-  | { type: "focusTerminal"; paneId?: string }
-  | { type: "webviewVisible"; paneId?: string }
+  | { type: "terminalOutput"; data: string }
+  | { type: "terminalExited" }
+  | { type: "clearTerminal" }
+  | { type: "focusTerminal" }
+  | { type: "webviewVisible" }
   | {
       type: "platformInfo";
       platform: string;
@@ -286,10 +259,7 @@ export type HostMessage =
       sessionName: string;
       defaultTool?: string;
       tools?: AiToolConfig[];
-      targetPaneId?: string;
     }
-  | { type: "paneDelete"; paneId?: string };
-
 export type LogLevel = "debug" | "info" | "warn" | "error";
 export type DiagnosticSeverity = "error" | "warning" | "information" | "hint";
 
@@ -313,10 +283,4 @@ export interface ExtensionConfig {
   maxDiagnosticLength: number;
   enableAutoSpawn: boolean;
   codeActionSeverities: DiagnosticSeverity[];
-  collapseSecondaryBarOnEditorOpen: boolean;
-  'pane.defaultSplitDirection': "horizontal" | "vertical";
-  'pane.focusOnClick': boolean;
-  'pane.showPaneActions': boolean;
-  'pane.renderer': "webgl" | "canvas" | "auto";
 }
-

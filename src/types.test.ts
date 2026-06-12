@@ -1,8 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type {
   HostMessage,
-  PaneConfig,
-  PaneLayout,
   TerminalBackendType,
   WebviewMessage,
 } from "./types";
@@ -16,68 +14,20 @@ import {
 
 describe("Types", () => {
   describe("WebviewMessage", () => {
-    it("should accept all variants with paneId", () => {
-      const messages: WebviewMessage[] = [
-        { type: "terminalInput", data: "test input", paneId: "pane-1" },
-        {
-          type: "terminalResize",
-          cols: 80,
-          rows: 24,
-          paneId: "pane-1",
-        },
-        { type: "listTerminals", paneId: "pane-1" },
-        {
-          type: "openFile",
-          path: "/test/file.ts",
-          line: 10,
-          paneId: "pane-1",
-        },
-        {
-          type: "openUrl",
-          url: "https://example.com",
-          paneId: "pane-1",
-        },
-        { type: "ready", cols: 80, rows: 24, paneId: "pane-1" },
-        {
-          type: "filesDropped",
-          files: ["/file1.ts", "/file2.ts"],
-          shiftKey: true,
-          paneId: "pane-1",
-        },
-        {
-          type: "setClipboard",
-          text: "clipboard text",
-          paneId: "pane-1",
-        },
-        { type: "triggerPaste", paneId: "pane-1" },
-        { type: "imagePasted", data: "data:image/png;base64,AA==", paneId: "pane-1" },
-        {
-          type: "launchAiTool",
-          sessionId: "workspace-a",
-          tool: "opencode",
-          savePreference: true,
-          paneId: "pane-1",
-        },
-        { type: "toggleEditorAttachment", paneId: "pane-1" },
-        { type: "requestAiToolSelector", paneId: "pane-1" },
-        { type: "requestRestart", paneId: "pane-1" },
-        { type: "paneCreate", direction: "horizontal", paneId: "pane-1" },
-        { type: "paneDelete", paneId: "pane-1" },
-        { type: "openSettings", paneId: "pane-1" },
-        { type: "openKeyboardShortcuts", paneId: "pane-1" },
-      ];
-
-      expect(messages).toHaveLength(18);
-      expect(messages[0]?.paneId).toBe("pane-1");
-    });
-
-    it("should accept all variants without paneId for backward compatibility", () => {
+    it("should accept all variants", () => {
       const messages: WebviewMessage[] = [
         { type: "terminalInput", data: "test input" },
         { type: "terminalResize", cols: 80, rows: 24 },
         { type: "listTerminals" },
-        { type: "openFile", path: "/test/file.ts", line: 10 },
-        { type: "openUrl", url: "https://example.com" },
+        {
+          type: "openFile",
+          path: "/test/file.ts",
+          line: 10,
+        },
+        {
+          type: "openUrl",
+          url: "https://example.com",
+        },
         { type: "ready", cols: 80, rows: 24 },
         {
           type: "filesDropped",
@@ -93,14 +43,14 @@ describe("Types", () => {
           tool: "opencode",
           savePreference: true,
         },
-        { type: "toggleEditorAttachment" },
         { type: "requestAiToolSelector" },
         { type: "requestRestart" },
+        { type: "openSettings" },
+        { type: "openKeyboardShortcuts" },
       ];
 
-      expect(messages).toHaveLength(14);
-      expect(messages[0]?.paneId).toBeUndefined();
-      expect(messages[13]?.type).toBe("requestRestart");
+      expect(messages).toHaveLength(15);
+      expect(messages[14]?.type).toBe("openKeyboardShortcuts");
     });
 
     it("should accept terminalInput message", () => {
@@ -223,28 +173,9 @@ describe("Types", () => {
         },
       ]);
     });
-
   });
 
   describe("HostMessage", () => {
-    it("should accept data-related host messages with paneId", () => {
-      const messages: HostMessage[] = [
-        {
-          type: "terminalOutput",
-          data: "output data",
-          paneId: "pane-1",
-        },
-        { type: "terminalExited", paneId: "pane-1" },
-        { type: "clearTerminal", paneId: "pane-1" },
-        { type: "focusTerminal", paneId: "pane-1" },
-        { type: "webviewVisible", paneId: "pane-1" },
-      ];
-
-      const first = messages[0] as { paneId?: string };
-      expect(first?.paneId).toBe("pane-1");
-      expect(messages.length).toBe(5);
-    });
-
     it("should accept terminalOutput message", () => {
       const message: HostMessage = {
         type: "terminalOutput",
@@ -271,36 +202,20 @@ describe("Types", () => {
       expect(message.type).toBe("focusTerminal");
     });
 
-    it("should define pane layout and pane config structures", () => {
-      const layout: PaneLayout = {
-        tabId: "tab-1",
-        paneId: "pane-1",
-        splitDirection: "horizontal",
-        size: 50,
-        children: [
-          {
-            tabId: "tab-1",
-            paneId: "pane-2",
-          },
-        ],
+    it("should accept webviewVisible message", () => {
+      const message: HostMessage = {
+        type: "webviewVisible",
       };
 
-      const config: PaneConfig = {
-        paneId: "pane-1",
-        command: "npm run dev",
-        cwd: "/workspace",
+      expect(message.type).toBe("webviewVisible");
+    });
+
+    it("should accept clearTerminal message", () => {
+      const message: HostMessage = {
+        type: "clearTerminal",
       };
 
-      const legacyConfig: PaneConfig = {
-        paneId: "pane-legacy",
-        command: "npm test",
-        cwd: "/workspace",
-      };
-
-      expect(layout.children?.[0]?.paneId).toBe("pane-2");
-      expect(config.paneId).toBe("pane-1");
-      expect(config.command).toBe("npm run dev");
-      expect(legacyConfig.paneId).toBe("pane-legacy");
+      expect(message.type).toBe("clearTerminal");
     });
   });
 

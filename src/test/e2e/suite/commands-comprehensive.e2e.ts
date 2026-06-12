@@ -16,8 +16,6 @@ const commandCategories = {
     "ai-sidebar-terminal.start",
     "ai-sidebar-terminal.focus",
     "ai-sidebar-terminal.paste",
-    "ai-sidebar-terminal.openTerminalInEditor",
-    "ai-sidebar-terminal.restoreTerminalToSidebar",
   ],
   "file-reference": [
     "ai-sidebar-terminal.sendToTerminal",
@@ -55,7 +53,7 @@ suite("Comprehensive command registration", () => {
       packageJSON.contributes?.commands?.map(({ command }) => command) ?? [];
     const expectedCommands = allExpectedCommands();
 
-    assert.strictEqual(expectedCommands.length, 9);
+    assert.strictEqual(expectedCommands.length, 7);
     assert.deepStrictEqual(
       [...new Set(expectedCommands)].sort(),
       [...expectedCommands].sort(),

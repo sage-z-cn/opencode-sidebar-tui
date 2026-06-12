@@ -192,16 +192,6 @@ npx @vscode/vsce package
 | `ai-sidebar-terminal.logLevel`                  | string | `"info"`               | 日志级别：`debug`、`info`、`warn`、`error` |
 | `ai-sidebar-terminal.maxDiagnosticLength`       | number | `500`                  | 诊断消息最大长度（100-2000）              |
 | `ai-sidebar-terminal.codeActionSeverities`      | array  | `["error", "warning"]` | 触发代码操作的诊断严重级别                |
-| `ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen` | boolean | `true`          | 打开编辑器标签页时关闭辅助侧边栏          |
-
-### 窗格设置
-
-| 设置                                          | 类型    | 默认值          | 描述                                      |
-| --------------------------------------------- | ------- | --------------- | ----------------------------------------- |
-| `ai-sidebar-terminal.pane.defaultSplitDirection` | string  | `"horizontal"`  | 默认分割方向（horizontal / vertical）    |
-| `ai-sidebar-terminal.pane.focusOnClick`       | boolean | `true`          | 点击窗格时聚焦                            |
-| `ai-sidebar-terminal.pane.showPaneActions`    | boolean | `true`          | 显示窗格操作按钮（分割、关闭）            |
-| `ai-sidebar-terminal.pane.renderer`           | string  | `"auto"`        | 渲染器：`webgl`、`canvas` 或 `auto`       |
 
 ### 示例配置
 
@@ -268,8 +258,7 @@ src/
 │   ├── PortManager.ts                  # 临时端口分配
 │   ├── NativeTerminalManager.ts         # 原生终端后端
 │   ├── terminalBackends.ts              # 后端注册表
-│   ├── PaneStore.ts                     # 窗格状态管理
-│   ├── DataThrottleService.ts           # 批量窗格数据投递
+│   ├── DataThrottleService.ts           # 批量终端数据投递
 │   ├── ContextManager.ts               # 活动编辑器/选区观察者
 │   ├── ContextSharingService.ts        # @file#L 上下文格式化器
 │   ├── FileReferenceManager.ts         # 文件引用序列化
@@ -279,16 +268,14 @@ src/
 │   └── aiTools/                        # AI 工具操作符系统
 ├── webview/
 │   ├── main.ts                         # 终端启动（xterm.js + WebGL）
-│   ├── pane-manager.ts                 # 多窗格生命周期
-│   ├── pane-message-router.ts          # 窗格消息路由
-│   ├── layout/                         # 布局引擎（多窗格）
-│   ├── tab-bar/                        # 标签栏 UI
-│   ├── pane-actions/                   # 窗格操作按钮
-│   ├── focus/                          # 聚焦管理
-│   ├── toolbar/                        # 工具栏按钮
+│   ├── terminal-manager.ts             # 终端实例与拖放管理器
+│   ├── terminal/                       # 终端容器、键盘、配置
+│   ├── toolbar/                        # 工具栏按钮 & Pills
 │   ├── clipboard/                      # 剪贴板处理
-│   ├── terminal/                       # 终端容器、键盘、AI 选择器
-│   └── messages/                       # 宿主消息处理
+│   ├── messages/                       # 宿主消息处理
+│   ├── links/                          # 链接处理
+│   ├── dragdrop/                       # 拖放处理
+│   └── shared/                         # 共享工具
 ├── utils/
 └── test/mocks/
     ├── vscode.ts                       # VS Code API 模拟

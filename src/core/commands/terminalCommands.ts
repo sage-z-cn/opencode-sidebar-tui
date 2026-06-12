@@ -196,20 +196,6 @@ export function registerTerminalCommands(
     },
   );
 
-  const openInEditorCommand = vscode.commands.registerCommand(
-    "ai-sidebar-terminal.openTerminalInEditor",
-    () => {
-      void deps.provider?.openInEditorTab();
-    },
-  );
-
-  const restoreToSidebarCommand = vscode.commands.registerCommand(
-    "ai-sidebar-terminal.restoreTerminalToSidebar",
-    () => {
-      void deps.provider?.toggleEditorAttachment();
-    },
-  );
-
   return [
     startCommand,
     sendToTerminalCommand,
@@ -218,8 +204,6 @@ export function registerTerminalCommands(
     sendToAiTerminalCommand,
     pasteCommand,
     focusCommand,
-    openInEditorCommand,
-    restoreToSidebarCommand,
   ];
 }
 

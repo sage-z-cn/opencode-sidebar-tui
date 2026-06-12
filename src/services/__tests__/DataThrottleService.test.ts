@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DataThrottleService } from "../DataThrottleService";
 
 describe("DataThrottleService", () => {
-  let onBatch: ReturnType<typeof vi.fn<(batch: Array<{ paneId: string; data: string }>) => void>>;
+  let onBatch: ReturnType<typeof vi.fn<(batch: Array<{ data: string }>) => void>>;
   let service: DataThrottleService;
 
   beforeEach(() => {
@@ -18,81 +18,46 @@ describe("DataThrottleService", () => {
     vi.useRealTimers();
   });
 
-  it("batches a single pane's buffered data on flush", () => {
-    service.push("pane-1", "hello");
-    service.push("pane-1", " world");
+  it("delivers data immediately on push", () => {
+    service.push("hello");
 
+    expect(onBatch).toHaveBeenCalledTimes(1);
+    expect(onBatch).toHaveBeenCalledWith([
+      { data: "hello" },
+    ]);
+  });
+
+  it("combines consecutive pushes into a single batch per push", () => {
+    service.push("hello");
+    service.push("world");
+
+    // Each push triggers an immediate flush, so onBatch is called twice
+    expect(onBatch).toHaveBeenCalledTimes(2);
+    expect(onBatch).toHaveBeenNthCalledWith(1, [
+      { data: "hello" },
+    ]);
+    expect(onBatch).toHaveBeenNthCalledWith(2, [
+      { data: "world" },
+    ]);
+  });
+
+  it("flush delivers buffered data immediately", () => {
+    service.push("a");
+    service.push("b");
+
+    // Both pushes already flushed immediately; explicit flush finds empty buffer
     service.flush();
 
-    expect(onBatch).toHaveBeenCalledTimes(1);
-    expect(onBatch).toHaveBeenCalledWith([
-      { paneId: "pane-1", data: "hello world" },
-    ]);
-  });
-
-  it("batches multiple panes together on flush", () => {
-    service.push("pane-1", "hello");
-    service.push("pane-2", "world");
-
-    service.flush();
-
-    expect(onBatch).toHaveBeenCalledTimes(1);
-    expect(onBatch).toHaveBeenCalledWith([
-      { paneId: "pane-1", data: "hello" },
-      { paneId: "pane-2", data: "world" },
-    ]);
-  });
-
-  it("delivers focused pane data immediately", () => {
-    service.setFocusedPane("pane-1");
-
-    service.push("pane-1", "typed");
-
-    expect(onBatch).toHaveBeenCalledTimes(1);
-    expect(onBatch).toHaveBeenCalledWith([
-      { paneId: "pane-1", data: "typed" },
-    ]);
-  });
-
-  it("debounces background pane data for at least 16ms", () => {
-    service.setFocusedPane("pane-1");
-
-    service.push("pane-2", "background");
-
-    expect(onBatch).not.toHaveBeenCalled();
-
-    vi.advanceTimersByTime(15);
-    expect(onBatch).not.toHaveBeenCalled();
-
-    vi.advanceTimersByTime(1);
-    expect(onBatch).toHaveBeenCalledTimes(1);
-    expect(onBatch).toHaveBeenCalledWith([
-      { paneId: "pane-2", data: "background" },
-    ]);
-  });
-
-  it("flushes pending data immediately", () => {
-    service.push("pane-1", "a");
-    service.push("pane-2", "b");
-
-    service.flush();
-
-    expect(onBatch).toHaveBeenCalledTimes(1);
-    expect(onBatch).toHaveBeenCalledWith([
-      { paneId: "pane-1", data: "a" },
-      { paneId: "pane-2", data: "b" },
-    ]);
-
-    vi.advanceTimersByTime(16);
-    expect(onBatch).toHaveBeenCalledTimes(1);
+    expect(onBatch).toHaveBeenCalledTimes(2);
   });
 
   it("prevents further callbacks after dispose", () => {
-    service.push("pane-1", "a");
+    service.push("a");
+    onBatch.mockClear();
+
     service.dispose();
 
-    vi.advanceTimersByTime(16);
-    service.push("pane-1", "b");
+    service.push("b");
     service.flush();
 
     expect(onBatch).not.toHaveBeenCalled();

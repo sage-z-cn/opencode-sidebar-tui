@@ -161,7 +161,7 @@ describe("SessionRuntime (native-only)", () => {
     expect(record?.config.selectedAiTool).toBe("claude");
   });
 
-  it("creates a native session and registers it in the session map", async () => {
+  it("starts a native session via startOpenCode", async () => {
     instanceStore.upsert({
       config: { id: "default" },
       runtime: { terminalKey: "default" },
@@ -174,17 +174,12 @@ describe("SessionRuntime (native-only)", () => {
       update: vi.fn(),
     } as any);
 
-    const result = await sessionRuntime.createSession("default", {
-      paneId: "default",
-      command: "echo hello",
-    });
+    await sessionRuntime.startOpenCode();
 
-    expect(result).toBeDefined();
-    expect(result?.backend).toBe("native");
-    expect(result?.paneId).toBe("default");
+    expect(sessionRuntime.isStartedFlag()).toBe(true);
   });
 
-  it("creates a sub-pane session with native backend", async () => {
+  it("getActiveSession returns session after creation", () => {
     instanceStore.upsert({
       config: { id: "default" },
       runtime: { terminalKey: "default" },
@@ -193,39 +188,8 @@ describe("SessionRuntime (native-only)", () => {
 
     sessionRuntime = createSessionRuntime();
 
-    const result = await sessionRuntime.createSession("pane-1", {
-      paneId: "pane-1",
-      command: "echo sub",
-    });
-
-    expect(result).toBeDefined();
-    expect(result?.backend).toBe("native");
-    expect(result?.paneId).toBe("pane-1");
-
-    const session = sessionRuntime.getSession("pane-1");
-    expect(session).toBeDefined();
-    expect(session?.backend).toBe("native");
-  });
-
-  it("destroys a sub-pane session and removes it from the session map", async () => {
-    instanceStore.upsert({
-      config: { id: "default" },
-      runtime: { terminalKey: "default" },
-      state: "disconnected",
-    });
-
-    sessionRuntime = createSessionRuntime();
-
-    await sessionRuntime.createSession("pane-2", {
-      paneId: "pane-2",
-      command: "echo test",
-    });
-
-    expect(sessionRuntime.getSession("pane-2")).toBeDefined();
-
-    sessionRuntime.destroySession("pane-2");
-
-    expect(sessionRuntime.getSession("pane-2")).toBeUndefined();
+    const session = sessionRuntime.getActiveSession();
+    expect(session).toBeUndefined(); // Not started yet
   });
 
   it("switches to another instance and clears previous state", async () => {
@@ -337,9 +301,7 @@ describe("SessionRuntime (native-only)", () => {
       update: vi.fn(),
     } as any);
 
-    await sessionRuntime.createSession("default", {
-      paneId: "default",
-    });
+    await sessionRuntime.startOpenCode();
 
     expect(sessionRuntime.isStartedFlag()).toBe(true);
   });
@@ -371,7 +333,7 @@ describe("SessionRuntime (native-only)", () => {
 
     sessionRuntime.dispose();
 
-    expect(sessionRuntime.getSession("default")).toBeUndefined();
+    expect(sessionRuntime.getActiveSession()).toBeUndefined();
   });
 
   it("hasLiveTerminalProcess returns false when not started", () => {

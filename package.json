@@ -94,32 +94,10 @@
         "title": "%command.ai-sidebar-terminal.paste.title%",
         "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(clippy)"
-      },
-      {
-        "command": "ai-sidebar-terminal.openTerminalInEditor",
-        "title": "%command.ai-sidebar-terminal.openTerminalInEditor.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": {
-          "light": "resources/activity-bar.svg",
-          "dark": "resources/activity-bar.svg"
-        }
-      },
-      {
-        "command": "ai-sidebar-terminal.restoreTerminalToSidebar",
-        "title": "%command.ai-sidebar-terminal.restoreTerminalToSidebar.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(layout-sidebar-left)"
       }
     ],
     "menus": {
       "view/title": [],
-      "editor/title": [
-        {
-          "command": "ai-sidebar-terminal.openTerminalInEditor",
-          "group": "navigation@1",
-          "when": "ai-sidebar-terminal.active"
-        }
-      ],
       "explorer/context": [
         {
           "command": "ai-sidebar-terminal.sendToAiTerminal",
@@ -276,11 +254,6 @@
           "default": true,
           "description": "%configuration.ai-sidebar-terminal.enableAutoSpawn.description%"
         },
-        "ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen.description%"
-        },
         "ai-sidebar-terminal.codeActionSeverities": {
           "type": "array",
           "items": {
@@ -391,35 +364,6 @@
           "type": "boolean",
           "default": true,
           "description": "%configuration.ai-sidebar-terminal.promptAiToolOnSession.description%"
-        },
-        "ai-sidebar-terminal.pane.defaultSplitDirection": {
-          "type": "string",
-          "default": "horizontal",
-          "enum": [
-            "horizontal",
-            "vertical"
-          ],
-          "description": "%configuration.ai-sidebar-terminal.pane.defaultSplitDirection.description%"
-        },
-        "ai-sidebar-terminal.pane.focusOnClick": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.ai-sidebar-terminal.pane.focusOnClick.description%"
-        },
-        "ai-sidebar-terminal.pane.showPaneActions": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.ai-sidebar-terminal.pane.showPaneActions.description%"
-        },
-        "ai-sidebar-terminal.pane.renderer": {
-          "type": "string",
-          "default": "auto",
-          "enum": [
-            "webgl",
-            "canvas",
-            "auto"
-          ],
-          "description": "%configuration.ai-sidebar-terminal.pane.renderer.description%"
         }
       }
     }

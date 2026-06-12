@@ -1,3 +1,4 @@
+
 import * as vscode from "vscode";
 import { l10n } from "../i18n";
 import { TerminalManager } from "../terminals/TerminalManager";
@@ -8,7 +9,6 @@ import { ContextSharingService } from "../services/ContextSharingService";
 import { OutputChannelService } from "../services/OutputChannelService";
 import { DataThrottleService } from "../services/DataThrottleService";
 import { InstanceId, InstanceStore } from "../services/InstanceStore";
-import { PaneStore } from "../services/PaneStore";
 import { AiToolFileReference } from "../services/aiTools/AiToolOperator";
 import {
   AiToolConfig,
@@ -37,11 +37,8 @@ export class TerminalProvider
   private readonly sessionRuntime: SessionRuntime;
   private readonly messageRouter: MessageRouter;
   private readonly dataThrottleService: DataThrottleService;
-  private readonly paneStore = new PaneStore();
   private readonly pendingWebviewMessages: HostMessage[] = [];
   private pendingQueueablePostChecks = 0;
-  private static readonly DEFAULT_PANE_ID = "default";
-  private static readonly DEFAULT_TAB_ID = "default";
 
   public constructor(
     private readonly context: vscode.ExtensionContext,
@@ -59,7 +56,6 @@ export class TerminalProvider
         this.postWebviewMessageNow({
           type: "terminalOutput",
           data: item.data,
-          paneId: item.paneId,
         });
       }
     });
@@ -91,6 +87,7 @@ export class TerminalProvider
       restart: () => this.restart(),
       openSettings: () => this.openSettings(),
       openKeyboardShortcuts: () => this.openKeyboardShortcuts(),
+      toggleEditorAttachment: () => this.toggleEditorAttachment(),
       pasteText: (text) => this.pasteText(text),
       getActiveInstanceId: () => this.getActiveInstanceId(),
       setLastKnownTerminalSize: (cols, rows) =>
@@ -105,16 +102,11 @@ export class TerminalProvider
         this.sessionRuntime.formatDroppedFiles(paths, { useAtSyntax }),
       formatPastedImage: (tempPath) =>
         this.sessionRuntime.formatPastedImage(tempPath),
-      launchAiTool: (sessionId, toolName, savePreference, targetPaneId) =>
-        this.launchAiTool(sessionId, toolName, savePreference, targetPaneId),
-      showAiToolSelector: (sessionId, sessionName, forceShow, targetPaneId) =>
+      launchAiTool: (sessionId, toolName, savePreference) =>
+        this.launchAiTool(sessionId, toolName, savePreference),
+      showAiToolSelector: (sessionId, sessionName, forceShow) =>
         Promise.resolve(
-          this.showAiToolSelector(
-            sessionId,
-            sessionName,
-            forceShow,
-            targetPaneId,
-          ),
+          this.showAiToolSelector(sessionId, sessionName, forceShow),
         ),
     };
 
@@ -168,7 +160,6 @@ export class TerminalProvider
       localResourceRoots: [this.context.extensionUri],
     };
 
-    this.ensureDefaultPaneState();
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
 
     const processAlive = this.sessionRuntime.hasLiveTerminalProcess();
@@ -200,7 +191,7 @@ export class TerminalProvider
         this.pendingQueueablePostChecks > 0;
       this.flushPendingWebviewMessages(webviewView.webview);
       if (!hadPendingMessages) {
-        this.postWebviewVisibleForKnownPanes();
+        this.postWebviewVisible();
         this.postTerminalConfig();
       }
 
@@ -242,7 +233,6 @@ export class TerminalProvider
     this._panel?.reveal(vscode.ViewColumn.Active);
     this.postWebviewMessage({
       type: "focusTerminal",
-      paneId: this.getFocusedPaneId(),
     });
   }
 
@@ -383,7 +373,6 @@ export class TerminalProvider
     sessionId: string,
     toolName: string,
     savePreference: boolean,
-    targetPaneId?: string,
   ): Promise<void> {
     if (savePreference) {
       const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
@@ -410,25 +399,6 @@ export class TerminalProvider
   }
 
   private handleMessage(message: unknown): void {
-    if (this.isPaneScopedWebviewMessage(message)) {
-      this.dataThrottleService.setFocusedPane(this.normalizePaneId(message.paneId));
-    }
-
-    if (this.isPaneCreateWebviewMessage(message)) {
-      void this.handlePaneCreate(message);
-      return;
-    }
-
-    if (this.isPaneDeleteWebviewMessage(message)) {
-      this.handlePaneDelete(message);
-      return;
-    }
-
-    if (this.isNonDefaultReadyMessage(message)) {
-      void this.handleNonDefaultPaneReady(message);
-      return;
-    }
-
     this.messageRouter.handleMessage(message);
   }
 
@@ -436,7 +406,6 @@ export class TerminalProvider
     sessionId: string,
     sessionName: string,
     forceShow = false,
-    targetPaneId?: string,
   ): void {
     const config = vscode.workspace.getConfiguration("ai-sidebar-terminal");
     if (forceShow && !config.get<boolean>("promptAiToolOnSession", true)) {
@@ -451,12 +420,7 @@ export class TerminalProvider
       config.get("aiTools", []),
     );
     if (!forceShow && savedTool) {
-      void this.launchAiTool(
-        sessionId,
-        savedTool,
-        false,
-        targetPaneId,
-      );
+      void this.launchAiTool(sessionId, savedTool, false);
       return;
     }
     this.postWebviewMessage({
@@ -465,7 +429,6 @@ export class TerminalProvider
       sessionName,
       defaultTool: undefined,
       tools,
-      targetPaneId,
     });
   }
 
@@ -523,91 +486,6 @@ export class TerminalProvider
     this.terminalManager.resizeTerminal(this.activeTerminalId, cols, rows);
   }
 
-  private async handlePaneCreate(message: {
-    paneId?: string;
-    direction?: "horizontal" | "vertical";
-  }): Promise<void> {
-    const paneId = this.normalizePaneId(message.paneId);
-    if (paneId === TerminalProvider.DEFAULT_PANE_ID) {
-      this.ensureDefaultPaneState();
-      return;
-    }
-
-    this.ensureDefaultPaneState();
-    if (this.paneStore.getPane(paneId)) {
-      this.setFocusedPane(paneId);
-      return;
-    }
-
-    this.paneStore.addPane({
-      paneId,
-      tabId: this.paneStore.getActiveTab() ?? TerminalProvider.DEFAULT_TAB_ID,
-      isActive: true,
-      size: 100,
-      splitDirection: message.direction,
-    });
-    this.setFocusedPane(paneId);
-
-    try {
-      await this.sessionRuntime.createSession(paneId, {
-        paneId,
-      });
-    } catch (error) {
-      this.logger.error(
-        `[TerminalProvider] Failed to create pane session '${paneId}': ${error instanceof Error ? error.message : String(error)}`,
-      );
-      this.paneStore.removePane(paneId);
-      this.setFocusedPane(this.getFocusedPaneId());
-      this.postWebviewMessage({
-        type: "terminalExited",
-        paneId,
-      });
-    }
-  }
-
-  private handlePaneDelete(message: { paneId?: string }): void {
-    const paneId = this.normalizePaneId(message.paneId);
-    if (paneId === TerminalProvider.DEFAULT_PANE_ID) {
-      return;
-    }
-
-    this.sessionRuntime.destroySession(paneId);
-    this.paneStore.removePane(paneId);
-    this.setFocusedPane(this.resolveNextPaneId());
-    this.postWebviewMessage({
-      type: "focusTerminal",
-      paneId: this.getFocusedPaneId(),
-    });
-  }
-
-  private async handleNonDefaultPaneReady(message: {
-    cols: number;
-    rows: number;
-    paneId?: string;
-  }): Promise<void> {
-    const paneId = this.normalizePaneId(message.paneId);
-
-    this.ensureDefaultPaneState();
-    if (!this.paneStore.getPane(paneId)) {
-      this.paneStore.addPane({
-        paneId,
-        tabId: this.paneStore.getActiveTab() ?? TerminalProvider.DEFAULT_TAB_ID,
-        isActive: true,
-        size: 100,
-      });
-    }
-    this.setFocusedPane(paneId);
-
-    if (!this.sessionRuntime.getSession(paneId)) {
-      await this.sessionRuntime.createSession(paneId, {
-        paneId,
-      });
-    }
-
-    this.messageRouter.handleTerminalResize(message.cols, message.rows, paneId);
-    this.postPlatformInfo();
-  }
-
   private getActiveInstanceId(): InstanceId {
     return this.activeInstanceId;
   }
@@ -626,45 +504,17 @@ export class TerminalProvider
 
   private postWebviewMessage(message: unknown): void {
     if (this.isTerminalOutputHostMessage(message)) {
-      this.dataThrottleService.push(
-        this.normalizePaneId(message.paneId),
-        message.data,
-      );
-      return;
-    }
-
-    if (this.isPaneScopedHostMessage(message)) {
-      const paneId = this.normalizePaneId(message.paneId);
-      if (message.type === "focusTerminal" || message.type === "webviewVisible") {
-        this.dataThrottleService.setFocusedPane(paneId);
-        this.dataThrottleService.flush();
-      }
-
-      this.postWebviewMessageNow({
-        ...message,
-        paneId,
-      });
+      this.dataThrottleService.push(message.data);
       return;
     }
 
     this.postWebviewMessageNow(message);
   }
 
-  private postPlatformInfo(): void {
+  private postWebviewVisible(): void {
     this.postWebviewMessage({
-      type: "platformInfo",
-      platform: process.platform,
-      activeBackend: "native" as TerminalBackendType,
+      type: "webviewVisible",
     });
-  }
-
-  private postWebviewVisibleForKnownPanes(): void {
-    for (const paneId of this.getKnownPaneIds()) {
-      this.postWebviewMessage({
-        type: "webviewVisible",
-        paneId,
-      });
-    }
   }
 
   private postWebviewMessageNow(message: unknown): void {
@@ -728,81 +578,6 @@ export class TerminalProvider
     );
   }
 
-  private isPaneScopedHostMessage(
-    message: unknown,
-  ): message is Extract<
-    HostMessage,
-    {
-      type:
-        | "terminalExited"
-        | "clearTerminal"
-        | "focusTerminal"
-        | "webviewVisible";
-    }
-  > {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "type" in message &&
-      (message.type === "terminalExited" ||
-        message.type === "clearTerminal" ||
-        message.type === "focusTerminal" ||
-        message.type === "webviewVisible")
-    );
-  }
-
-  private normalizePaneId(paneId: string | undefined): string {
-    return paneId ?? TerminalProvider.DEFAULT_PANE_ID;
-  }
-
-  private isPaneScopedWebviewMessage(
-    message: unknown,
-  ): message is { paneId?: string } {
-    return typeof message === "object" && message !== null && "type" in message;
-  }
-
-  private isPaneCreateWebviewMessage(
-    message: unknown,
-  ): message is { type: "paneCreate"; paneId?: string; direction?: "horizontal" | "vertical" } {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "type" in message &&
-      message.type === "paneCreate"
-    );
-  }
-
-  private isPaneDeleteWebviewMessage(
-    message: unknown,
-  ): message is { type: "paneDelete"; paneId?: string } {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "type" in message &&
-      message.type === "paneDelete"
-    );
-  }
-
-  private isNonDefaultReadyMessage(
-    message: unknown,
-  ): message is { type: "ready"; cols: number; rows: number; paneId?: string } {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "type" in message &&
-      message.type === "ready" &&
-      this.normalizePaneId(
-        "paneId" in message && typeof message.paneId === "string"
-          ? message.paneId
-          : undefined,
-      ) !== TerminalProvider.DEFAULT_PANE_ID &&
-      "cols" in message &&
-      typeof message.cols === "number" &&
-      "rows" in message &&
-      typeof message.rows === "number"
-    );
-  }
-
   private isQueueableHostMessage(
     message: unknown,
   ): message is Extract<HostMessage, { type: "showAiToolSelector" }> {
@@ -859,65 +634,6 @@ export class TerminalProvider
     });
   }
 
-  private getEditorPanelOptions(): vscode.WebviewOptions &
-    vscode.WebviewPanelOptions {
-    return {
-      enableScripts: true,
-      retainContextWhenHidden: true,
-      localResourceRoots: [this.context.extensionUri],
-    };
-  }
-
-  private initializeEditorPanel(panel: vscode.WebviewPanel): void {
-    this._panel = panel;
-    panel.webview.options = this.getEditorPanelOptions();
-    this.ensureDefaultPaneState();
-    panel.webview.html = this.getHtmlForWebview(panel.webview);
-
-    const processAlive = this.sessionRuntime.hasLiveTerminalProcess();
-    if (this.sessionRuntime.isStartedFlag() && !processAlive) {
-      this.sessionRuntime.resetState();
-    }
-
-    panel.webview.onDidReceiveMessage((message) => {
-      this.handleMessage(message);
-    });
-
-    if (processAlive) {
-      this.sessionRuntime.reconnectListeners();
-    }
-
-    this.postTerminalConfig();
-    this.postCurrentSessionState(panel.webview);
-    this.flushPendingWebviewMessages(panel.webview);
-
-    panel.onDidDispose(() => {
-      if (this._panel === panel) {
-        this._panel = undefined;
-        if (this._view) {
-          this.postTerminalConfig();
-          this.postWebviewVisibleForKnownPanes();
-        }
-      }
-    });
-  }
-
-  private async revealSidebarView(): Promise<void> {
-    try {
-      await vscode.commands.executeCommand(
-        "workbench.view.extension.ai-sidebar-terminalContainer",
-      );
-    } catch {
-      // intentionally empty: sidebar reveal is best-effort
-    }
-
-    this._view?.show?.(true);
-    this.postWebviewMessage({
-      type: "focusTerminal",
-      paneId: this.getFocusedPaneId(),
-    });
-  }
-
   private postTerminalConfig(): void {
     const terminalConfig = this.getTerminalConfig();
     this.postWebviewMessage({
@@ -962,46 +678,6 @@ export class TerminalProvider
       )
       .toString();
     const nonce = this.getNonce();
-    const layoutCssUri = webview
-      .asWebviewUri(
-        vscode.Uri.joinPath(
-          this.context.extensionUri,
-          "dist",
-          "layout",
-          "layout-engine.css",
-        ),
-      )
-      .toString();
-    const tabBarCssUri = webview
-      .asWebviewUri(
-        vscode.Uri.joinPath(
-          this.context.extensionUri,
-          "dist",
-          "tab-bar",
-          "tab-bar.css",
-        ),
-      )
-      .toString();
-    const paneActionsCssUri = webview
-      .asWebviewUri(
-        vscode.Uri.joinPath(
-          this.context.extensionUri,
-          "dist",
-          "pane-actions",
-          "pane-actions.css",
-        ),
-      )
-      .toString();
-    const focusManagerCssUri = webview
-      .asWebviewUri(
-        vscode.Uri.joinPath(
-          this.context.extensionUri,
-          "dist",
-          "focus",
-          "focus-manager.css",
-        ),
-      )
-      .toString();
 
     const terminalConfig = this.getTerminalConfig();
 
@@ -1018,71 +694,7 @@ export class TerminalProvider
       sendKeybindingsToShell: String(terminalConfig.sendKeybindingsToShell),
     });
 
-    const multiPaneCssLinks = [
-      layoutCssUri,
-      tabBarCssUri,
-      paneActionsCssUri,
-      focusManagerCssUri,
-    ]
-      .map((uri) => `<link rel="stylesheet" href="${uri}" />`)
-      .join("\n    ");
-    const bootstrapScript = `<script nonce="${nonce}">(() => {\n  const container = document.getElementById("terminal-container");\n  if (!container) {\n    return;\n  }\n\n  if (!document.getElementById("terminal-layout-root")) {\n    const root = document.createElement("div");\n    root.id = "terminal-layout-root";\n    root.className = "layout-root";\n    root.dataset.defaultPaneId = "${TerminalProvider.DEFAULT_PANE_ID}";\n    container.parentElement?.insertBefore(root, container);\n    root.appendChild(container);\n  }\n\n  document.body.dataset.multiPaneBootstrap = "enabled";\n  window.__OPENCODE_TUI_MULTI_PANE__ = Object.freeze({\n    defaultPaneId: "${TerminalProvider.DEFAULT_PANE_ID}",\n    components: [\n      "PaneManager",\n      "PaneMessageRouter",\n      "LayoutEngine",\n      "TabBar",\n      "PaneActions",\n      "FocusManager"\n    ]\n  });\n})();</script>`;
-
-    return html
-      .replace("</head>", `    ${multiPaneCssLinks}\n  </head>`)
-      .replace(
-        `<script nonce="${nonce}" src="${scriptUri}"></script>`,
-        `${bootstrapScript}\n    <script nonce="${nonce}" src="${scriptUri}"></script>`,
-      );
-  }
-
-  private ensureDefaultPaneState(): void {
-    if (this.paneStore.getPane(TerminalProvider.DEFAULT_PANE_ID)) {
-      return;
-    }
-
-    this.paneStore.addPane({
-      paneId: TerminalProvider.DEFAULT_PANE_ID,
-      tabId: TerminalProvider.DEFAULT_TAB_ID,
-      isActive: true,
-      size: 100,
-    });
-    this.dataThrottleService.setFocusedPane(TerminalProvider.DEFAULT_PANE_ID);
-  }
-
-  private getKnownPaneIds(): string[] {
-    const paneIds = Array.from(this.paneStore.getAllPanes().keys());
-    return paneIds.length > 0 ? paneIds : [TerminalProvider.DEFAULT_PANE_ID];
-  }
-
-  private getFocusedPaneId(): string {
-    return this.paneStore.getActivePane()?.paneId ?? TerminalProvider.DEFAULT_PANE_ID;
-  }
-
-  private setFocusedPane(paneId: string): void {
-    const normalizedPaneId = this.normalizePaneId(paneId);
-    if (this.paneStore.getPane(normalizedPaneId)) {
-      this.paneStore.setActivePane(normalizedPaneId);
-    }
-    this.dataThrottleService.setFocusedPane(normalizedPaneId);
-  }
-
-  private resolveNextPaneId(): string {
-    const nextPaneId = this.paneStore.getActivePane()?.paneId;
-    if (nextPaneId) {
-      return nextPaneId;
-    }
-
-    const firstRemainingPaneId = this.paneStore.getAllPanes().keys().next().value as
-      | string
-      | undefined;
-    if (firstRemainingPaneId) {
-      this.paneStore.setActivePane(firstRemainingPaneId);
-      return firstRemainingPaneId;
-    }
-
-    this.ensureDefaultPaneState();
-    return TerminalProvider.DEFAULT_PANE_ID;
+    return html;
   }
 
   private getNonce(): string {
@@ -1095,9 +707,64 @@ export class TerminalProvider
     return text;
   }
 
+  private getEditorPanelOptions(): vscode.WebviewOptions &
+    vscode.WebviewPanelOptions {
+    return {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+      localResourceRoots: [this.context.extensionUri],
+    };
+  }
+
+  private initializeEditorPanel(panel: vscode.WebviewPanel): void {
+    this._panel = panel;
+    panel.webview.options = this.getEditorPanelOptions();
+    panel.webview.html = this.getHtmlForWebview(panel.webview);
+
+    const processAlive = this.sessionRuntime.hasLiveTerminalProcess();
+    if (this.sessionRuntime.isStartedFlag() && !processAlive) {
+      this.sessionRuntime.resetState();
+    }
+
+    panel.webview.onDidReceiveMessage((message) => {
+      this.handleMessage(message);
+    });
+
+    if (processAlive) {
+      this.sessionRuntime.reconnectListeners();
+    }
+
+    this.postTerminalConfig();
+    this.postCurrentSessionState(panel.webview);
+    this.flushPendingWebviewMessages(panel.webview);
+
+    panel.onDidDispose(() => {
+      if (this._panel === panel) {
+        this._panel = undefined;
+        if (this._view) {
+          this.postTerminalConfig();
+        }
+      }
+    });
+  }
+
+  private async revealSidebarView(): Promise<void> {
+    try {
+      await vscode.commands.executeCommand(
+        "workbench.view.extension.ai-sidebar-terminalContainer",
+      );
+    } catch {
+      // intentionally empty: sidebar reveal is best-effort
+    }
+
+    this._view?.show?.(true);
+    this.postWebviewMessage({
+      type: "focusTerminal",
+    });
+  }
+
   public dispose(): void {
     this.dataThrottleService.dispose();
-    this.paneStore.dispose();
     this.sessionRuntime.dispose();
   }
 }

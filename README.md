@@ -11,7 +11,7 @@ Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi 
 - **Auto-launch AI Tools**: Automatically start your chosen AI coding agent when the sidebar is activated
 - **Full TUI Support**: Complete terminal emulation with xterm.js and WebGL rendering
 - **Multi-AI Tool Support**: Built-in support for OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, Mimo Code with custom tool configuration
-- **Multi-Pane Layout**: Split the terminal into multiple panes with tabs, powered by xterm.js
+- **Single-Terminal**: Focused single-terminal experience with session/instance switching
 - **Pill Dropdown Toolbar**: Unified pill-style dropdowns for quick AI tool switching
 - **HTTP API Integration**: Bidirectional communication with OpenCode CLI via HTTP API
 - **Auto-Context Sharing**: Automatically shares editor context when terminal opens
@@ -202,16 +202,6 @@ Available settings in VS Code settings (`Cmd+,` / `Ctrl+,`):
 | `ai-sidebar-terminal.logLevel`                | string | `"info"`                | Log level: `debug`, `info`, `warn`, `error`      |
 | `ai-sidebar-terminal.maxDiagnosticLength`     | number | `500`                   | Maximum length of diagnostic messages (100-2000) |
 | `ai-sidebar-terminal.codeActionSeverities`    | array  | `["error", "warning"]`  | Diagnostic severities that trigger code actions  |
-| `ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen` | boolean | `true`        | Close secondary sidebar when opening editor tab  |
-
-### Pane Settings
-
-| Setting                                       | Type    | Default      | Description                                          |
-| --------------------------------------------- | ------- | ------------ | ---------------------------------------------------- |
-| `ai-sidebar-terminal.pane.defaultSplitDirection` | string  | `"horizontal"` | Default split direction (horizontal / vertical)   |
-| `ai-sidebar-terminal.pane.focusOnClick`       | boolean | `true`       | Focus a pane when clicking on it                     |
-| `ai-sidebar-terminal.pane.showPaneActions`    | boolean | `true`       | Show pane action buttons (split, close)              |
-| `ai-sidebar-terminal.pane.renderer`           | string  | `"auto"`     | Renderer: `webgl`, `canvas`, or `auto`               |
 
 ### Example Configuration
 
@@ -278,8 +268,7 @@ src/
 │   ├── PortManager.ts                  # Ephemeral port allocation
 │   ├── NativeTerminalManager.ts         # Native terminal backend
 │   ├── terminalBackends.ts              # Backend registry
-│   ├── PaneStore.ts                     # Pane state management
-│   ├── DataThrottleService.ts           # Batched pane data delivery
+│   ├── DataThrottleService.ts           # Batched terminal data delivery
 │   ├── ContextManager.ts               # Active editor/selection observer
 │   ├── ContextSharingService.ts        # @file#L context formatter
 │   ├── FileReferenceManager.ts         # File reference serialization
@@ -289,16 +278,14 @@ src/
 │   └── aiTools/                        # AI tool operator system
 ├── webview/
 │   ├── main.ts                         # Terminal bootstrap (xterm.js + WebGL)
-│   ├── pane-manager.ts                 # Multi-pane lifecycle
-│   ├── pane-message-router.ts          # Pane message routing
-│   ├── layout/                         # Layout engine (multi-pane)
-│   ├── tab-bar/                        # Tab bar UI
-│   ├── pane-actions/                   # Pane action buttons
-│   ├── focus/                          # Focus management
-│   ├── toolbar/                        # Toolbar buttons
+│   ├── terminal-manager.ts             # Terminal instance & drag/drop manager
+│   ├── terminal/                       # Terminal container, keyboard, config
+│   ├── toolbar/                        # Toolbar buttons & pills
 │   ├── clipboard/                      # Clipboard handling
-│   ├── terminal/                       # Terminal container, keyboard, AI selector
-│   └── messages/                       # Host message handling
+│   ├── messages/                       # Host message handling
+│   ├── links/                          # Link handling
+│   ├── dragdrop/                       # Drag & drop handling
+│   └── shared/                         # Shared utilities
 ├── utils/
 └── test/mocks/
     ├── vscode.ts                       # VS Code API mock

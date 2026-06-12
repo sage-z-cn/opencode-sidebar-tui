@@ -61,11 +61,6 @@ describe("ExtensionLifecycle", () => {
           webviewOptions: { retainContextWhenHidden: true },
         }),
       );
-
-      expect(vscode.window.registerWebviewPanelSerializer).toHaveBeenCalledWith(
-        "ai-sidebar-terminal.terminalEditor",
-        expect.any(Object),
-      );
     });
 
     it("should swallow duplicate webview provider registration races", async () => {

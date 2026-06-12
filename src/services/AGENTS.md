@@ -2,7 +2,7 @@
 
 ## Scope
 
-- `src/services` is the stateful backend: instance store/persistence/discovery/control, HTTP client, ports, native terminal backend plans, pane state, throttling, AI tool operators, context/file references, logging, and output capture.
+- `src/services` is the stateful backend: instance store/persistence/discovery/control, HTTP client, ports, native terminal backend plans, throttling, AI tool operators, context/file references, logging, and output capture.
 - The only backend type is `"native"`. There are no external multiplexer managers, pane sync services, or dashboard services in the current tree.
 
 ## Instance Layer
@@ -14,12 +14,11 @@
 - `ConnectionResolver` is the stored/discovered/spawn resolution path for HTTP ports; do not duplicate that fallback chain elsewhere.
 - `InstanceQuickPick` is the user-facing session switcher: selecting an item calls `InstanceStore.setActive()`, which drives provider/session switching.
 
-## Multi-Terminal State
+## Single-Terminal State
 
 - Active instance switching is store-driven; do not keep a separate active instance cache outside `InstanceStore`/`SessionRuntime`.
-- Per-pane terminal state is split: extension-host pane metadata is `PaneStore`, running sessions are `SessionRuntime.sessions`, and browser xterm instances are `webview/PaneManager`.
-- Default session ids differ from pane sessions: default uses the active instance id as terminal key; non-default panes use `paneId` as terminal key and `${activeInstanceId}::${paneId}` as instance id.
-- `DataThrottleService` batches pane output and tracks the focused pane; update focus before flushing output on pane/tab changes.
+- `SessionRuntime` manages a single terminal session with one terminal key.
+- `DataThrottleService` batches terminal output for smooth rendering.
 - `NativeTerminalManager.create()` returns a `BackendLaunchPlan` for persisted restore metadata, but backend availability currently resolves to `native` in `terminalBackends.ts`.
 
 ## Ports And Logging

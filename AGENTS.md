@@ -22,20 +22,18 @@
 - `npm run test:e2e` runs `pretest:e2e` (`compile` + `compile:e2e`) then `vscode-test`.
 - `scripts/check-l10n.js` checks missing/extra `l10n.t()` keys but is not wired into package scripts.
 
-## Multi-Terminal Model
+## Single-Terminal Model
 
-- There are two switching layers: session/instance switching in the extension host, and tab/pane switching inside the webview.
+- Session/instance switching is handled in the extension host via `InstanceQuickPick`, `InstanceStore`, and `SessionRuntime`.
 - Instance switching: `InstanceQuickPick` calls `InstanceStore.setActive()`, `SessionRuntime` subscribes via `onDidSetActive`, and `TerminalProvider.switchToInstance()` reconnects to an existing terminal or force-restarts the selected AI tool.
-- Pane switching: `TabBar` hides panes from the old tab and shows panes for the new tab; `PaneMessageRouter` carries the focused `paneId` on webview messages.
-- `TerminalProvider` handles `paneCreate`, `paneDelete`, and non-default `ready` before delegating normal messages to `MessageRouter`.
-- `SessionRuntime.sessions` maps `paneId -> { instanceId, terminalKey, port, backend }`; the default pane uses the active instance id as terminal key, while non-default panes use `paneId` as terminal key and `${activeInstanceId}::${paneId}` as instance id.
-- Terminal output is throttled per pane through `DataThrottleService`; focus changes must update both `PaneStore` and the throttle focused pane.
+- `SessionRuntime` manages a single terminal session; there is no multi-pane or tab switching in the webview.
+- Terminal output is throttled through `DataThrottleService` for smooth rendering.
 
 ## Architecture Constraints
 
 - `ExtensionLifecycle` creates services/providers/code actions and delegates command registration to `src/core/commands`; do not register commands directly in providers.
 - Providers bridge VS Code/webview actions to services. Keep terminal state, discovery, ports, and process lifecycle in services or `SessionRuntime`, not ad hoc provider state.
-- `TerminalProvider` owns webview lifecycle/HTML/pane host glue, `MessageRouter` owns message dispatch, and `SessionRuntime` owns process/session start, restart, reconnect, and instance switching.
+- `TerminalProvider` owns webview lifecycle and HTML, `MessageRouter` owns message dispatch, and `SessionRuntime` owns process/session start, restart, reconnect, and instance switching.
 - Instance state should flow through `InstanceStore`; avoid parallel caches for active instances or discovered processes.
 - Use `PortManager.getInstance(...)` / `portManager` for ports; OpenCode HTTP discovery uses ephemeral range `16384-65535`.
 - Use `OutputChannelService.getInstance()`; tests can reset through the provided reset path. Do not instantiate `OutputChannelService` directly.
@@ -45,7 +43,7 @@
 
 - `src/webview` is browser-only: no `fs`, `path`, `os`, child processes, or VS Code extension-host APIs.
 - Host communication must use `WebviewMessage` / `HostMessage` from `src/types.ts`.
-- xterm sizing is timing-sensitive; keep the existing visible-pane-only `fit()` behavior and avoid fitting hidden panes.
+- xterm sizing is timing-sensitive; fit after fonts are ready and after terminal becomes visible; avoid fitting hidden DOM nodes.
 - Webpack currently has one webview entry: `src/webview/main.ts`; do not assume a second webview bundle unless you add a new entry to `webpack.config.js`.
 
 ## Packaging Notes

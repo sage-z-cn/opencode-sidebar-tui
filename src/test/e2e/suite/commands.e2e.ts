@@ -19,8 +19,6 @@ suite("Command registration", () => {
 
     assert.ok(commands.includes("ai-sidebar-terminal.start"));
     assert.ok(commands.includes("ai-sidebar-terminal.focus"));
-    assert.ok(commands.includes("ai-sidebar-terminal.openTerminalInEditor"));
-    assert.ok(commands.includes("ai-sidebar-terminal.restoreTerminalToSidebar"));
   });
 
   test("registers focus command without relying on internal workbench commands", async () => {

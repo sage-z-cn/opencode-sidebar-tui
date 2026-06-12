@@ -1,12 +1,10 @@
-export type DataThrottleBatchItem = {
-  paneId: string;
+
+export interface DataThrottleBatchItem {
   data: string;
-};
+}
 
 export class DataThrottleService {
-  private buffers = new Map<string, string[]>();
-
-  private focusedPaneId: string | null = null;
+  private buffer: string[] = [];
 
   private timerId: ReturnType<typeof setTimeout> | null = null;
 
@@ -16,32 +14,16 @@ export class DataThrottleService {
     private readonly onBatch: (batch: Array<DataThrottleBatchItem>) => void,
   ) {}
 
-  push(paneId: string, data: string): void {
+  push(data: string): void {
     if (this.disposed) {
       return;
     }
 
-    if (this.focusedPaneId === paneId) {
-      this.deliver([{ paneId, data }]);
-      return;
-    }
-
-    const existing = this.buffers.get(paneId);
-    if (existing) {
-      existing.push(data);
-    } else {
-      this.buffers.set(paneId, [data]);
-    }
-
-    this.scheduleFlush();
-  }
-
-  setFocusedPane(paneId: string): void {
-    if (this.disposed) {
-      return;
-    }
-
-    this.focusedPaneId = paneId;
+    // Single-terminal model: the only terminal is always "focused",
+    // so deliver data immediately rather than buffering for 16ms.
+    // This eliminates input echo latency from the host.
+    this.buffer.push(data);
+    this.flush();
   }
 
   flush(): void {
@@ -54,12 +36,14 @@ export class DataThrottleService {
       this.timerId = null;
     }
 
-    const batch = this.takeBufferedBatch();
-    if (batch.length === 0) {
+    const combined = this.buffer.join("");
+    this.buffer = [];
+
+    if (combined.length === 0) {
       return;
     }
 
-    this.deliver(batch);
+    this.deliver([{ data: combined }]);
   }
 
   dispose(): void {
@@ -68,8 +52,7 @@ export class DataThrottleService {
     }
 
     this.disposed = true;
-    this.focusedPaneId = null;
-    this.buffers.clear();
+    this.buffer = [];
 
     if (this.timerId !== null) {
       clearTimeout(this.timerId);
@@ -86,21 +69,6 @@ export class DataThrottleService {
       this.timerId = null;
       this.flush();
     }, 16);
-  }
-
-  private takeBufferedBatch(): DataThrottleBatchItem[] {
-    const batch: DataThrottleBatchItem[] = [];
-
-    for (const [paneId, chunks] of this.buffers.entries()) {
-      if (chunks.length === 0) {
-        continue;
-      }
-
-      batch.push({ paneId, data: chunks.join("") });
-    }
-
-    this.buffers.clear();
-    return batch;
   }
 
   private deliver(batch: DataThrottleBatchItem[]): void {

@@ -1,3 +1,4 @@
+
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -28,6 +29,7 @@ export interface MessageRouterProviderBridge {
   restart(): void;
   openSettings(): void;
   openKeyboardShortcuts(): void;
+  toggleEditorAttachment(): Promise<void>;
   pasteText(text: string): void;
   getActiveInstanceId(): InstanceId;
   getActiveTerminalId(): string;
@@ -42,19 +44,15 @@ export interface MessageRouterProviderBridge {
     sessionId: string,
     toolName: string,
     savePreference: boolean,
-    targetPaneId?: string,
   ): Promise<void>;
   showAiToolSelector(
     sessionId: string,
     sessionName: string,
     forceShow?: boolean,
-    targetPaneId?: string,
   ): Promise<void>;
 }
 
 export class MessageRouter {
-  private static readonly DEFAULT_PANE_ID = "default";
-
   public constructor(
     private readonly provider: MessageRouterProviderBridge,
     private readonly context: vscode.ExtensionContext,
@@ -72,16 +70,15 @@ export class MessageRouter {
     }
 
     const message = rawMessage as WebviewMessage;
-    const paneId = this.resolvePaneId(message.paneId);
     switch (message.type) {
       case "terminalInput":
-        this.handleTerminalInput(message.data, paneId);
+        this.handleTerminalInput(message.data);
         break;
       case "terminalResize":
-        this.handleTerminalResize(message.cols, message.rows, paneId);
+        this.handleTerminalResize(message.cols, message.rows);
         break;
       case "ready":
-        this.handleReady(message.cols, message.rows, paneId);
+        this.handleReady(message.cols, message.rows);
         break;
       case "filesDropped":
         await this.handleFilesDropped(
@@ -89,7 +86,6 @@ export class MessageRouter {
           message.shiftKey ?? false,
           message.dropCell,
           message.blobFiles,
-          paneId,
         );
         break;
       case "openUrl":
@@ -128,7 +124,6 @@ export class MessageRouter {
           message.sessionId,
           message.tool,
           message.savePreference,
-          message.targetPaneId,
         );
         break;
       case "requestAiToolSelector": {
@@ -137,6 +132,7 @@ export class MessageRouter {
         break;
       }
       case "toggleEditorAttachment":
+        await this.provider.toggleEditorAttachment();
         break;
       case "requestRestart":
         this.provider.restart();
@@ -152,21 +148,17 @@ export class MessageRouter {
     }
   }
 
-  public handleTerminalInput(
-    data: string | undefined,
-    paneId: string = MessageRouter.DEFAULT_PANE_ID,
-  ): void {
+  public handleTerminalInput(data: string | undefined): void {
     if (typeof data !== "string") {
       return;
     }
 
-    this.terminalManager.writeToTerminal(this.resolveTerminalTarget(paneId), data);
+    this.terminalManager.writeToTerminal(this.provider.getActiveTerminalId(), data);
   }
 
   public handleTerminalResize(
     cols: number | undefined,
     rows: number | undefined,
-    paneId: string = MessageRouter.DEFAULT_PANE_ID,
   ): void {
     if (typeof cols !== "number" || typeof rows !== "number") {
       return;
@@ -174,7 +166,7 @@ export class MessageRouter {
 
     this.provider.setLastKnownTerminalSize(cols, rows);
     this.terminalManager.resizeTerminal(
-      this.resolveTerminalTarget(paneId),
+      this.provider.getActiveTerminalId(),
       cols,
       rows,
     );
@@ -183,7 +175,6 @@ export class MessageRouter {
   public handleReady(
     cols: number | undefined,
     rows: number | undefined,
-    _paneId: string = MessageRouter.DEFAULT_PANE_ID,
   ): void {
     if (typeof cols === "number" && typeof rows === "number") {
       this.provider.setLastKnownTerminalSize(cols, rows);
@@ -221,7 +212,6 @@ export class MessageRouter {
     shiftKey: boolean,
     dropCell?: { col: number; row: number },
     blobFiles?: DroppedBlobFile[],
-    paneId: string = MessageRouter.DEFAULT_PANE_ID,
   ): Promise<void> {
     this.logger.info(
       `[PROVIDER] handleFilesDropped - files: ${JSON.stringify(files)} shiftKey: ${shiftKey} dropCell: ${JSON.stringify(dropCell)}`,
@@ -254,6 +244,8 @@ export class MessageRouter {
       return;
     }
 
+    const terminalId = this.provider.getActiveTerminalId();
+
     if (shiftKey) {
       const fileRefs = this.provider.formatDroppedFiles(
         dedupedFiles.map((file) =>
@@ -263,10 +255,7 @@ export class MessageRouter {
       );
       this.logger.info(`[PROVIDER] Writing with @: ${fileRefs}`);
 
-      this.terminalManager.writeToTerminal(
-        this.resolveTerminalTarget(paneId),
-        fileRefs + " ",
-      );
+      this.terminalManager.writeToTerminal(terminalId, fileRefs + " ");
     } else {
       const filePaths = this.provider.formatDroppedFiles(
         dedupedFiles.map((file) =>
@@ -275,21 +264,8 @@ export class MessageRouter {
         false,
       );
       this.logger.info(`[PROVIDER] Writing without @: ${filePaths}`);
-      this.terminalManager.writeToTerminal(
-        this.resolveTerminalTarget(paneId),
-        filePaths + " ",
-      );
+      this.terminalManager.writeToTerminal(terminalId, filePaths + " ");
     }
-  }
-
-  private resolvePaneId(paneId: string | undefined): string {
-    return paneId ?? MessageRouter.DEFAULT_PANE_ID;
-  }
-
-  private resolveTerminalTarget(paneId: string): string {
-    return paneId === MessageRouter.DEFAULT_PANE_ID
-      ? this.provider.getActiveTerminalId()
-      : paneId;
   }
 
   public async handlePaste(): Promise<void> {

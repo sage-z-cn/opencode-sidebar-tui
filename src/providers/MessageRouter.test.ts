@@ -249,25 +249,23 @@ describe("MessageRouter", () => {
     });
   });
 
-  it("routes terminal input and resize to pane-specific terminal ids", async () => {
+  it("routes terminal input and resize to the active terminal", async () => {
     await router.handleMessage({
       type: "terminalInput",
-      data: "pane text",
-      paneId: "pane-2",
+      data: "term input",
     });
     await router.handleMessage({
       type: "terminalResize",
       cols: 140,
       rows: 50,
-      paneId: "pane-2",
     });
 
     expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-      "pane-2",
-      "pane text",
+      "terminal-1",
+      "term input",
     );
     expect(terminalManager.resizeTerminal).toHaveBeenCalledWith(
-      "pane-2",
+      "terminal-1",
       140,
       50,
     );
@@ -296,10 +294,8 @@ describe("MessageRouter", () => {
       sessionId: "instance-1",
       tool: "claude",
       savePreference: true,
-      targetPaneId: "%1",
     });
     await router.handleMessage({ type: "requestAiToolSelector" });
-    await router.handleMessage({ type: "toggleEditorAttachment" });
     await router.handleMessage({ type: "requestRestart" });
     await router.handleMessage({
       type: "openFile",
@@ -315,7 +311,6 @@ describe("MessageRouter", () => {
       "instance-1",
       "claude",
       true,
-      "%1",
     );
     expect(provider.showAiToolSelector).toHaveBeenCalledWith(
       "instance-1",
@@ -363,21 +358,20 @@ describe("MessageRouter", () => {
     );
   });
 
-  it("routes filesDropped writes to the targeted pane id", async () => {
+  it("routes filesDropped writes to the active terminal id", async () => {
     vi.mocked(vscode.workspace.asRelativePath).mockImplementation(
       (value: string) => value,
     );
 
     await router.handleMessage({
       type: "filesDropped",
-      files: ["/workspace/pane.txt"],
+      files: ["/workspace/file.txt"],
       shiftKey: true,
-      paneId: "pane-7",
     });
 
     expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
-      "pane-7",
-      "@/workspace/pane.txt ",
+      "terminal-1",
+      "@/workspace/file.txt ",
     );
   });
 
@@ -751,8 +745,6 @@ describe("MessageRouter", () => {
     await router.handleMessage({ type: "imagePasted", data: 123 });
     await router.handleMessage({ type: "requestRestart" });
     await router.handleMessage({ type: "unknownMessage" });
-    await router.handleMessage({ type: "paneCreate" });
-    await router.handleMessage({ type: "paneDelete" });
     await router.handleMessage({ type: "openSettings" });
     await router.handleMessage({ type: "openKeyboardShortcuts" });
 

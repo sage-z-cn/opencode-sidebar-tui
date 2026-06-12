@@ -10,8 +10,6 @@
   "command.ai-sidebar-terminal.sendAllOpenFiles.title": "Send All Open File References",
   "command.ai-sidebar-terminal.sendToAiTerminal.title": "Send to AI Terminal",
   "command.ai-sidebar-terminal.paste.title": "Paste",
-  "command.ai-sidebar-terminal.openTerminalInEditor.title": "Open Terminal in Editor",
-  "command.ai-sidebar-terminal.restoreTerminalToSidebar.title": "Restore Terminal to Sidebar",
   "command.category.ai-sidebar-terminal": "AI Sidebar Terminal",
   "configuration.title": "AI Sidebar Terminal",
   "configuration.ai-sidebar-terminal.fontSize.description": "Terminal font size in pixels",
@@ -31,7 +29,6 @@
   "configuration.ai-sidebar-terminal.contextDebounceMs.description": "Debounce delay for context updates (ms)",
   "configuration.ai-sidebar-terminal.maxDiagnosticLength.description": "Maximum length of diagnostic messages",
   "configuration.ai-sidebar-terminal.enableAutoSpawn.description": "Auto-spawn OpenCode if not running",
-  "configuration.ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen.description": "Close the secondary sidebar before moving the terminal into an editor group so the new editor tab gets the full workspace width.",
   "configuration.ai-sidebar-terminal.codeActionSeverities.description": "Diagnostic severities that trigger code actions",
   "configuration.ai-sidebar-terminal.aiTools.description": "Configure AI coding tools. Use Add Item to add new tools, Edit to modify, Delete to remove.",
   "configuration.ai-sidebar-terminal.aiTools.items.name.description": "Unique identifier (e.g. 'opencode', 'claude')",
@@ -41,9 +38,5 @@
   "configuration.ai-sidebar-terminal.aiTools.items.aliases.description": "Alternative names that resolve to this tool",
   "configuration.ai-sidebar-terminal.aiTools.items.operator.description": "Operator ID for tool-specific launch and routing behavior",
   "configuration.ai-sidebar-terminal.defaultAiTool.description": "Name of the default AI tool to launch when creating a new terminal session",
-  "configuration.ai-sidebar-terminal.promptAiToolOnSession.description": "Show the AI tool selector popup when attaching to or creating a new session",
-  "configuration.ai-sidebar-terminal.pane.defaultSplitDirection.description": "Default direction when splitting a terminal pane",
-  "configuration.ai-sidebar-terminal.pane.focusOnClick.description": "Focus a pane when clicking on it",
-  "configuration.ai-sidebar-terminal.pane.showPaneActions.description": "Show pane action buttons (split, close) in the terminal",
-  "configuration.ai-sidebar-terminal.pane.renderer.description": "Terminal renderer: webgl (fast), canvas (fallback), or auto (webgl up to 4 panes, then canvas)"
+  "configuration.ai-sidebar-terminal.promptAiToolOnSession.description": "Show the AI tool selector popup when attaching to or creating a new session"
 }

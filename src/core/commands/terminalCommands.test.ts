@@ -24,8 +24,6 @@ type ProviderMock = Pick<
   | "formatUriReference"
   | "requestPaste"
   | "pasteText"
-  | "openInEditorTab"
-  | "toggleEditorAttachment"
 >;
 
 type OutputChannelMock = Pick<OutputChannelService, "info" | "warn" | "error">;
@@ -38,8 +36,6 @@ function createProviderMock(): ProviderMock {
     formatUriReference: vi.fn((uri) => `@${uri.fsPath}`),
     requestPaste: vi.fn(),
     pasteText: vi.fn(),
-    openInEditorTab: vi.fn(),
-    toggleEditorAttachment: vi.fn(),
   };
 }
 
@@ -124,7 +120,7 @@ describe("registerTerminalCommands", () => {
     vi.useRealTimers();
   });
 
-  it("registers all 9 terminal commands", () => {
+  it("registers all 7 terminal commands", () => {
     const commands = registerAndGetCommands(createDependencies());
 
     expect(Array.from(commands.keys())).toEqual(
@@ -136,11 +132,9 @@ describe("registerTerminalCommands", () => {
         "ai-sidebar-terminal.sendToAiTerminal",
         "ai-sidebar-terminal.paste",
         "ai-sidebar-terminal.focus",
-        "ai-sidebar-terminal.openTerminalInEditor",
-        "ai-sidebar-terminal.restoreTerminalToSidebar",
       ]),
     );
-    expect(commands.size).toBe(9);
+    expect(commands.size).toBe(7);
   });
 
   it("starts OpenCode from the start command", () => {
@@ -506,22 +500,6 @@ describe("registerTerminalCommands", () => {
     expect(stringErrorDeps.outputChannel?.error).toHaveBeenCalledWith(
       "[TerminalProvider] Failed to paste: paste failed",
     );
-  });
-
-  it("focuses the sidebar, opens the terminal in an editor tab, and restores it to the sidebar", () => {
-    const deps = createDependencies();
-    const commands = registerAndGetCommands(deps);
-
-    getCommand(commands, "ai-sidebar-terminal.focus")();
-    getCommand(commands, "ai-sidebar-terminal.openTerminalInEditor")();
-    getCommand(commands, "ai-sidebar-terminal.restoreTerminalToSidebar")();
-
-    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "workbench.view.focus",
-      "ai-sidebar-terminal-view",
-    );
-    expect(deps.provider?.openInEditorTab).toHaveBeenCalledTimes(1);
-    expect(deps.provider?.toggleEditorAttachment).toHaveBeenCalledTimes(1);
   });
 
   it("returns the executeCommand promise from ai-sidebar-terminal.focus", () => {

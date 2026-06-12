@@ -10,8 +10,6 @@
   "command.ai-sidebar-terminal.sendAllOpenFiles.title": "发送所有打开的文件引用",
   "command.ai-sidebar-terminal.sendToAiTerminal.title": "发送到 AI 终端",
   "command.ai-sidebar-terminal.paste.title": "粘贴",
-  "command.ai-sidebar-terminal.openTerminalInEditor.title": "在编辑器中打开终端",
-  "command.ai-sidebar-terminal.restoreTerminalToSidebar.title": "将终端恢复到侧边栏",
   "command.category.ai-sidebar-terminal": "AI Sidebar Terminal",
   "configuration.title": "AI Sidebar Terminal",
   "configuration.ai-sidebar-terminal.fontSize.description": "终端字体大小（像素）",
@@ -31,7 +29,6 @@
   "configuration.ai-sidebar-terminal.contextDebounceMs.description": "上下文更新的防抖延迟（毫秒）",
   "configuration.ai-sidebar-terminal.maxDiagnosticLength.description": "诊断消息的最大长度",
   "configuration.ai-sidebar-terminal.enableAutoSpawn.description": "OpenCode 未运行时自动启动",
-  "configuration.ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen.description": "将终端移入编辑器组之前关闭辅助侧边栏，以便新的编辑器标签页获得完整的工作区宽度。",
   "configuration.ai-sidebar-terminal.codeActionSeverities.description": "触发代码操作的诊断严重级别",
   "configuration.ai-sidebar-terminal.aiTools.description": "配置 AI 编码工具。使用'添加项'添加新工具，'编辑'修改，'删除'移除。",
   "configuration.ai-sidebar-terminal.aiTools.items.name.description": "唯一标识符（例如 'opencode'、'claude'）",
@@ -41,9 +38,5 @@
   "configuration.ai-sidebar-terminal.aiTools.items.aliases.description": "可解析为此工具的备用名称",
   "configuration.ai-sidebar-terminal.aiTools.items.operator.description": "用于工具特定启动和路由行为的操作符 ID",
   "configuration.ai-sidebar-terminal.defaultAiTool.description": "创建新终端会话时启动的默认 AI 工具名称",
-  "configuration.ai-sidebar-terminal.promptAiToolOnSession.description": "在附加到或创建新会话时显示 AI 工具选择器弹窗",
-  "configuration.ai-sidebar-terminal.pane.defaultSplitDirection.description": "分割终端窗格时的默认方向",
-  "configuration.ai-sidebar-terminal.pane.focusOnClick.description": "点击窗格时聚焦该窗格",
-  "configuration.ai-sidebar-terminal.pane.showPaneActions.description": "在终端中显示窗格操作按钮（分割、关闭）",
-  "configuration.ai-sidebar-terminal.pane.renderer.description": "终端渲染器：webgl（快速）、canvas（备用）或 auto（最多 4 个窗格使用 webgl，之后使用 canvas）"
+  "configuration.ai-sidebar-terminal.promptAiToolOnSession.description": "在附加到或创建新会话时显示 AI 工具选择器弹窗"
 }
