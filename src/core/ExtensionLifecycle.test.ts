@@ -1,15 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ExtensionLifecycle } from "./ExtensionLifecycle";
-import { TerminalDashboardProvider } from "../providers/TerminalDashboardProvider";
 import { OutputCaptureManager } from "../services/OutputCaptureManager";
 import { OutputChannelService } from "../services/OutputChannelService";
 import { InstanceRegistry } from "../services/InstanceRegistry";
 import { InstanceStore } from "../services/InstanceStore";
 import { OpenCodeApiClient } from "../services/OpenCodeApiClient";
-import { TmuxSessionManager } from "../services/TmuxSessionManager";
-import { ZellijSessionManager } from "../services/ZellijSessionManager";
-import { TmuxPaneSyncService } from "../services/TmuxPaneSyncService";
-import { ZellijPaneSyncService } from "../services/ZellijPaneSyncService";
 import type * as vscodeTypes from "../test/mocks/vscode";
 
 const vscode = await vi.importActual<typeof vscodeTypes>(
@@ -45,9 +40,6 @@ describe("ExtensionLifecycle", () => {
     vi.clearAllMocks();
     vi.useRealTimers();
     OutputChannelService.resetInstance();
-    vi.spyOn(TmuxSessionManager.prototype, "isAvailable").mockResolvedValue(
-      true,
-    );
     lifecycle = new ExtensionLifecycle();
     mockContext = new vscode.ExtensionContext();
   });
@@ -70,52 +62,9 @@ describe("ExtensionLifecycle", () => {
         }),
       );
 
-      expect(vscode.commands.registerCommand).toHaveBeenCalledWith(
-        "ai-sidebar-terminal.openTerminalManager",
-        expect.any(Function),
-      );
       expect(vscode.window.registerWebviewPanelSerializer).toHaveBeenCalledWith(
         "ai-sidebar-terminal.terminalEditor",
         expect.any(Object),
-      );
-    });
-
-    it("should skip tmux dashboard registration when tmux is unavailable", async () => {
-      vi.spyOn(TmuxSessionManager.prototype, "isAvailable").mockResolvedValue(
-        false,
-      );
-
-      await lifecycle.activate(mockContext);
-
-      expect(vscode.window.registerWebviewViewProvider).toHaveBeenCalledWith(
-        "ai-sidebar-terminal-view",
-        expect.any(Object),
-        expect.objectContaining({
-          webviewOptions: { retainContextWhenHidden: true },
-        }),
-      );
-      expect(
-        vscode.window.registerWebviewViewProvider,
-      ).not.toHaveBeenCalledWith("ai-sidebar-terminal.tmuxSessions", expect.anything());
-    });
-
-    it("should log unavailable terminal backends and continue activation", async () => {
-      vi.spyOn(TmuxSessionManager.prototype, "isAvailable").mockResolvedValue(
-        false,
-      );
-      vi.spyOn(ZellijSessionManager.prototype, "isAvailable").mockResolvedValue(
-        false,
-      );
-
-      await lifecycle.activate(mockContext);
-
-      const outputChannel = vi.mocked(vscode.window.createOutputChannel).mock
-        .results[0].value;
-      expect(outputChannel.info).toHaveBeenCalledWith(
-        expect.stringContaining("tmux not detected"),
-      );
-      expect(outputChannel.info).toHaveBeenCalledWith(
-        expect.stringContaining("zellij not detected"),
       );
     });
 
@@ -159,29 +108,6 @@ describe("ExtensionLifecycle", () => {
       );
       expect(vscode.window.registerWebviewViewProvider).toHaveBeenCalledTimes(
         registrationCount,
-      );
-    });
-
-    it("should register zellij as available when detected", async () => {
-      vi.spyOn(ZellijSessionManager.prototype, "isAvailable").mockResolvedValue(
-        true,
-      );
-
-      await lifecycle.activate(mockContext);
-
-      expect(Reflect.get(lifecycle, "zellijSessionManager")).toBeInstanceOf(
-        ZellijSessionManager,
-      );
-    });
-
-    it("should initialize pane sync services and pass them to TerminalProvider", async () => {
-      await lifecycle.activate(mockContext);
-
-      expect(Reflect.get(lifecycle, "tmuxPaneSyncService")).toBeInstanceOf(
-        TmuxPaneSyncService,
-      );
-      expect(Reflect.get(lifecycle, "zellijPaneSyncService")).toBeInstanceOf(
-        ZellijPaneSyncService,
       );
     });
 
@@ -257,36 +183,6 @@ describe("ExtensionLifecycle", () => {
       expect(cleanupSpy).toHaveBeenCalledWith(terminal);
     });
 
-    it("should log native shell fallback when tmux is unavailable", async () => {
-      vi.spyOn(TmuxSessionManager.prototype, "isAvailable").mockResolvedValue(
-        false,
-      );
-
-      await lifecycle.activate(mockContext);
-
-      const outputChannel = vi.mocked(vscode.window.createOutputChannel).mock
-        .results[0].value;
-      expect(outputChannel.info).toHaveBeenCalledWith(
-        expect.stringContaining("tmux not detected"),
-      );
-    });
-
-    it("should open the terminal dashboard through the registered command", async () => {
-      const showSpy = vi
-        .spyOn(TerminalDashboardProvider.prototype, "show")
-        .mockImplementation(() => undefined);
-
-      await lifecycle.activate(mockContext);
-
-      const openTerminalManager = getRegisteredCommandHandler<() => void>(
-        "ai-sidebar-terminal.openTerminalManager",
-      );
-
-      openTerminalManager();
-
-      expect(showSpy).toHaveBeenCalledTimes(1);
-    });
-
     it("should handle activation errors", async () => {
       vi.mocked(vscode.window.registerWebviewViewProvider).mockImplementation(
         () => {
@@ -339,19 +235,13 @@ describe("ExtensionLifecycle", () => {
     });
 
     it("should dispose all initialized collaborators and clear references", async () => {
-      const promptKillSpy = vi
-        .spyOn(lifecycle as any, "promptKillTmuxSessions")
-        .mockResolvedValue(undefined);
       const logger = { info: vi.fn(), dispose: vi.fn() };
       const tuiProvider = { dispose: vi.fn() };
       const terminalManager = { dispose: vi.fn() };
       const contextManager = { dispose: vi.fn() };
       const instanceDiscoveryService = { dispose: vi.fn() };
       const instanceRegistry = { dispose: vi.fn() };
-      const terminalDashboardProvider = { dispose: vi.fn() };
       const tuiProviderRegistration = { dispose: vi.fn() };
-      const tmuxPaneSyncService = { dispose: vi.fn() };
-      const zellijPaneSyncService = { dispose: vi.fn() };
 
       Reflect.set(lifecycle, "outputChannelService", logger);
       Reflect.set(lifecycle, "tuiProvider", tuiProvider);
@@ -364,28 +254,17 @@ describe("ExtensionLifecycle", () => {
       );
       Reflect.set(lifecycle, "instanceRegistry", instanceRegistry);
       Reflect.set(lifecycle, "instanceStore", new InstanceStore());
-      Reflect.set(
-        lifecycle,
-        "terminalDashboardProvider",
-        terminalDashboardProvider,
-      );
       Reflect.set(lifecycle, "tuiProviderRegistration", tuiProviderRegistration);
-      Reflect.set(lifecycle, "tmuxPaneSyncService", tmuxPaneSyncService);
-      Reflect.set(lifecycle, "zellijPaneSyncService", zellijPaneSyncService);
 
       await lifecycle.deactivate();
 
-      expect(promptKillSpy).toHaveBeenCalledTimes(1);
       expect(tuiProvider.dispose).toHaveBeenCalledTimes(1);
       expect(terminalManager.dispose).toHaveBeenCalledTimes(1);
       expect(logger.dispose).toHaveBeenCalledTimes(1);
       expect(contextManager.dispose).toHaveBeenCalledTimes(1);
       expect(instanceDiscoveryService.dispose).toHaveBeenCalledTimes(1);
       expect(instanceRegistry.dispose).toHaveBeenCalledTimes(1);
-      expect(terminalDashboardProvider.dispose).toHaveBeenCalledTimes(1);
       expect(tuiProviderRegistration.dispose).toHaveBeenCalledTimes(1);
-      expect(tmuxPaneSyncService.dispose).toHaveBeenCalledTimes(1);
-      expect(zellijPaneSyncService.dispose).toHaveBeenCalledTimes(1);
       expect(Reflect.get(lifecycle, "tuiProvider")).toBeUndefined();
       expect(Reflect.get(lifecycle, "terminalManager")).toBeUndefined();
       expect(Reflect.get(lifecycle, "outputChannelService")).toBeUndefined();
@@ -395,10 +274,7 @@ describe("ExtensionLifecycle", () => {
       ).toBeUndefined();
       expect(Reflect.get(lifecycle, "instanceRegistry")).toBeUndefined();
       expect(Reflect.get(lifecycle, "instanceStore")).toBeUndefined();
-      expect(Reflect.get(lifecycle, "terminalDashboardProvider")).toBeUndefined();
       expect(Reflect.get(lifecycle, "tuiProviderRegistration")).toBeUndefined();
-      expect(Reflect.get(lifecycle, "tmuxPaneSyncService")).toBeUndefined();
-      expect(Reflect.get(lifecycle, "zellijPaneSyncService")).toBeUndefined();
       expect(logger.info).toHaveBeenLastCalledWith(
         "AI Sidebar Terminal deactivated",
       );
@@ -408,11 +284,6 @@ describe("ExtensionLifecycle", () => {
   describe("private helpers", () => {
     it("should expose live command dependencies and helper closures", async () => {
       const provider = { sendPrompt: vi.fn().mockResolvedValue(undefined) };
-      const tmuxSessionManager = { kind: "tmux" };
-      const zellijSessionManager = { kind: "zellij" };
-      const focusTmuxManager = {
-        getActiveFocus: vi.fn().mockResolvedValue({ paneId: "%1" }),
-      };
       const terminalManager = { kind: "terminal" };
       const contextSharingService = { kind: "share" };
       const contextManager = { kind: "context" };
@@ -426,13 +297,8 @@ describe("ExtensionLifecycle", () => {
       const sendTerminalCwdSpy = vi
         .spyOn(lifecycle as any, "sendTerminalCwd")
         .mockImplementation(() => undefined);
-      const resolveActiveTmuxSessionIdSpy = vi
-        .spyOn(lifecycle as any, "resolveActiveTmuxSessionId")
-        .mockReturnValue("tmux-42");
 
       Reflect.set(lifecycle, "tuiProvider", provider);
-      Reflect.set(lifecycle, "tmuxSessionManager", tmuxSessionManager);
-      Reflect.set(lifecycle, "zellijSessionManager", zellijSessionManager);
       Reflect.set(lifecycle, "terminalManager", terminalManager);
       Reflect.set(lifecycle, "contextSharingService", contextSharingService);
       Reflect.set(lifecycle, "contextManager", contextManager);
@@ -444,46 +310,26 @@ describe("ExtensionLifecycle", () => {
       const deps = (lifecycle as any).getCommandDependencies();
 
       expect(deps.provider).toBe(provider);
-      expect(deps.tmuxManager).toBe(tmuxSessionManager);
-      expect(deps.zellijManager).toBe(zellijSessionManager);
       expect(deps.terminalManager).toBe(terminalManager);
       expect(deps.contextSharingService).toBe(contextSharingService);
       expect(deps.contextManager).toBe(contextManager);
-      expect(deps.instanceStore).toBe(instanceStore);
-      expect(deps.instanceController).toBe(instanceController);
-      expect(deps.instanceQuickPick).toBe(instanceQuickPick);
       expect(deps.outputChannel).toBe(outputChannelService);
       expect(deps.getActiveTerminalId()).toBe("terminal-42");
       deps.sendTerminalCwd();
       await deps.sendPrompt("hello");
-      expect(deps.resolveActiveTmuxSessionId()).toBe("tmux-42");
-      Reflect.set(lifecycle, "tmuxSessionManager", focusTmuxManager);
-      await expect(deps.resolveActiveTmuxFocus()).resolves.toEqual({
-        paneId: "%1",
-      });
-      Reflect.set(lifecycle, "tmuxSessionManager", undefined);
-      await expect(deps.resolveActiveTmuxFocus()).resolves.toBeUndefined();
       Reflect.set(lifecycle, "tuiProvider", undefined);
       await expect(deps.sendPrompt("without provider")).resolves.toBeUndefined();
-      vscode.workspace.workspaceFolders = [
-        { uri: { fsPath: "/repo" } },
-      ] as never;
-      expect(deps.resolveWorkspacePath()).toBe("/repo");
-      vscode.workspace.workspaceFolders = undefined;
-      expect(deps.resolveWorkspacePath()).toBeUndefined();
 
       expect(getActiveTerminalIdSpy).toHaveBeenCalledTimes(1);
       expect(sendTerminalCwdSpy).toHaveBeenCalledTimes(1);
       expect(provider.sendPrompt).toHaveBeenCalledWith("hello");
-      expect(resolveActiveTmuxSessionIdSpy).toHaveBeenCalledTimes(1);
-      expect(focusTmuxManager.getActiveFocus).toHaveBeenCalledTimes(1);
     });
 
     it("should resolve the active terminal id from runtime terminal key", () => {
       const instanceStore = {
         getActive: vi.fn(() => ({
           config: { id: "instance-1" },
-          runtime: { terminalKey: "terminal-1", tmuxSessionId: "tmux-1" },
+          runtime: { terminalKey: "terminal-1" },
         })),
       };
 
@@ -546,32 +392,6 @@ describe("ExtensionLifecycle", () => {
       expect(error).toHaveBeenCalledWith(
         expect.stringContaining("ERROR: string boom"),
       );
-    });
-
-    it("should return undefined when resolving the active tmux session id throws", () => {
-      Reflect.set(lifecycle, "instanceStore", {
-        getActive: vi.fn(() => {
-          throw new Error("broken store");
-        }),
-      });
-
-      expect((lifecycle as any).resolveActiveTmuxSessionId()).toBeUndefined();
-    });
-
-    it("should resolve active tmux session ids from the active instance", () => {
-      Reflect.set(lifecycle, "instanceStore", {
-        getActive: vi.fn(() => ({ runtime: { tmuxSessionId: "tmux-active" } })),
-      });
-
-      expect((lifecycle as any).resolveActiveTmuxSessionId()).toBe(
-        "tmux-active",
-      );
-
-      Reflect.set(lifecycle, "instanceStore", {
-        getActive: vi.fn(() => undefined),
-      });
-
-      expect((lifecycle as any).resolveActiveTmuxSessionId()).toBeUndefined();
     });
 
     it("should return false when no discovery service is available", async () => {
@@ -900,105 +720,6 @@ describe("ExtensionLifecycle", () => {
     });
   });
 
-  describe("tmux shutdown prompt", () => {
-    it("should return early when there are no tmux sessions to kill", async () => {
-      const tmuxManager = {
-        discoverSessions: vi.fn().mockResolvedValue([]),
-        killSession: vi.fn(),
-      };
-      Reflect.set(lifecycle, "tmuxSessionManager", tmuxManager);
-
-      await (lifecycle as any).promptKillTmuxSessions();
-
-      expect(vscode.window.showWarningMessage).not.toHaveBeenCalled();
-      expect(tmuxManager.killSession).not.toHaveBeenCalled();
-    });
-
-    it("should keep tmux sessions running when the user declines shutdown", async () => {
-      const tmuxManager = {
-        discoverSessions: vi.fn().mockResolvedValue([{ id: "session-1" }]),
-        killSession: vi.fn(),
-      };
-      vi.mocked(vscode.window.showWarningMessage).mockResolvedValue(
-        "Keep Running" as never,
-      );
-      Reflect.set(lifecycle, "tmuxSessionManager", tmuxManager);
-
-      await (lifecycle as any).promptKillTmuxSessions();
-
-      expect(tmuxManager.killSession).not.toHaveBeenCalled();
-    });
-
-    it("should route tmux session shutdown through provider and manager safely", async () => {
-      const tmuxManager = {
-        discoverSessions: vi
-          .fn()
-          .mockResolvedValue([
-            { id: "instance-session" },
-            { id: "external-session" },
-          ]),
-        killSession: vi.fn().mockResolvedValue(undefined),
-      };
-      const killTmuxSession = vi.fn().mockResolvedValue(undefined);
-      const instanceStore = new InstanceStore();
-      instanceStore.upsert({
-        config: { id: "instance-1", label: "OpenCode" },
-        runtime: { tmuxSessionId: "instance-session" },
-        state: "connected",
-      });
-      vi.mocked(vscode.window.showWarningMessage).mockResolvedValue(
-        "Kill Sessions" as never,
-      );
-      Reflect.set(lifecycle, "tmuxSessionManager", tmuxManager);
-      Reflect.set(lifecycle, "instanceStore", instanceStore);
-      Reflect.set(lifecycle, "tuiProvider", { killTmuxSession });
-
-      await (lifecycle as any).promptKillTmuxSessions();
-
-      expect(killTmuxSession).toHaveBeenCalledWith("instance-session");
-      expect(tmuxManager.killSession).toHaveBeenCalledWith("external-session");
-    });
-
-    it("should kill sessions through the manager when no instance store is available", async () => {
-      const tmuxManager = {
-        discoverSessions: vi.fn().mockResolvedValue([{ id: "external-session" }]),
-        killSession: vi.fn().mockResolvedValue(undefined),
-      };
-      vi.mocked(vscode.window.showWarningMessage).mockResolvedValue(
-        "Kill Sessions" as never,
-      );
-      Reflect.set(lifecycle, "tmuxSessionManager", tmuxManager);
-      Reflect.set(lifecycle, "instanceStore", undefined);
-
-      await (lifecycle as any).promptKillTmuxSessions();
-
-      expect(tmuxManager.killSession).toHaveBeenCalledWith("external-session");
-    });
-
-    it("should safely resolve instance-backed shutdown without a provider", async () => {
-      const tmuxManager = {
-        discoverSessions: vi.fn().mockResolvedValue([{ id: "instance-session" }]),
-        killSession: vi.fn().mockResolvedValue(undefined),
-      };
-      const instanceStore = new InstanceStore();
-      instanceStore.upsert({
-        config: { id: "instance-1", label: "OpenCode" },
-        runtime: { tmuxSessionId: "instance-session" },
-        state: "connected",
-      });
-      vi.mocked(vscode.window.showWarningMessage).mockResolvedValue(
-        "Kill Sessions" as never,
-      );
-      Reflect.set(lifecycle, "tmuxSessionManager", tmuxManager);
-      Reflect.set(lifecycle, "instanceStore", instanceStore);
-      Reflect.set(lifecycle, "tuiProvider", undefined);
-
-      await (lifecycle as any).promptKillTmuxSessions();
-
-      expect(tmuxManager.killSession).not.toHaveBeenCalled();
-    });
-  });
-
   describe("commands", () => {
     beforeEach(async () => {
       await lifecycle.activate(mockContext);
@@ -1045,129 +766,6 @@ describe("ExtensionLifecycle", () => {
       );
 
       expect(fileCall).toBeDefined();
-    });
-
-    it("should register and execute tmux management commands", async () => {
-      const createTmuxSession = vi.fn().mockResolvedValue(undefined);
-      const switchToNativeShell = vi.fn().mockResolvedValue(undefined);
-
-      Reflect.set(lifecycle, "tuiProvider", {
-        createTmuxSession,
-        switchToNativeShell,
-      });
-
-      const calls = vi.mocked(vscode.commands.registerCommand).mock.calls;
-      const createCall = calls.find(
-        (call) => call[0] === "ai-sidebar-terminal.createTmuxSession",
-      );
-      const nativeCall = calls.find(
-        (call) => call[0] === "ai-sidebar-terminal.switchNativeShell",
-      );
-
-      expect(createCall).toBeDefined();
-      expect(nativeCall).toBeDefined();
-
-      const createHandler = createCall?.[1] as () => Promise<void>;
-      const nativeHandler = nativeCall?.[1] as () => Promise<void>;
-
-      await createHandler();
-      await nativeHandler();
-
-      expect(createTmuxSession).toHaveBeenCalledTimes(1);
-      expect(switchToNativeShell).toHaveBeenCalledTimes(1);
-    });
-
-    describe("ai-sidebar-terminal.spawnForWorkspace", () => {
-      const getSpawnForWorkspaceHandler = () => {
-        (lifecycle as any).registerCommands(mockContext);
-        const commandCall = vi
-          .mocked(vscode.commands.registerCommand)
-          .mock.calls.find((call) => call[0] === "ai-sidebar-terminal.spawnForWorkspace");
-
-        expect(commandCall).toBeDefined();
-        return commandCall?.[1] as (uri?: {
-          toString(): string;
-        }) => Promise<void>;
-      };
-
-      it("should focus reusable existing workspace instance instead of creating duplicate", async () => {
-        const workspaceUri = "file:///workspace/reused";
-        const instanceStore = new InstanceStore();
-        instanceStore.upsert({
-          config: {
-            id: "existing-workspace-instance",
-            workspaceUri,
-            label: "Existing Workspace",
-          },
-          runtime: {},
-          state: "connected",
-        });
-
-        const spawnSpy = vi.fn().mockResolvedValue(undefined);
-        (lifecycle as any).instanceStore = instanceStore;
-        (lifecycle as any).instanceController = { spawn: spawnSpy };
-
-        const spawnForWorkspace = getSpawnForWorkspaceHandler();
-        await spawnForWorkspace({ toString: () => workspaceUri });
-
-        expect(spawnSpy).not.toHaveBeenCalled();
-        expect(instanceStore.getAll()).toHaveLength(1);
-        expect(instanceStore.getActive().config.id).toBe(
-          "existing-workspace-instance",
-        );
-        expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-          "ai-sidebar-terminal.focus",
-        );
-      });
-
-      it("should spawn matching disconnected workspace instance instead of focus-only no-op", async () => {
-        const workspaceUri = "file:///workspace/disconnected";
-        const instanceStore = new InstanceStore();
-        instanceStore.upsert({
-          config: {
-            id: "disconnected-workspace-instance",
-            workspaceUri,
-            label: "Disconnected Workspace",
-          },
-          runtime: {},
-          state: "disconnected",
-        });
-
-        const spawnSpy = vi.fn().mockResolvedValue(undefined);
-        (lifecycle as any).instanceStore = instanceStore;
-        (lifecycle as any).instanceController = { spawn: spawnSpy };
-
-        const spawnForWorkspace = getSpawnForWorkspaceHandler();
-        await spawnForWorkspace({ toString: () => workspaceUri });
-
-        expect(spawnSpy).toHaveBeenCalledTimes(1);
-        expect(spawnSpy).toHaveBeenCalledWith(
-          "disconnected-workspace-instance",
-        );
-        expect(instanceStore.getAll()).toHaveLength(1);
-        expect(instanceStore.getActive().config.id).toBe(
-          "disconnected-workspace-instance",
-        );
-      });
-
-      it("should persist workspace metadata for new workspace instances before spawn", async () => {
-        const instanceStore = new InstanceStore();
-        const spawnSpy = vi.fn().mockResolvedValue(undefined);
-        (lifecycle as any).instanceStore = instanceStore;
-        (lifecycle as any).instanceController = { spawn: spawnSpy };
-
-        const workspaceUri = "file:///workspace/new";
-        const spawnForWorkspace = getSpawnForWorkspaceHandler();
-        await spawnForWorkspace({ toString: () => workspaceUri });
-
-        expect(spawnSpy).toHaveBeenCalledTimes(1);
-        const spawnedId = spawnSpy.mock.calls[0]?.[0] as string;
-        const createdRecord = instanceStore.get(spawnedId);
-
-        expect(createdRecord).toBeDefined();
-        expect(createdRecord?.config.workspaceUri).toBe(workspaceUri);
-        expect(createdRecord?.config.label).toBe("OpenCode (Workspace)");
-      });
     });
   });
 
@@ -1256,8 +854,6 @@ describe("ExtensionLifecycle", () => {
         "ai-sidebar-terminal.hasAutoEnabledKeybindings",
         false,
       );
-      // ensure no auto-enable update happened for this path (default getConfiguration mock has update)
-      // we can check globalState update not called for the flag
       expect(mockContext.globalState.update).not.toHaveBeenCalledWith(
         "ai-sidebar-terminal.hasAutoEnabledKeybindings",
         true,
@@ -1267,7 +863,6 @@ describe("ExtensionLifecycle", () => {
     it("should catch and swallow errors from config.update (error path)", async () => {
       const failingUpdate = vi.fn().mockRejectedValue(new Error("update failed for test"));
       const warnSpy = vi.fn();
-      // pre-set a logger so the ?.warn call actually evaluates the template literal on line 588
       Reflect.set(lifecycle, "outputChannelService", { warn: warnSpy });
 
       vi.mocked(vscode.workspace.getConfiguration).mockImplementation((section) => {
@@ -1281,7 +876,6 @@ describe("ExtensionLifecycle", () => {
         return { get: vi.fn(), update: vi.fn(), inspect: vi.fn() } as any;
       });
 
-      // should not throw even on failure inside ensure
       await expect(lifecycle.activate(mockContext)).resolves.not.toThrow();
       expect(failingUpdate).toHaveBeenCalledWith(
         "sendKeybindingsToShell",
@@ -1294,7 +888,6 @@ describe("ExtensionLifecycle", () => {
     });
 
     it("should no-op early when context is falsy (line 549 guard)", async () => {
-      // ensure the defensive early return is covered
       Reflect.set(lifecycle, "context", undefined);
       await expect(
         (lifecycle as any).ensureSendKeybindingsToShellDefault(),
@@ -1362,4 +955,3 @@ describe("ExtensionLifecycle", () => {
     });
   });
 });
-

@@ -16,15 +16,9 @@ import { InstanceController } from "../services/InstanceController";
 import { NativeTerminalManager } from "../services/NativeTerminalManager";
 import { PortManager } from "../services/PortManager";
 import { ConnectionResolver } from "../services/ConnectionResolver";
-import { TmuxSessionManager } from "../services/TmuxSessionManager";
-import { ZellijSessionManager } from "../services/ZellijSessionManager";
-import { TmuxPaneSyncService } from "../services/TmuxPaneSyncService";
-import { ZellijPaneSyncService } from "../services/ZellijPaneSyncService";
 import {
-  StaticTerminalBackend,
   TerminalBackendRegistry,
 } from "../services/terminalBackends";
-import { TerminalDashboardProvider } from "../providers/TerminalDashboardProvider";
 import {
   registerCommands as registerAllCommands,
   type RegisterCommandDependencies,
@@ -47,12 +41,7 @@ export class ExtensionLifecycle {
   private instanceQuickPick: InstanceQuickPick | undefined;
   private instanceController: InstanceController | undefined;
   private portManager: PortManager | undefined;
-  private tmuxSessionManager: TmuxSessionManager | undefined;
-  private zellijSessionManager: ZellijSessionManager | undefined;
-  private tmuxPaneSyncService: TmuxPaneSyncService | undefined;
-  private zellijPaneSyncService: ZellijPaneSyncService | undefined;
   private backendRegistry: TerminalBackendRegistry | undefined;
-  private terminalDashboardProvider: TerminalDashboardProvider | undefined;
   private activated = false;
   private tuiProviderRegistration: vscode.Disposable | undefined;
   private context?: vscode.ExtensionContext;
@@ -65,7 +54,7 @@ export class ExtensionLifecycle {
       const active = this.instanceStore?.getActive();
       if (active?.runtime.terminalKey) {
         this.outputChannelService?.info(
-          `[DIAG:getActiveTerminalId] resolved terminalKey="${active.runtime.terminalKey}" for instance="${active.config.id}" tmuxSession="${active.runtime.tmuxSessionId}"`,
+          `[DIAG:getActiveTerminalId] resolved terminalKey="${active.runtime.terminalKey}" for instance="${active.config.id}"`,
         );
         return active.runtime.terminalKey;
       }
@@ -84,14 +73,6 @@ export class ExtensionLifecycle {
         `[DIAG:getActiveTerminalId] ERROR: ${err instanceof Error ? err.message : String(err)}`,
       );
       return ExtensionLifecycle.TERMINAL_ID;
-    }
-  }
-
-  private resolveActiveTmuxSessionId(): string | undefined {
-    try {
-      return this.instanceStore?.getActive()?.runtime.tmuxSessionId;
-    } catch {
-      return undefined;
     }
   }
 
@@ -122,40 +103,8 @@ export class ExtensionLifecycle {
 
       this.instanceStore = new InstanceStore();
       this.portManager = PortManager.getInstance(this.instanceStore);
-      const tmuxSessionManager = new TmuxSessionManager(logger);
-      if (await tmuxSessionManager.isAvailable()) {
-        this.tmuxSessionManager = tmuxSessionManager;
-      } else {
-        logger.info(
-          "[ExtensionLifecycle] tmux not detected; tmux backend unavailable",
-        );
-      }
 
-      const zellijSessionManager = new ZellijSessionManager(logger);
-      if (await zellijSessionManager.isAvailable()) {
-        this.zellijSessionManager = zellijSessionManager;
-      } else {
-        logger.info(
-          "[ExtensionLifecycle] zellij not detected; zellij backend unavailable",
-        );
-      }
-
-      if (this.tmuxSessionManager) {
-        this.tmuxPaneSyncService = new TmuxPaneSyncService(
-          this.tmuxSessionManager,
-        );
-      }
-      this.zellijPaneSyncService = new ZellijPaneSyncService();
-
-      this.backendRegistry = new TerminalBackendRegistry([
-        new StaticTerminalBackend("native", "Native", true),
-        new StaticTerminalBackend("tmux", "Tmux", !!this.tmuxSessionManager),
-        new StaticTerminalBackend(
-          "zellij",
-          "Zellij",
-          !!this.zellijSessionManager,
-        ),
-      ]);
+      this.backendRegistry = new TerminalBackendRegistry();
       const nativeTerminalManager = new NativeTerminalManager(logger);
       this.instanceRegistry = new InstanceRegistry(context);
       this.instanceRegistry.hydrate(this.instanceStore);
@@ -193,17 +142,10 @@ export class ExtensionLifecycle {
         this.captureManager,
         this.portManager,
         this.instanceStore,
-        this.tmuxSessionManager,
-        this.zellijSessionManager,
         this.backendRegistry,
         nativeTerminalManager,
-        this.tmuxPaneSyncService,
-        this.zellijPaneSyncService,
       );
 
-      // Register webview provider — guard against double-registration on fast
-      // reload (build-and-install) where the previous context.subscriptions may
-      // not yet be disposed when the new activation begins.
       this.tuiProviderRegistration?.dispose();
       this.tuiProviderRegistration = undefined;
       try {
@@ -235,26 +177,6 @@ export class ExtensionLifecycle {
         } else {
           throw err;
         }
-      }
-
-      if (this.tmuxSessionManager) {
-        this.terminalDashboardProvider = new TerminalDashboardProvider(
-          context,
-          this.tmuxSessionManager,
-          logger,
-          this.instanceStore,
-          this.tuiProvider,
-          this.zellijSessionManager,
-        );
-
-        context.subscriptions.push(
-          vscode.commands.registerCommand(
-            "ai-sidebar-terminal.openTerminalManager",
-            () => {
-              this.terminalDashboardProvider?.show();
-            },
-          ),
-        );
       }
 
       this.registerCommands(context);
@@ -300,12 +222,6 @@ export class ExtensionLifecycle {
       get provider() {
         return self.tuiProvider;
       },
-      get tmuxManager() {
-        return self.tmuxSessionManager;
-      },
-      get zellijManager() {
-        return self.zellijSessionManager;
-      },
       get terminalManager() {
         return self.terminalManager;
       },
@@ -315,15 +231,6 @@ export class ExtensionLifecycle {
       get contextManager() {
         return self.contextManager;
       },
-      get instanceStore() {
-        return self.instanceStore;
-      },
-      get instanceController() {
-        return self.instanceController;
-      },
-      get instanceQuickPick() {
-        return self.instanceQuickPick;
-      },
       get outputChannel() {
         return self.outputChannelService;
       },
@@ -331,11 +238,6 @@ export class ExtensionLifecycle {
       sendTerminalCwd: () => this.sendTerminalCwd(),
       sendPrompt: (prompt: string) =>
         this.tuiProvider?.sendPrompt(prompt) ?? Promise.resolve(),
-      resolveActiveTmuxSessionId: () => this.resolveActiveTmuxSessionId(),
-      resolveActiveTmuxFocus: () =>
-        this.tmuxSessionManager?.getActiveFocus() ?? Promise.resolve(undefined),
-      resolveWorkspacePath: () =>
-        vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? undefined,
     };
   }
 
@@ -457,63 +359,9 @@ export class ExtensionLifecycle {
     }
   }
 
-  private async promptKillTmuxSessions(): Promise<void> {
-    if (!this.tmuxSessionManager) {
-      return;
-    }
-
-    const allSessions = await this.tmuxSessionManager.discoverSessions();
-
-    if (allSessions.length === 0) {
-      return;
-    }
-
-    const count = allSessions.length;
-    const message =
-      count === 1
-        ? l10n.t(
-            "{count} tmux session is running. Kill it when closing VS Code?",
-            { count },
-          )
-        : l10n.t(
-            "{count} tmux sessions are running. Kill them when closing VS Code?",
-            { count },
-          );
-    const answer = await vscode.window.showWarningMessage(
-      message,
-      { modal: true },
-      l10n.t("Kill Sessions"),
-      l10n.t("Keep Running"),
-    );
-
-    if (answer === "Kill Sessions") {
-      const instanceSessionIds = new Set(
-        this.instanceStore
-          ?.getAll()
-          .map((r) => r.runtime.tmuxSessionId)
-          .filter(
-            (id): id is string => typeof id === "string" && id.length > 0,
-          ) ?? [],
-      );
-
-      await Promise.allSettled(
-        allSessions.map((session) => {
-          if (instanceSessionIds.has(session.id)) {
-            return (
-              this.tuiProvider?.killTmuxSession(session.id) ?? Promise.resolve()
-            );
-          }
-          return this.tmuxSessionManager!.killSession(session.id);
-        }),
-      );
-    }
-  }
-
   async deactivate(): Promise<void> {
     this.outputChannelService?.info("Deactivating AI Sidebar Terminal...");
     this.activated = false;
-
-    await this.promptKillTmuxSessions();
 
     if (this.tuiProviderRegistration) {
       this.tuiProviderRegistration.dispose();
@@ -523,16 +371,6 @@ export class ExtensionLifecycle {
     if (this.tuiProvider) {
       this.tuiProvider.dispose();
       this.tuiProvider = undefined;
-    }
-
-    if (this.tmuxPaneSyncService) {
-      this.tmuxPaneSyncService.dispose();
-      this.tmuxPaneSyncService = undefined;
-    }
-
-    if (this.zellijPaneSyncService) {
-      this.zellijPaneSyncService.dispose();
-      this.zellijPaneSyncService = undefined;
     }
 
     if (this.terminalManager) {
@@ -567,17 +405,10 @@ export class ExtensionLifecycle {
       this.instanceStore = undefined;
     }
 
-    if (this.terminalDashboardProvider) {
-      this.terminalDashboardProvider.dispose();
-      this.terminalDashboardProvider = undefined;
-    }
-
     this.codeActionProvider = undefined;
 
     this.captureManager = undefined;
     this.contextSharingService = undefined;
-    this.tmuxPaneSyncService = undefined;
-    this.zellijPaneSyncService = undefined;
 
     // Clear the context key so editor/title buttons disappear cleanly
     try {
@@ -594,9 +425,6 @@ export class ExtensionLifecycle {
    * `sendKeybindingsToShell` so that Ctrl+P and other TUI shortcuts
    * work immediately in the sidebar terminal without the user having
    * to manually edit settings.
-   *
-   * We only do this if the user has never explicitly set the value
-   * (we respect their choice if they turned it off).
    */
   private async ensureSendKeybindingsToShellDefault(): Promise<void> {
     if (!this.context) return;
@@ -610,7 +438,7 @@ export class ExtensionLifecycle {
       inspect?.workspaceFolderValue !== undefined;
 
     if (userHasExplicitValue) {
-      return; // respect user's choice
+      return;
     }
 
     const alreadyAutoEnabled = this.context.globalState.get<boolean>(
@@ -643,4 +471,3 @@ export class ExtensionLifecycle {
     }
   }
 }
-
