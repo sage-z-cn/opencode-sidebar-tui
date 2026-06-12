@@ -6,7 +6,6 @@ import { MessageRouter } from "./MessageRouter";
 import { OutputChannelService } from "../services/OutputChannelService";
 import type { TerminalManager } from "../terminals/TerminalManager";
 import type { OutputCaptureManager } from "../services/OutputCaptureManager";
-import type { TerminalBackendType } from "../types";
 
 const mockWriteFile = vi.hoisted(() =>
   vi.fn(async (file: string | Buffer | URL, data: unknown, options?: unknown) => {
@@ -91,18 +90,9 @@ describe("MessageRouter", () => {
   function createProviderBridge(): MessageRouterProviderBridge {
     return {
       startOpenCode: vi.fn(async () => undefined),
-      switchToTmuxSession: vi.fn(async () => undefined),
-      switchToZellijSession: vi.fn(async () => undefined),
-      killTmuxSession: vi.fn(async () => undefined),
-      createTmuxSession: vi.fn(async () => "tmux-new"),
-      toggleDashboard: vi.fn(),
-      toggleEditorAttachment: vi.fn(async () => undefined),
       restart: vi.fn(),
       openSettings: vi.fn(),
-      switchToNativeShell: vi.fn(async () => undefined),
-      selectTerminalBackend: vi.fn(async () => undefined),
-      switchToBackend: vi.fn(async () => undefined),
-      cycleTerminalBackend: vi.fn(async () => undefined),
+      openKeyboardShortcuts: vi.fn(),
       pasteText: vi.fn(),
       getActiveInstanceId: vi.fn(() => "instance-1"),
       getActiveTerminalId: vi.fn(() => "terminal-1"),
@@ -111,7 +101,6 @@ describe("MessageRouter", () => {
       isStarted: vi.fn(() => false),
       resizeActiveTerminal: vi.fn(),
       postWebviewMessage: vi.fn(),
-      routeDroppedTextToTmuxPane: vi.fn(async () => false),
       formatDroppedFiles: vi.fn(
         (paths: string[], useAtSyntax: boolean) =>
           `${useAtSyntax ? "@" : ""}${paths.join(" ")}`,
@@ -119,18 +108,6 @@ describe("MessageRouter", () => {
       formatPastedImage: vi.fn((tempPath: string) => `@img:${tempPath}`),
       launchAiTool: vi.fn(async () => undefined),
       showAiToolSelector: vi.fn(async () => undefined),
-      executeRawTmuxCommand: vi.fn(async () => ""),
-      zoomTmuxPane: vi.fn(async () => undefined),
-      getSelectedTmuxSessionId: vi.fn(() => "tmux-selected"),
-      isTmuxAvailable: vi.fn(() => true),
-      isZellijAvailable: vi.fn(() => true),
-      getActiveBackend: vi.fn<() => TerminalBackendType>(() => "tmux"),
-      getBackendAvailability: vi.fn(() => ({
-        native: true,
-        tmux: true,
-        zellij: true,
-      })),
-      switchPaneBackend: vi.fn(async () => undefined),
     };
   }
 
@@ -268,10 +245,7 @@ describe("MessageRouter", () => {
     expect(provider.postWebviewMessage).toHaveBeenCalledWith({
       type: "platformInfo",
       platform: process.platform,
-      tmuxAvailable: true,
-      zellijAvailable: true,
-      backendAvailability: { native: true, tmux: true, zellij: true },
-      activeBackend: "tmux",
+      activeBackend: "native",
     });
   });
 
@@ -317,41 +291,16 @@ describe("MessageRouter", () => {
     await router.handleMessage({ type: "listTerminals" });
     await router.handleMessage({ type: "setClipboard", text: "copied" });
     await router.handleMessage({ type: "triggerPaste" });
-    await router.handleMessage({ type: "switchSession", sessionId: "tmux-a" });
-    await router.handleMessage({ type: "killSession", sessionId: "tmux-b" });
-    await router.handleMessage({ type: "createTmuxSession" });
     await router.handleMessage({
       type: "launchAiTool",
-      sessionId: "tmux-c",
+      sessionId: "instance-1",
       tool: "claude",
       savePreference: true,
       targetPaneId: "%1",
     });
-    await router.handleMessage({
-      type: "sendTmuxPromptChoice",
-      choice: "tmux",
-    });
-    await router.handleMessage({
-      type: "sendTmuxPromptChoice",
-      choice: "shell",
-    });
-    await router.handleMessage({
-      type: "sendTmuxPromptChoice",
-      choice: "zellij",
-    });
-    await router.handleMessage({
-      type: "paneSwitchBackend",
-      paneId: "pane-1",
-      backend: "native",
-    });
-    await router.handleMessage({ type: "cycleTerminalBackend" });
     await router.handleMessage({ type: "requestAiToolSelector" });
-    await router.handleMessage({
-      type: "executeTmuxCommand",
-      commandId: "ai-sidebar-terminal.tmuxCreateWindow",
-    });
-    await router.handleMessage({ type: "toggleDashboard" });
     await router.handleMessage({ type: "toggleEditorAttachment" });
+    await router.handleMessage({ type: "requestRestart" });
     await router.handleMessage({
       type: "openFile",
       path: "src/providers/MessageRouter.ts",
@@ -362,96 +311,48 @@ describe("MessageRouter", () => {
     );
     expect(vscode.env.clipboard.writeText).toHaveBeenCalledWith("copied");
     expect(provider.pasteText).toHaveBeenCalledWith("clipboard text");
-    expect(provider.switchToTmuxSession).toHaveBeenCalledWith("tmux-a");
-    expect(provider.killTmuxSession).toHaveBeenCalledWith("tmux-b");
-    expect(provider.createTmuxSession).toHaveBeenCalledTimes(1);
-    expect(provider.selectTerminalBackend).toHaveBeenCalledWith("tmux");
-    expect(provider.selectTerminalBackend).toHaveBeenCalledWith("zellij");
-    expect(provider.cycleTerminalBackend).toHaveBeenCalledTimes(1);
-    expect(provider.switchToNativeShell).toHaveBeenCalledTimes(1);
-    expect(provider.switchPaneBackend).toHaveBeenCalledWith("pane-1", "native");
     expect(provider.launchAiTool).toHaveBeenCalledWith(
-      "tmux-c",
+      "instance-1",
       "claude",
       true,
       "%1",
-      "tmux",
     );
     expect(provider.showAiToolSelector).toHaveBeenCalledWith(
-      "tmux-selected",
-      "tmux-selected",
+      "instance-1",
+      "instance-1",
       true,
     );
-    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ai-sidebar-terminal.tmuxCreateWindow",
-    );
-    expect(provider.toggleDashboard).toHaveBeenCalledTimes(1);
-    expect(provider.toggleEditorAttachment).toHaveBeenCalledTimes(1);
+    expect(provider.restart).toHaveBeenCalledTimes(1);
     expect(vscode.window.showTextDocument).toHaveBeenCalledTimes(1);
   });
 
-  it("routes switchSession through zellij when zellij backend is active", async () => {
-    provider.getActiveBackend = vi.fn<() => TerminalBackendType>(() => "zellij");
-
-    await router.handleMessage({ type: "switchSession", sessionId: "zellij-a" });
-
-    expect(provider.switchToZellijSession).toHaveBeenCalledWith("zellij-a");
-    expect(provider.switchToTmuxSession).not.toHaveBeenCalled();
-  });
-
-  it("routes killSession through the backend-aware session runtime bridge for zellij", async () => {
-    provider.getActiveBackend = vi.fn<() => TerminalBackendType>(() => "zellij");
-
-    await router.handleMessage({ type: "killSession", sessionId: "zellij-b" });
-
-    expect(provider.killTmuxSession).toHaveBeenCalledWith("zellij-b");
-  });
-
-  it("routes zoomTmuxPane through the backend-aware session runtime bridge for zellij", async () => {
-    provider.getActiveBackend = vi.fn<() => TerminalBackendType>(() => "zellij");
-
-    await router.handleMessage({ type: "zoomTmuxPane" });
-
-    expect(provider.zoomTmuxPane).toHaveBeenCalledTimes(1);
-  });
-
-  it("routes filesDropped with shift and pane fallback or direct terminal writes", async () => {
+  it("routes filesDropped with shift and direct terminal writes", async () => {
     vi.mocked(vscode.workspace.asRelativePath).mockImplementation(
       (value: string) => value,
     );
 
-    provider.routeDroppedTextToTmuxPane = vi
-      .fn<MessageRouterProviderBridge["routeDroppedTextToTmuxPane"]>()
-      .mockResolvedValueOnce(false)
-      .mockResolvedValueOnce(true);
-
-    router.handleFilesDropped(
-      [
+    await router.handleMessage({
+      type: "filesDropped",
+      files: [
         "file:///workspace/src/index.ts",
         "file:///workspace/src/index.ts",
         "/workspace/notes.md",
       ],
-      true,
-      { col: 4, row: 2 },
-    );
-    await Promise.resolve();
+      shiftKey: true,
+    });
 
-    router.handleFilesDropped(["/workspace/README.md"], true);
-    router.handleFilesDropped(["/workspace/docs/guide.md"], false);
-
-    expect(provider.formatDroppedFiles).toHaveBeenNthCalledWith(
-      1,
+    expect(provider.formatDroppedFiles).toHaveBeenCalledWith(
       ["/workspace/src/index.ts", "/workspace/notes.md"],
       true,
-    );
-    expect(provider.routeDroppedTextToTmuxPane).toHaveBeenCalledWith(
-      "@/workspace/src/index.ts /workspace/notes.md ",
-      { col: 4, row: 2 },
     );
     expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
       "terminal-1",
       "@/workspace/src/index.ts /workspace/notes.md ",
     );
+
+    router.handleFilesDropped(["/workspace/README.md"], true);
+    router.handleFilesDropped(["/workspace/docs/guide.md"], false);
+
     expect(terminalManager.writeToTerminal).toHaveBeenCalledWith(
       "terminal-1",
       "@/workspace/README.md ",
@@ -462,20 +363,15 @@ describe("MessageRouter", () => {
     );
   });
 
-  it("routes filesDropped fallback writes to the targeted pane id", async () => {
+  it("routes filesDropped writes to the targeted pane id", async () => {
     vi.mocked(vscode.workspace.asRelativePath).mockImplementation(
       (value: string) => value,
     );
-
-    provider.routeDroppedTextToTmuxPane = vi
-      .fn<MessageRouterProviderBridge["routeDroppedTextToTmuxPane"]>()
-      .mockResolvedValueOnce(false);
 
     await router.handleMessage({
       type: "filesDropped",
       files: ["/workspace/pane.txt"],
       shiftKey: true,
-      dropCell: { col: 1, row: 1 },
       paneId: "pane-7",
     });
 
@@ -549,31 +445,6 @@ describe("MessageRouter", () => {
 
     expect(mockUnlink).toHaveBeenCalledWith(
       "/tmp/opencode-tests/opencode-drop-uuid-1234-notes.txt",
-    );
-  });
-
-  it("routes blob fallback drops through tmux pane formatting when shift is held", async () => {
-    vi.mocked(vscode.workspace.asRelativePath).mockImplementation(
-      (value: string) => value,
-    );
-    provider.routeDroppedTextToTmuxPane = vi
-      .fn<MessageRouterProviderBridge["routeDroppedTextToTmuxPane"]>()
-      .mockResolvedValueOnce(true);
-
-    await router.handleFilesDropped([], true, { col: 2, row: 3 }, [
-      {
-        name: "image.png",
-        data: "data:image/png;base64,aGVsbG8=",
-      },
-    ]);
-
-    expect(provider.formatDroppedFiles).toHaveBeenCalledWith(
-      ["/tmp/opencode-tests/opencode-drop-uuid-1234-image.png"],
-      true,
-    );
-    expect(provider.routeDroppedTextToTmuxPane).toHaveBeenCalledWith(
-      "@/tmp/opencode-tests/opencode-drop-uuid-1234-image.png ",
-      { col: 2, row: 3 },
     );
   });
 
@@ -870,128 +741,28 @@ describe("MessageRouter", () => {
     expect(provider.resizeActiveTerminal).toHaveBeenCalledWith(132, 44);
     expect(terminalManager.writeToTerminal).not.toHaveBeenCalled();
     expect(terminalManager.resizeTerminal).not.toHaveBeenCalled();
-    expect(provider.postWebviewMessage).toHaveBeenCalledWith({
-      type: "platformInfo",
-      platform: process.platform,
-      tmuxAvailable: true,
-      zellijAvailable: true,
-      backendAvailability: { native: true, tmux: true, zellij: true },
-      activeBackend: "tmux",
-    });
   });
 
-  it("logs bridge errors for tmux actions", async () => {
-    provider.zoomTmuxPane = vi.fn(async () => {
-      throw new Error("zoom boom");
-    });
-
-    const errorSpy = vi.spyOn(logger, "error");
-
-    await router.handleMessage({ type: "zoomTmuxPane" });
-
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("zoomTmuxPane failed: zoom boom"),
-    );
-  });
-
-  it("ignores unsupported tmux command ids and logs execute failures", async () => {
-    const errorSpy = vi.spyOn(logger, "error");
-    vi.mocked(vscode.commands.executeCommand).mockRejectedValueOnce(
-      new Error("command boom"),
-    );
-
-    await router.handleMessage({
-      type: "executeTmuxCommand",
-      commandId: "ai-sidebar-terminal.tmuxNextWindow",
-    });
-    await router.handleMessage({
-      type: "executeTmuxCommand",
-      commandId: "ai-sidebar-terminal.invalidCommand" as never,
-    });
-
-    expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-      "ai-sidebar-terminal.tmuxNextWindow",
-    );
-    expect(vscode.commands.executeCommand).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "executeTmuxCommand failed for ai-sidebar-terminal.tmuxNextWindow: command boom",
-      ),
-    );
-  });
-
-  it("routes supported raw tmux commands and ignores invalid payloads", async () => {
-    const rawSpy = vi.spyOn(provider, "executeRawTmuxCommand");
-
-    await router.handleMessage({
-      type: "executeTmuxRawCommand",
-      subcommand: "rename-session",
-      args: ["repo-next"],
-    });
-    await router.handleMessage({
-      type: "executeTmuxRawCommand",
-      subcommand: "not-supported",
-      args: ["ignored"],
-    });
-    await router.handleMessage({
-      type: "executeTmuxRawCommand",
-      subcommand: "choose-tree",
-      args: [123],
-    });
-
-    expect(rawSpy).toHaveBeenCalledTimes(1);
-    expect(rawSpy).toHaveBeenCalledWith("rename-session", ["repo-next"]);
-  });
-
-  it("logs raw tmux bridge failures", async () => {
-    provider.executeRawTmuxCommand = vi.fn(async () => {
-      throw new Error("raw boom");
-    });
-    const errorSpy = vi.spyOn(logger, "error");
-
-    await router.handleMessage({
-      type: "executeTmuxRawCommand",
-      subcommand: "choose-tree",
-    });
-
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "executeTmuxRawCommand failed for choose-tree: raw boom",
-      ),
-    );
-  });
-
-  it("covers ignored message payload branches and restart/select dispatch", async () => {
+  it("covers ignored message payload branches and restart dispatch", async () => {
     await router.handleMessage({ type: "filesDropped" });
     await router.handleMessage({ type: "openUrl", url: 123 });
     await router.handleMessage({ type: "openFile", path: 123 });
     await router.handleMessage({ type: "setClipboard", text: 123 });
     await router.handleMessage({ type: "imagePasted", data: 123 });
-    await router.handleMessage({ type: "selectTerminalBackend", backend: "native" });
     await router.handleMessage({ type: "requestRestart" });
     await router.handleMessage({ type: "unknownMessage" });
+    await router.handleMessage({ type: "paneCreate" });
+    await router.handleMessage({ type: "paneDelete" });
+    await router.handleMessage({ type: "openSettings" });
+    await router.handleMessage({ type: "openKeyboardShortcuts" });
 
-    expect(provider.selectTerminalBackend).toHaveBeenCalledWith("native");
     expect(provider.restart).toHaveBeenCalledTimes(1);
+    expect(provider.openSettings).toHaveBeenCalledTimes(1);
+    expect(provider.openKeyboardShortcuts).toHaveBeenCalledTimes(1);
     expect(provider.formatDroppedFiles).not.toHaveBeenCalled();
   });
 
-  it("keeps create-session and raw-command behavior backend aware for zellij", async () => {
-    provider.getActiveBackend = vi.fn<() => TerminalBackendType>(() => "zellij");
-    const warnSpy = vi.spyOn(logger, "warn");
-
-    await router.handleMessage({ type: "createTmuxSession" });
-    await router.handleMessage({ type: "executeTmuxRawCommand", subcommand: "choose-tree" });
-
-    expect(provider.selectTerminalBackend).toHaveBeenCalledWith("zellij");
-    expect(provider.createTmuxSession).not.toHaveBeenCalled();
-    expect(provider.executeRawTmuxCommand).not.toHaveBeenCalled();
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("executeTmuxRawCommand ignored for zellij backend"),
-    );
-  });
-
-  it("handles ready without saved dimensions and non-string tmux prompt choices", () => {
+  it("handles ready without saved dimensions", () => {
     provider.isStarted = vi.fn(() => true);
     provider.getLastKnownTerminalSize = vi.fn(() => ({ cols: 0, rows: 0 }));
 
@@ -1078,42 +849,6 @@ describe("MessageRouter", () => {
     expect(await router.fuzzyMatchFile("src/providers/MessageRouter.tsx")).toEqual(
       matchingDir,
     );
-  });
-
-  it("routes zellij session switches and ignores malformed session messages", async () => {
-    provider.getActiveBackend = vi.fn<() => TerminalBackendType>(() => "zellij");
-
-    await router.handleMessage({ type: "switchSession", sessionId: "zellij-a" });
-    await router.handleMessage({ type: "switchSession", sessionId: 42 });
-    await router.handleMessage({ type: "killSession", sessionId: 42 });
-    await router.handleMessage({ type: "sendTmuxPromptChoice", choice: "ignored" });
-
-    expect(provider.switchToZellijSession).toHaveBeenCalledWith("zellij-a");
-    expect(provider.switchToTmuxSession).not.toHaveBeenCalled();
-    expect(provider.killTmuxSession).not.toHaveBeenCalled();
-    expect(provider.selectTerminalBackend).not.toHaveBeenCalled();
-    expect(provider.switchToNativeShell).not.toHaveBeenCalled();
-  });
-
-  it("logs non-Error command failures with stringified messages", async () => {
-    vi.mocked(vscode.commands.executeCommand).mockRejectedValueOnce("command down");
-    provider.executeRawTmuxCommand = vi.fn().mockRejectedValueOnce("raw down");
-    const errorSpy = vi.spyOn(logger, "error");
-
-    await router.handleMessage({
-      type: "executeTmuxCommand",
-      commandId: "ai-sidebar-terminal.tmuxCreateWindow",
-    });
-    await router.handleMessage({
-      type: "executeTmuxRawCommand",
-      subcommand: "rename-window",
-    });
-
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("command down"),
-    );
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("raw down"));
-    errorSpy.mockRestore();
   });
 
   it("resolves direct, absolute, relative, and fallback file paths", async () => {
@@ -1251,9 +986,6 @@ describe("MessageRouter", () => {
     const errorSpy = vi.spyOn(logger, "error");
     const warnSpy = vi.spyOn(logger, "warn");
 
-    provider.zoomTmuxPane = vi.fn().mockRejectedValueOnce("zoom down");
-    await router.handleMessage({ type: "zoomTmuxPane" });
-
     vi.mocked(vscode.env.clipboard.readText).mockRejectedValueOnce("paste down");
     await router.handlePaste();
     vi.mocked(vscode.env.clipboard.writeText).mockRejectedValueOnce("clip down");
@@ -1291,7 +1023,6 @@ describe("MessageRouter", () => {
     expect(await router.getTerminalEntries()).toEqual([{ name: "No Cwd", cwd: "" }]);
 
     expect(sanitized).toBe("dropped-file");
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("zoom down"));
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("paste down"));
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("clip down"));
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("image down"));
@@ -1302,4 +1033,3 @@ describe("MessageRouter", () => {
   });
 
 });
-

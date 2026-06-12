@@ -14,15 +14,9 @@ import {
   ALLOWED_IMAGE_TYPES,
   DroppedBlobFile,
   MAX_IMAGE_SIZE,
-  TMUX_RAW_ALLOWED_SUBCOMMANDS,
-  TMUX_WEBVIEW_COMMAND_IDS,
   WebviewMessage,
 } from "../types";
-import type {
-  TerminalBackendType,
-  TmuxRawSubcommand,
-  TmuxWebviewCommandId,
-} from "../types";
+import type { TerminalBackendType } from "../types";
 import {
   createSelection,
   fuzzyMatchFile,
@@ -31,19 +25,9 @@ import {
 
 export interface MessageRouterProviderBridge {
   startOpenCode(): Promise<void>;
-  switchToTmuxSession(sessionId: string): Promise<void>;
-  switchToZellijSession(sessionId: string): Promise<void>;
-  killTmuxSession(sessionId: string): Promise<void>;
-  createTmuxSession(): Promise<string | undefined>;
-  toggleDashboard(): void;
-  toggleEditorAttachment(): Promise<void>;
   restart(): void;
   openSettings(): void;
   openKeyboardShortcuts(): void;
-  switchToNativeShell(): Promise<void>;
-  selectTerminalBackend(backend: TerminalBackendType): Promise<void>;
-  switchToBackend(backend: TerminalBackendType, sessionId?: string): Promise<void>;
-  cycleTerminalBackend(): Promise<void>;
   pasteText(text: string): void;
   getActiveInstanceId(): InstanceId;
   getActiveTerminalId(): string;
@@ -52,10 +36,6 @@ export interface MessageRouterProviderBridge {
   isStarted(): boolean;
   resizeActiveTerminal(cols: number, rows: number): void;
   postWebviewMessage(message: unknown): void;
-  routeDroppedTextToTmuxPane(
-    text: string,
-    dropCell: { col: number; row: number },
-  ): Promise<boolean>;
   formatDroppedFiles(paths: string[], useAtSyntax: boolean): string;
   formatPastedImage(tempPath: string): string | undefined;
   launchAiTool(
@@ -63,7 +43,6 @@ export interface MessageRouterProviderBridge {
     toolName: string,
     savePreference: boolean,
     targetPaneId?: string,
-    backendHint?: TerminalBackendType,
   ): Promise<void>;
   showAiToolSelector(
     sessionId: string,
@@ -71,18 +50,6 @@ export interface MessageRouterProviderBridge {
     forceShow?: boolean,
     targetPaneId?: string,
   ): Promise<void>;
-  executeRawTmuxCommand(subcommand: string, args?: string[]): Promise<string>;
-  zoomTmuxPane(): Promise<void>;
-  getSelectedTmuxSessionId(): string | undefined;
-  isTmuxAvailable(): boolean;
-  isZellijAvailable(): boolean;
-  getActiveBackend(): TerminalBackendType;
-  getBackendAvailability(): {
-    native: boolean;
-    tmux: boolean;
-    zellij: boolean;
-  };
-  switchPaneBackend(paneId: string, backend: TerminalBackendType): Promise<void>;
 }
 
 export class MessageRouter {
@@ -156,89 +123,20 @@ export class MessageRouter {
           void this.handleImagePasted(message.data);
         }
         break;
-      case "switchSession":
-        if (typeof message.sessionId === "string") {
-          if (this.provider.getActiveBackend() === "zellij") {
-            void this.provider.switchToZellijSession(message.sessionId);
-          } else {
-            void this.provider.switchToTmuxSession(message.sessionId);
-          }
-        }
-        break;
-      case "killSession":
-        if (typeof message.sessionId === "string") {
-          void this.provider.killTmuxSession(message.sessionId);
-        }
-        break;
-      case "createTmuxSession":
-        if (this.provider.getActiveBackend() === "zellij") {
-          void this.provider.selectTerminalBackend("zellij");
-        } else {
-          void this.provider.createTmuxSession();
-        }
-        break;
-      case "launchAiTool": {
-        const backendHint = this.provider.getActiveBackend();
+      case "launchAiTool":
         void this.provider.launchAiTool(
           message.sessionId,
           message.tool,
           message.savePreference,
           message.targetPaneId,
-          backendHint,
         );
         break;
-      }
-      case "zoomTmuxPane":
-        try {
-          await this.provider.zoomTmuxPane();
-        } catch (error) {
-          this.logger.error(
-            `[MessageRouter] zoomTmuxPane failed: ${error instanceof Error ? error.message : String(error)}`,
-          );
-        }
-        break;
-      case "sendTmuxPromptChoice":
-        if (message.choice === "tmux") {
-          void this.provider.selectTerminalBackend("tmux");
-        } else if (message.choice === "shell") {
-          void this.provider.switchToNativeShell();
-        } else if (message.choice === "zellij") {
-          void this.provider.selectTerminalBackend("zellij");
-        }
-        break;
-      case "selectTerminalBackend":
-        void this.provider.selectTerminalBackend(message.backend);
-        break;
-      case "switchToBackend":
-        void this.provider.switchToBackend(message.backend, message.sessionId);
-        break;
-      case "cycleTerminalBackend":
-        void this.provider.cycleTerminalBackend();
-        break;
-      case "paneSwitchBackend":
-        void this.provider.switchPaneBackend(message.paneId, message.backend);
-        break;
       case "requestAiToolSelector": {
-        const sessionId =
-          this.provider.getSelectedTmuxSessionId() ??
-          this.provider.getActiveInstanceId();
+        const sessionId = this.provider.getActiveInstanceId();
         void this.provider.showAiToolSelector(sessionId, sessionId, true);
         break;
       }
-      case "executeTmuxCommand":
-        await this.handleExecuteTmuxCommand(message.commandId);
-        break;
-      case "executeTmuxRawCommand":
-        await this.handleExecuteTmuxRawCommand(
-          message.subcommand,
-          message.args,
-        );
-        break;
-      case "toggleDashboard":
-        this.provider.toggleDashboard();
-        break;
       case "toggleEditorAttachment":
-        await this.provider.toggleEditorAttachment();
         break;
       case "requestRestart":
         this.provider.restart();
@@ -263,70 +161,6 @@ export class MessageRouter {
     }
 
     this.terminalManager.writeToTerminal(this.resolveTerminalTarget(paneId), data);
-  }
-
-  private async handleExecuteTmuxCommand(commandId: unknown): Promise<void> {
-    if (!this.isTmuxWebviewCommandId(commandId)) {
-      return;
-    }
-
-    try {
-      await vscode.commands.executeCommand(commandId);
-    } catch (error) {
-      this.logger.error(
-        `[MessageRouter] executeTmuxCommand failed for ${commandId}: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-  }
-
-  private async handleExecuteTmuxRawCommand(
-    subcommand: unknown,
-    args: unknown,
-  ): Promise<void> {
-    if (!this.isTmuxRawSubcommand(subcommand)) {
-      return;
-    }
-
-    if (args !== undefined && !this.isStringArray(args)) {
-      return;
-    }
-
-    try {
-      if (this.provider.getActiveBackend() === "zellij") {
-        this.logger.warn(
-          `[MessageRouter] executeTmuxRawCommand ignored for zellij backend: ${subcommand}`,
-        );
-        return;
-      }
-
-      await this.provider.executeRawTmuxCommand(subcommand, args);
-    } catch (error) {
-      this.logger.error(
-        `[MessageRouter] executeTmuxRawCommand failed for ${subcommand}: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-  }
-
-  private isTmuxWebviewCommandId(
-    value: unknown,
-  ): value is TmuxWebviewCommandId {
-    return (
-      typeof value === "string" &&
-      TMUX_WEBVIEW_COMMAND_IDS.some((commandId) => commandId === value)
-    );
-  }
-
-  private isTmuxRawSubcommand(value: unknown): value is TmuxRawSubcommand {
-    return (
-      typeof value === "string" &&
-      TMUX_RAW_ALLOWED_SUBCOMMANDS.some((command) => command === value)
-    );
-  }
-
-  private isStringArray(value: unknown): value is string[] {
-    return (
-      Array.isArray(value) && value.every((item) => typeof item === "string")
-    );
   }
 
   public handleTerminalResize(
@@ -367,10 +201,7 @@ export class MessageRouter {
     this.provider.postWebviewMessage({
       type: "platformInfo",
       platform: process.platform,
-      tmuxAvailable: this.provider.isTmuxAvailable(),
-      zellijAvailable: this.provider.isZellijAvailable(),
-      backendAvailability: this.provider.getBackendAvailability(),
-      activeBackend: this.provider.getActiveBackend(),
+      activeBackend: "native" as TerminalBackendType,
     });
   }
 
@@ -401,7 +232,6 @@ export class MessageRouter {
         try {
           return vscode.Uri.parse(file).fsPath;
         } catch {
-          // intentionally empty: fall through to raw file path on URI parse failure
         }
       }
       return file;
@@ -433,26 +263,10 @@ export class MessageRouter {
       );
       this.logger.info(`[PROVIDER] Writing with @: ${fileRefs}`);
 
-      if (dropCell) {
-        void this.provider
-          .routeDroppedTextToTmuxPane(fileRefs + " ", dropCell)
-          .then((routed) => {
-            if (!routed) {
-              this.logger.info(
-                `[PROVIDER] Pane routing failed, falling back to active terminal`,
-              );
-              this.terminalManager.writeToTerminal(
-                this.resolveTerminalTarget(paneId),
-                fileRefs + " ",
-              );
-            }
-          });
-      } else {
-        this.terminalManager.writeToTerminal(
-          this.resolveTerminalTarget(paneId),
-          fileRefs + " ",
-        );
-      }
+      this.terminalManager.writeToTerminal(
+        this.resolveTerminalTarget(paneId),
+        fileRefs + " ",
+      );
     } else {
       const filePaths = this.provider.formatDroppedFiles(
         dedupedFiles.map((file) =>
@@ -727,4 +541,3 @@ export class MessageRouter {
     });
   }
 }
-
