@@ -1,47 +1,29 @@
-# TEST KNOWLEDGE BASE
+# Test Agent Notes
 
-## OVERVIEW
+## Scope
 
-Vitest + manual mocks. `@vscode/test-electron` is not used — standalone runner.
+- Unit tests use Vitest in Node, not `@vscode/test-electron`.
+- `vitest.config.ts` includes `src/**/*.test.ts`, aliases `vscode` to `src/test/mocks/vscode.ts`, and sets `mockReset: true` plus `restoreMocks: true`.
+- Coverage excludes `src/webview/**`; webview tests still run, they just do not count toward coverage thresholds.
 
-## WHERE TO LOOK
+## Mocks
 
-| Task             | Location                     | Notes                                         |
-| ---------------- | ---------------------------- | --------------------------------------------- |
-| VS Code API mock | `src/test/mocks/vscode.ts`   | 363 lines, full API surface                   |
-| node-pty mock    | `src/test/mocks/node-pty.ts` | `createMockPtyProcess()` + simulation helpers |
-| Mock setup/reset | `src/test/mocks/index.ts`    | `setupMocks()`, `resetMocks()`                |
-| Test setup       | `src/__tests__/setup.ts`     | Global vitest setup                           |
-| Test colocated   | `src/**/*.test.ts`           | `Foo.test.ts` placed next to the service      |
+- Use `vi.mock("vscode")` to pick up `src/test/mocks/vscode.ts`.
+- Use the existing node-pty mock patterns in `src/test/mocks/node-pty.ts`; do not instantiate real PTYs in unit tests.
+- `src/test/mocks/index.ts` exposes setup/reset helpers used by tests that need global mock state cleanup.
+- Tests touching singletons or shared stores must reset with existing helpers such as `resetMocks()` / `resetInstance()` where available.
 
-## MOCK PATTERNS
+## Multi-Terminal Test Targets
 
-```typescript
-// vscode.ts — EventEmitter, workspace, window, commands, full API mock
-// node-pty.ts — createMockPtyProcess() with _simulateData(), _simulateExit()
+- Command routing: `src/core/commands/terminalCommands.test.ts`.
+- Host/session switching and pane session lifecycle: `src/providers/SessionRuntime.test.ts` and `TerminalProvider.test.ts`.
+- Webview pane/tab behavior: `src/webview/__tests__/tab-bar.test.ts`, `pane-manager.test.ts`, `pane-message-router.test.ts`, and `layout-engine.test.ts`.
+- Instance state/persistence/switching: `src/services/InstanceStore.test.ts`, `InstanceRegistry.test.ts`, `InstanceQuickPick.test.ts`, and `InstanceController.test.ts`.
 
-// Usage in tests:
-import { vi } from "vitest";
-vi.mock("vscode"); // vitest alias → src/test/mocks/vscode.ts
-vi.mock("node-pty"); // vitest alias → src/test/mocks/node-pty.ts
-```
+## Commands
 
-## VITEST CONFIG
-
-- `environment: "node"` — jsdom not used
-- `vscode` aliased to `./src/test/mocks/vscode.ts`
-- `mockReset: true` + `restoreMocks: true` — auto cleanup between tests
-- Coverage: 80% lines/functions/statements, 70% branches
-- **Webview excluded:** `src/webview/**` is excluded from coverage
-
-## CONVENTIONS
-
-- New service test → create `*.test.ts` next to the service
-- Never bypass existing mock patterns — use `src/test/mocks/`
-- Singleton tests → must call `resetInstance()` / `resetMocks()`
-
-## ANTI-PATTERNS
-
-- Never use `@vscode/test-electron` — replaced by manual mocks
-- Never modify mock files directly — use `vi.mock()` + helper functions
-- Never leave singleton state uncleared — reset in each test
+- Full unit suite: `npm run test`.
+- Focused file: `npx vitest run src/path/File.test.ts`.
+- Focused test name: `npx vitest run -t "test name"`.
+- Coverage: `npm run test:coverage`.
+- E2E is separate and uses `npm run test:e2e` after compile steps.

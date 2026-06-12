@@ -1,59 +1,39 @@
-# SERVICES KNOWLEDGE BASE
+# Services Agent Notes
 
-## OVERVIEW
+## Scope
 
-The extension's stateful backend. Instance lifecycle, discovery, HTTP, context, tmux, and logging.
+- `src/services` is the stateful backend: instance store/persistence/discovery/control, HTTP client, ports, native terminal backend plans, pane state, throttling, AI tool operators, context/file references, logging, and output capture.
+- The only backend type is `"native"`. There are no external multiplexer managers, pane sync services, or dashboard services in the current tree.
 
-## WHERE TO LOOK
+## Instance Layer
 
-| Task                    | Location                      | Lines | Notes                                          |
-| ----------------------- | ----------------------------- | ----- | ---------------------------------------------- |
-| Instance state hub      | `InstanceStore.ts`            | 242   | EventEmitter, active instance, change events   |
-| Lifecycle orchestration | `InstanceController.ts`       | 357   | spawn/connect/disconnect/kill/resolve          |
-| Process discovery       | `InstanceDiscoveryService.ts` | 562   | Process scan, auto-spawn, store sync           |
-| Persistence             | `InstanceRegistry.ts`         | 322   | globalState/workspaceState, migration          |
-| 4-tier resolution       | `ConnectionResolver.ts`       | 258   | stored → discovered → spawned + client pool    |
-| HTTP client             | `OpenCodeApiClient.ts`        | 165   | Retry/backoff, `/health`, `/tui/append-prompt` |
-| Port allocation         | `PortManager.ts`              | 271   | Singleton export, range 16384-65535            |
-| Tmux CLI                | `TmuxSessionManager.ts`       | 462   | Standalone, no service deps                    |
-| Context observation     | `ContextManager.ts`           | 142   | Active editor, selection, diagnostics          |
-| Context formatting      | `ContextSharingService.ts`    | 141   | `@file#L` formatter                            |
-| File references         | `FileReferenceManager.ts`     | 282   | Serialize, git diff, dir expansion             |
-| Quick pick UI           | `InstanceQuickPick.ts`        | 272   | Store + discovery + controller wiring          |
-| Logging                 | `OutputChannelService.ts`     | 124   | Singleton (`getInstance()`)                    |
-| Output capture          | `OutputCaptureManager.ts`     | 119   | `script` command to temp file                  |
+- `InstanceStore` is the in-memory source of truth for instance records and the active instance. It emits `change`, `setActive`, `add`, and `remove`.
+- `InstanceRegistry` hydrates/persists `InstanceStore` from VS Code global/workspace state and preserves `selectedAiTool`, `terminalBackend`, and `backendState` when present.
+- `InstanceDiscoveryService` discovers running OpenCode-compatible HTTP instances and syncs discovered process state.
+- `InstanceController` spawns/connects/disconnects/kills/resolves stored instances; it uses `PortManager` and `TerminalManager` and optionally `ConnectionResolver`.
+- `ConnectionResolver` is the stored/discovered/spawn resolution path for HTTP ports; do not duplicate that fallback chain elsewhere.
+- `InstanceQuickPick` is the user-facing session switcher: selecting an item calls `InstanceStore.setActive()`, which drives provider/session switching.
 
-## INSTANCE LAYER — CORRECT SEPARATION
+## Multi-Terminal State
 
-```
-InstanceStore (in-memory state + events)
-  ↑ hydrates/persists        ↑ writes (discovery)    ↑ writes (user actions)
-InstanceRegistry ─────── InstanceDiscoveryService ─ InstanceController
-                                   ↓ reads               ↓ reads
-                              OpenCodeApiClient      PortManager, TerminalManager
-                                   ↓
-                            ConnectionResolver (chains discovery → spawn + client pool)
-```
+- Active instance switching is store-driven; do not keep a separate active instance cache outside `InstanceStore`/`SessionRuntime`.
+- Per-pane terminal state is split: extension-host pane metadata is `PaneStore`, running sessions are `SessionRuntime.sessions`, and browser xterm instances are `webview/PaneManager`.
+- Default session ids differ from pane sessions: default uses the active instance id as terminal key; non-default panes use `paneId` as terminal key and `${activeInstanceId}::${paneId}` as instance id.
+- `DataThrottleService` batches pane output and tracks the focused pane; update focus before flushing output on pane/tab changes.
+- `NativeTerminalManager.create()` returns a `BackendLaunchPlan` for persisted restore metadata, but backend availability currently resolves to `native` in `terminalBackends.ts`.
 
-## SINGLETONS
+## Ports And Logging
 
-- `OutputChannelService.getInstance()` — global logging
-- `portManager` (module-level export) — port allocation
+- Use `PortManager.getInstance(...)` or the module-level `portManager`; no ad hoc port allocation.
+- OpenCode HTTP ports are assigned in the ephemeral range `16384-65535` and passed via `_EXTENSION_OPENCODE_PORT` plus `OPENCODE_CALLER=vscode`.
+- Use `OutputChannelService.getInstance()` for logging. Tests may reset the singleton; never call `new OutputChannelService()` directly.
 
-## CONVENTIONS
+## AI Tool Operators
 
-- Async flows → `try/catch` + actionable logs
-- Port allocation → via `PortManager` (no ad hoc allocation)
-- Tests → colocated as `*.test.ts` next to the service
+- Add tool-specific behavior under `src/services/aiTools/operators` and register through `AiToolOperatorRegistry`.
+- Formatting file refs, dropped files, pasted images, launch commands, auto-context support, and HTTP support should live in operators rather than command/provider conditionals.
 
-## ANTI-PATTERNS
+## Verification
 
-- No duplicating instance state outside `InstanceStore`
-- No ad hoc port allocation — use `PortManager`
-- No tmux logic in providers — use `TmuxSessionManager`
-- Never `new OutputChannelService()` — use `getInstance()`
-- Never bypass mocks — follow existing patterns in `src/test/mocks/`
-
-## KNOWN DEBT
-
-- `PortManager` — created separately in provider and lifecycle (needs singleton consolidation)
+- Service tests are colocated as `*.test.ts`, with some older grouped tests under `src/services/__tests__`.
+- Tests touching singleton or global service state must reset using the existing reset helpers/patterns.

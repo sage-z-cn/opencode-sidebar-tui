@@ -1,47 +1,34 @@
-# PROVIDERS KNOWLEDGE BASE
+# Providers Agent Notes
 
-## OVERVIEW
+## Scope
 
-Extension-host code. Bridges VS Code webview views/actions with backend services.
+- Providers are extension-host code that bridge VS Code webviews/actions to services.
+- Current provider files are `TerminalProvider.ts`, `MessageRouter.ts`, `SessionRuntime.ts`, `CodeActionProvider.ts`, and `openFile.ts`.
+- Do not assume a dashboard or multi-backend provider exists; the current tree only has the providers listed above.
 
-## STRUCTURE
+## Responsibility Split
 
-```
-providers/
-├── TerminalProvider.ts            # Webview lifecycle shell + orchestration
-├── MessageRouter.ts              # Message dispatch + all handlers
-├── SessionRuntime.ts             # Start/restart/tmux/instance management
-├── TerminalDashboardProvider.ts  # tmux dashboard
-├── CodeActionProvider.ts         # Code actions
-└── AGENTS.md
-```
+- `TerminalProvider` owns VS Code webview lifecycle, editor-tab attachment, HTML generation, pane host glue, pending webview messages, `PaneStore`, and `DataThrottleService` integration.
+- `MessageRouter` dispatches normal `WebviewMessage` values: terminal input/resize, ready, drag/drop, paste/image paste, file open, external terminal list, restart/settings, and AI tool selector messages.
+- `SessionRuntime` owns terminal session state: start/restart, active instance switching, per-pane sessions, HTTP client readiness, selected AI tool persistence, and listener reconnects.
+- `CodeActionProvider` stays focused on diagnostic code actions and sends prompts through the provider path.
 
-## WHERE TO LOOK
+## Multi-Terminal Flow
 
-| Task             | Location                     | Notes                                             |
-| ---------------- | ---------------------------- | ------------------------------------------------- |
-| Webview shell    | `TerminalProvider.ts`        | resolveWebviewView, getHtmlForWebview, dispose    |
-| Message handling | `MessageRouter.ts`           | handleMessage dispatch + 20+ handlers             |
-| Session runtime  | `SessionRuntime.ts`          | start/restart, tmux attach/switch, HTTP readiness |
-| Tmux dashboard   | `TerminalDashboardProvider.ts` | Inline HTML/CSS/JS                              |
-| Code actions     | `CodeActionProvider.ts`      | Focused, no issues                                |
+- Default startup: webview sends `ready` for the default pane; `MessageRouter.handleReady()` starts the default session if needed.
+- Non-default pane startup: `TerminalProvider` intercepts non-default `ready`, ensures `PaneStore` has that pane, calls `SessionRuntime.createSession(paneId, ...)`, then delegates resize to `MessageRouter`.
+- Pane creation/deletion: `TerminalProvider` intercepts `paneCreate` / `paneDelete` before `MessageRouter`; deletion must call both `SessionRuntime.destroySession(paneId)` and `PaneStore.removePane(paneId)`.
+- Instance switching: `SessionRuntime` listens to `InstanceStore.onDidSetActive`; `TerminalProvider.switchToInstance()` clears the terminal, reconnects listeners to an existing terminal, or force-restarts with the selected AI tool.
+- `MessageRouter.resolveTerminalTarget()` sends default-pane input to `provider.getActiveTerminalId()` and non-default pane input directly to the `paneId` terminal key.
+- `TerminalProvider.postWebviewMessage()` throttles `terminalOutput` by `paneId`; focus messages must update `DataThrottleService.setFocusedPane()` before flushing.
 
-## PROVIDER SPLIT — RESPONSIBILITY MAP
+## Constraints
 
-| Module             | Owns                                                                               |
-| ------------------ | ---------------------------------------------------------------------------------- |
-| `TerminalProvider` | webview lifecycle, HTML generation, nonce, public API surface                      |
-| `MessageRouter`    | terminal I/O, clipboard, image paste, file open/drop, VS Code terminal bridge      |
-| `SessionRuntime`   | process start/restart, tmux session management, instance switching, HTTP readiness |
+- Providers can use Node/VS Code APIs, but browser rendering and DOM behavior belong in `src/webview`.
+- Any message shape used here must be declared in `src/types.ts`; no arbitrary provider-only payloads.
+- Do not put process lifecycle or port allocation directly in `MessageRouter`; route through `SessionRuntime`, `TerminalManager`, and services.
+- `TerminalProvider.getHtmlForWebview()` loads only `dist/webview.js` plus copied CSS assets; do not reference a dashboard bundle unless webpack is changed.
 
-## CONVENTIONS
+## Verification
 
-- Providers = extension host process (not browser)
-- Message contracts use `src/types.ts` — no arbitrary shapes
-- Provider role: routing, orchestration, state bridging only
-
-## ANTI-PATTERNS
-
-- No browser-only logic (DOM, rendering) here — belongs in `src/webview`
-- No arbitrary message shapes — must update `src/types.ts`
-- Never bypass `ExtensionLifecycle` for provider registration or command wiring
+- Provider tests are colocated: `TerminalProvider.test.ts`, `MessageRouter.test.ts`, `SessionRuntime.test.ts`, and `CodeActionProvider.test.ts`.
