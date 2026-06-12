@@ -1,15 +1,12 @@
 import "@xterm/xterm/css/xterm.css";
-import * as TmuxPrompt from "./tmux-prompt";
 import * as AiSelector from "./ai-tool-selector";
-import * as TmuxCmd from "./tmux-command-dropdown";
-import { HostMessage } from "../types";
+import type { HostMessage, TerminalBackendType } from "../types";
 import { PaneManager } from "./pane-manager";
 import { PaneMessageRouter } from "./pane-message-router";
 import { LayoutEngine } from "./layout/layout-engine";
 import { TabBar } from "./tab-bar/tab-bar";
 import { PaneActions } from "./pane-actions/pane-actions";
 import { FocusManager } from "./focus/focus-manager";
-import type { TerminalBackendAvailability, TerminalBackendType } from "../types";
 import {
   copySelectionToClipboard,
   handlePasteEventWithImageSupport,
@@ -22,90 +19,26 @@ import {
   setupReloadButton,
   setupRerenderButton,
   setupSettingsButton,
-  setupTmuxCommandButton,
-  setupTmuxWindowButtons,
-  updateBackendToggleButtonState,
   initPills,
   updatePillsFromActiveSession,
-  setCurrentSessionId as setToolbarSessionId,
 } from "./toolbar";
-
-let currentSessionId: string | null = null;
-let activeBackend: TerminalBackendType = "native";
-let backendAvailability: TerminalBackendAvailability = {
-  native: true,
-  tmux: true,
-  zellij: false,
-};
-
-function toggleTmuxCommandMenu(): void {
-  if (!currentSessionId) {
-    return;
-  }
-
-  if (TmuxCmd.isVisible()) {
-    TmuxCmd.hide();
-  } else {
-    TmuxCmd.show(currentSessionId, activeBackend);
-  }
-}
-
-function updateBackendOnlyElements(): void {
-  const elements = document.querySelectorAll("[data-tmux-only]");
-  Array.from(elements).forEach((el) => {
-    if (el instanceof HTMLElement) {
-      el.style.display = backendAvailability.tmux ? "" : "none";
-    }
-  });
-  const zellijElements = document.querySelectorAll("[data-zellij-only]");
-  Array.from(zellijElements).forEach((el) => {
-    if (el instanceof HTMLElement) {
-      el.style.display = backendAvailability.zellij ? "" : "none";
-    }
-  });
-}
 
 const callbacks: MessageHandlerCallbacks = {
   onActiveSession(message) {
-    const toolbar = document.getElementById("tmux-toolbar");
+    const toolbar = document.getElementById("toolbar");
     const toolbarControls = document.querySelector(".toolbar-controls");
 
     if (toolbar) toolbar.classList.remove("hidden");
 
-    if ("sessionName" in message && message.sessionName) {
-      currentSessionId = message.sessionId;
-      activeBackend = message.backend ?? "tmux";
-      setToolbarSessionId(currentSessionId);
-      if (toolbarControls) {
-        if (activeBackend === "tmux" || activeBackend === "zellij") {
-          toolbarControls.classList.remove("hidden");
-        } else {
-          toolbarControls.classList.add("hidden");
-        }
-      }
-    } else {
-      currentSessionId = null;
-      activeBackend = "native";
-      setToolbarSessionId(null);
-      if (toolbarControls) {
-        toolbarControls.classList.add("hidden");
-      }
+    if (toolbarControls) {
+      toolbarControls.classList.add("hidden");
     }
 
-    // Update both pill dropdowns
     updatePillsFromActiveSession({
-      aiToolLabel: "aiToolLabel" in message ? message.aiToolLabel : undefined,
-      aiTools: "aiTools" in message ? message.aiTools : undefined,
-      backend: activeBackend,
-      backendOptions:
-        "backendOptions" in message ? message.backendOptions : undefined,
+      backend: "native" as TerminalBackendType,
+      aiToolLabel: message.aiToolLabel,
+      aiTools: message.aiTools,
     });
-
-    updateBackendToggleButtonState(activeBackend, backendAvailability);
-  },
-
-  onToggleTmuxCommandToolbar() {
-    toggleTmuxCommandMenu();
   },
 
   onShowAiToolSelector(message) {
@@ -118,21 +51,8 @@ const callbacks: MessageHandlerCallbacks = {
     );
   },
 
-  onShowTmuxPrompt(message) {
-    backendAvailability.tmux = message.tmuxAvailable !== false;
-    backendAvailability.zellij = message.zellijAvailable === true;
-    TmuxPrompt.show(message.workspaceName, backendAvailability);
-  },
-
   onPlatformInfo(message) {
-    backendAvailability = message.backendAvailability ?? {
-      native: true,
-      tmux: message.tmuxAvailable !== false,
-      zellij: message.zellijAvailable === true,
-    };
-    activeBackend = message.activeBackend ?? activeBackend;
-    updateBackendOnlyElements();
-    updateBackendToggleButtonState(activeBackend, backendAvailability);
+    void message;
   },
 };
 
@@ -148,9 +68,6 @@ function initApp(): void {
     },
     onResize: (cols, rows) => {
       postMessage({ type: "terminalResize", cols, rows });
-    },
-    onToggleTmuxCommands: () => {
-      toggleTmuxCommandMenu();
     },
   });
 
@@ -220,8 +137,6 @@ function initApp(): void {
   setupRerenderButton();
   setupEditorAttachmentButton();
   setupSettingsButton();
-  setupTmuxCommandButton(() => currentSessionId, () => activeBackend);
-  setupTmuxWindowButtons();
   initPills();
 
   window.addEventListener("message", (event: MessageEvent) => {
@@ -240,12 +155,6 @@ function initApp(): void {
         focusManager.registerPane(paneId, newContainer);
         tabBar.addTab(paneId, `Terminal ${paneId}`);
       }
-    }
-    if (msg && msg.type === "paneBackendChanged" && "paneId" in msg) {
-      const paneId = msg.paneId as string;
-      const backend = msg.backend as TerminalBackendType;
-      paneManager.setBackend(paneId, backend);
-      tabBar.setTabBackend(paneId, backend);
     }
     if (msg && msg.type === "paneDelete" && "paneId" in msg) {
       const paneId = msg.paneId as string;
@@ -275,47 +184,7 @@ const aiCallbacks = {
   },
 };
 
-const tmuxPromptCallbacks = {
-  postMessage: (msg: unknown) => {
-    const m = msg as Record<string, unknown>;
-    if (m && m.type === "sendTmuxPromptChoice") {
-      postMessage({
-        type: "sendTmuxPromptChoice",
-        choice: String(m.choice) as "tmux" | "shell" | "zellij",
-      });
-    }
-  },
-};
-
 function setupAiToolSelectorEvents(): void {
-  document.addEventListener("keydown", (event) => {
-    // Cmd/Ctrl+Alt+M → toggle tmux command dropdown
-    // VS Code keybindings don't fire when xterm has focus,
-    // so we handle this directly in the webview.
-    const isToggleTmuxCmd =
-      event.altKey && (event.metaKey || event.ctrlKey) && event.code === "KeyM";
-    if (isToggleTmuxCmd) {
-      if (currentSessionId) {
-        event.preventDefault();
-        if (TmuxCmd.isVisible()) {
-          TmuxCmd.hide();
-        } else {
-          TmuxCmd.show(currentSessionId, activeBackend);
-        }
-      }
-      return;
-    }
-
-    if (TmuxCmd.isVisible()) {
-      if (TmuxCmd.handleKeydown(event)) {
-        return;
-      }
-    }
-    if (AiSelector.isVisible()) {
-      AiSelector.handleKeydown(event, aiCallbacks);
-    }
-  });
-
   document.addEventListener("click", (event) => {
     const target = event
       .composedPath()
@@ -323,24 +192,6 @@ function setupAiToolSelectorEvents(): void {
     if (!target) return;
     if (AiSelector.isVisible()) {
       AiSelector.handleClick(target, aiCallbacks);
-    }
-
-    if (TmuxPrompt.isVisible()) {
-      TmuxPrompt.handleClick(target, tmuxPromptCallbacks);
-    }
-
-    if (TmuxCmd.isVisible()) {
-      if (
-        target.closest(".tmux-cmd-item") &&
-        !target.closest(".tmux-cmd-item.disabled")
-      ) {
-        TmuxCmd.handleClick(target);
-      } else if (
-        !target.closest("#tmux-command-dropdown") &&
-        !target.closest("#btn-tmux-commands")
-      ) {
-        TmuxCmd.hide();
-      }
     }
   });
 }

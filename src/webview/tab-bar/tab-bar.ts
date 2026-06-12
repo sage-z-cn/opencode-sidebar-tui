@@ -246,10 +246,8 @@ export class TabBar {
     const rec = this.tabs.get(tabId);
     if (!rec) return;
 
-    const icons: Record<TerminalBackendType, string> = {
+    const icons: Record<string, string> = {
       native: "$",
-      tmux: "⊞",
-      zellij: "◈",
     };
 
     const iconEl = rec.el.querySelector(".tab-bar__icon") as HTMLElement;

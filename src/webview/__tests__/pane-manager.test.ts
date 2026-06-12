@@ -315,59 +315,42 @@ describe("PaneManager", () => {
     it("stores backend for registered pane", () => {
       const manager = new PaneManager();
       const container = document.createElement("div");
-      manager.registerPane("pane-1", null, container, "tmux");
-      expect(manager.getBackend("pane-1")).toBe("tmux");
+      manager.registerPane("pane-1", null, container, "native");
+      expect(manager.getBackend("pane-1")).toBe("native");
     });
 
-    it("updates backend via setBackend", () => {
+    it("keeps backend as native via setBackend", () => {
       const manager = new PaneManager();
       const container = document.createElement("div");
       manager.registerPane("pane-1", null, container);
       expect(manager.getBackend("pane-1")).toBe("native");
 
-      manager.setBackend("pane-1", "zellij");
-      expect(manager.getBackend("pane-1")).toBe("zellij");
+      manager.setBackend("pane-1", "native");
+      expect(manager.getBackend("pane-1")).toBe("native");
     });
 
     it("cleans up backend tracking on disposePane", () => {
       const manager = new PaneManager();
       const container = document.createElement("div");
-      manager.registerPane("pane-1", null, container, "tmux");
-      expect(manager.getBackend("pane-1")).toBe("tmux");
+      manager.registerPane("pane-1", null, container, "native");
+      expect(manager.getBackend("pane-1")).toBe("native");
 
       manager.disposePane("pane-1");
       expect(manager.getBackend("pane-1")).toBe("native");
     });
 
-    it("disposes old terminal and updates backend on switchPaneBackend", async () => {
+    it("disposes terminal on switchPaneBackend to same backend (full reset)", async () => {
       const manager = new PaneManager();
       const container = document.createElement("div");
       const instance = manager.createPane("pane-1", container, {}, "native");
       const terminal = instance.terminal;
 
-      await manager.switchPaneBackend("pane-1", "tmux");
+      await manager.switchPaneBackend("pane-1", "native");
 
       expect(terminal.dispose).toHaveBeenCalled();
-      expect(manager.getBackend("pane-1")).toBe("tmux");
+      expect(manager.getBackend("pane-1")).toBe("native");
       expect(instance.disposed).toBe(true);
     });
 
-    it("re-initializes terminal on writeData if pane was switched", async () => {
-      const manager = new PaneManager();
-      const container = document.createElement("div");
-      const instance = manager.createPane("pane-1", container, {}, "native");
-      const oldTerminal = instance.terminal;
-
-      await manager.switchPaneBackend("pane-1", "tmux");
-      expect(instance.disposed).toBe(true);
-
-      manager.writeData("pane-1", "new data");
-
-      const newInstance = manager.getPane("pane-1")!;
-      expect(newInstance).not.toBe(instance);
-      expect(newInstance.disposed).toBe(false);
-      expect(newInstance.terminal).not.toBe(oldTerminal);
-      expect(mockState.terminalInstances[mockState.terminalInstances.length - 1].write).toHaveBeenCalledWith("new data");
-    });
   });
 });

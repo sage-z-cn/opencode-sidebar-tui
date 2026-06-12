@@ -5,7 +5,6 @@ export interface TerminalContainerParams {
   cursorStyle: string;
   scrollback: string;
   sendKeybindingsToShell?: string;
-  showTmuxWindowControls?: string;
 }
 
 export function renderTerminalContainer({

@@ -12,12 +12,6 @@ export interface MessageHandlerCallbacks {
   onShowAiToolSelector: (
     message: Extract<HostMessage, { type: "showAiToolSelector" }>,
   ) => void;
-  onToggleTmuxCommandToolbar: (
-    message: Extract<HostMessage, { type: "toggleTmuxCommandToolbar" }>,
-  ) => void;
-  onShowTmuxPrompt: (
-    message: Extract<HostMessage, { type: "showTmuxPrompt" }>,
-  ) => void;
   onPlatformInfo?: (
     message: Extract<HostMessage, { type: "platformInfo" }>,
   ) => void;
@@ -92,9 +86,6 @@ export function createMessageHandler(
           break;
 
         case "terminalConfig":
-          setTmuxWindowControlsVisibility(
-            message.showTmuxWindowControls !== false,
-          );
           if (terminal) {
             terminal.options.fontSize = message.fontSize;
             terminal.options.fontFamily = message.fontFamily;
@@ -124,25 +115,9 @@ export function createMessageHandler(
         case "showAiToolSelector":
           callbacks.onShowAiToolSelector(message);
           break;
-
-        case "toggleTmuxCommandToolbar":
-          callbacks.onToggleTmuxCommandToolbar(message);
-          break;
-
-        case "showTmuxPrompt":
-          callbacks.onShowTmuxPrompt(message);
-          break;
       }
     },
   };
 
   return state;
-}
-
-function setTmuxWindowControlsVisibility(visible: boolean): void {
-  document.querySelectorAll("[data-tmux-window-controls]").forEach((element) => {
-    if (element instanceof HTMLElement) {
-      element.classList.toggle("hidden", !visible);
-    }
-  });
 }

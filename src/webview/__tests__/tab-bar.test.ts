@@ -93,12 +93,6 @@ describe("TabBar", () => {
     const iconEl = bar.getElement().querySelector('[data-tab-id="tab-1"] .tab-bar__icon') as HTMLElement;
     expect(iconEl.textContent).toBe("$");
 
-    bar.setTabBackend("tab-1", "tmux");
-    expect(iconEl.textContent).toBe("⊞");
-
-    bar.setTabBackend("tab-1", "zellij");
-    expect(iconEl.textContent).toBe("◈");
-
     bar.setTabBackend("tab-1", "native");
     expect(iconEl.textContent).toBe("$");
   });

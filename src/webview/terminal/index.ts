@@ -68,7 +68,6 @@ export function initTerminal(
   options: {
     onData: (data: string) => void;
     onResize: (cols: number, rows: number) => void;
-    onToggleTmuxCommands: () => void;
   },
 ): TerminalInstance | null {
   const config = readTerminalConfig(container);

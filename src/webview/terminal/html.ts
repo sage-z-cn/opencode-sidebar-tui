@@ -3,8 +3,7 @@ import {
   renderTerminalContainer,
   type TerminalContainerParams,
 } from "./terminal-container";
-import { renderTmuxPrompt } from "./tmux-prompt-template";
-import { renderTmuxToolbar, toolbarL10nStrings } from "./tmux-toolbar";
+import { renderToolbar, toolbarL10nStrings } from "./toolbar";
 
 export interface TerminalHtmlParams extends TerminalContainerParams {
   cspSource: string;
@@ -24,7 +23,6 @@ export function renderTerminalHtml({
   cursorStyle,
   scrollback,
   sendKeybindingsToShell,
-  showTmuxWindowControls,
 }: TerminalHtmlParams): string {
   const toolbarL10nScript = `<script nonce="${nonce}">window.__TOOLBAR_L10N__=${JSON.stringify(toolbarL10nStrings)};</script>`;
   return `<!doctype html>
@@ -41,7 +39,7 @@ export function renderTerminalHtml({
     ${toolbarL10nScript}
   </head>
   <body>
-    ${renderTmuxToolbar(showTmuxWindowControls !== "false")}
+    ${renderToolbar()}
     ${renderTerminalContainer({
       fontSize,
       fontFamily,
@@ -51,7 +49,6 @@ export function renderTerminalHtml({
       sendKeybindingsToShell,
     })}
     ${renderAiSelector()}
-    ${renderTmuxPrompt()}
     <script nonce="${nonce}" src="${scriptUri}"></script>
   </body>
 </html>`;
