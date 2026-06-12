@@ -733,6 +733,7 @@ describe("MessageRouter", () => {
     await router.handleSetClipboard("x");
 
     expect(provider.resizeActiveTerminal).toHaveBeenCalledWith(132, 44);
+    expect(provider.postWebviewMessage).toHaveBeenCalledWith({ type: "requestPaste" });
     expect(terminalManager.writeToTerminal).not.toHaveBeenCalled();
     expect(terminalManager.resizeTerminal).not.toHaveBeenCalled();
   });
@@ -894,6 +895,7 @@ describe("MessageRouter", () => {
     vi.mocked(vscode.env.clipboard.readText).mockResolvedValueOnce("");
     await router.handlePaste();
     expect(provider.pasteText).not.toHaveBeenCalled();
+    expect(provider.postWebviewMessage).toHaveBeenCalledWith({ type: "requestPaste" });
 
     provider.formatPastedImage = vi.fn(() => undefined);
     await router.handleImagePasted("data:image/png;base64,aGVsbG8=");

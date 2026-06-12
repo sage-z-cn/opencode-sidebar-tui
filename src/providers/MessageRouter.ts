@@ -273,12 +273,19 @@ export class MessageRouter {
       const text = await vscode.env.clipboard.readText();
       if (text) {
         this.provider.pasteText(text);
+        return;
       }
     } catch (error) {
       this.logger.error(
         `[TerminalProvider] Failed to paste: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
+
+    // No text in clipboard — delegate to webview for image detection.
+    // The webview will try navigator.clipboard.read() and send
+    // imagePasted if an image is found.  We do NOT fall back to
+    // triggerPaste from the webview to avoid an infinite loop.
+    this.provider.postWebviewMessage({ type: "requestPaste" });
   }
 
   public async handleSetClipboard(text: string): Promise<void> {

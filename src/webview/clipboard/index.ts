@@ -56,20 +56,19 @@ export async function handlePasteWithImageSupport(): Promise<void> {
       if (imageType) {
         const blob = await item.getType(imageType);
         if (blob.size > MAX_IMAGE_SIZE) {
-          console.warn("Image too large, falling back to text paste");
-          break;
+          console.warn("Image too large, ignoring paste");
+          return;
         }
         postImageFromBlob(blob);
         return;
       }
     }
   } catch (err) {
-    console.warn(
-      "Could not read image from clipboard, falling back to text paste:",
-      err,
-    );
+    console.warn("Could not read image from clipboard:", err);
   }
-  postTriggerPaste();
+  // Intentionally no fallback to triggerPaste — the host already tried
+  // text and delegated here only when no text was found.  Sending
+  // triggerPaste back would cause an infinite loop.
 }
 
 export function copySelectionToClipboard(selection: string): void {
