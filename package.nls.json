@@ -28,7 +28,7 @@
   "configuration.ai-sidebar-terminal.logLevel.description": "Log output level for AI Sidebar Terminal",
   "configuration.ai-sidebar-terminal.contextDebounceMs.description": "Debounce delay for context updates (ms)",
   "configuration.ai-sidebar-terminal.maxDiagnosticLength.description": "Maximum length of diagnostic messages",
-  "configuration.ai-sidebar-terminal.enableAutoSpawn.description": "Auto-spawn OpenCode if not running",
+  "configuration.ai-sidebar-terminal.enableAutoSpawn.description": "Auto-spawn the last used AI tool",
   "configuration.ai-sidebar-terminal.codeActionSeverities.description": "Diagnostic severities that trigger code actions",
   "configuration.ai-sidebar-terminal.aiTools.description": "Configure AI coding tools. Use Add Item to add new tools, Edit to modify, Delete to remove.",
   "configuration.ai-sidebar-terminal.aiTools.items.name.description": "Unique identifier (e.g. 'opencode', 'claude')",
