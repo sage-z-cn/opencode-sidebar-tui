@@ -17,7 +17,8 @@ Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi 
 - **Auto-Context Sharing**: Automatically shares editor context when terminal opens
 - **File References with Line Numbers**: Send file references with `@filename#L10-L20` syntax
 - **Code Actions**: Diagnostic-triggered code actions for errors and warnings
-- **Keyboard Shortcuts**: Quick access with `Alt+A` and `Cmd+Alt+A`
+- **Keyboard Shortcuts**: `Alt+A` to send file reference, `Cmd+Alt+A` to send all open files
+- **Image Paste Support**: Paste images from clipboard directly into the terminal
 - **Drag & Drop Support**: Hold Shift and drag files/folders to send as references
 - **Context Menu Integration**: Right-click files in Explorer or text in Editor to send to AI terminal
 - **Secondary Sidebar**: Dock the terminal in the secondary sidebar for split-screen workflows
@@ -218,89 +219,6 @@ Available settings in VS Code settings (`Cmd+,` / `Ctrl+,`):
   "ai-sidebar-terminal.defaultAiTool": "opencode"
 }
 ```
-
-## Requirements
-
-- VS Code 1.106.0 or higher
-- Node.js 20.0.0 or higher
-- At least one supported AI tool installed and accessible via command line
-
-## Development
-
-### Build
-
-```bash
-npm run compile         # Development build
-npm run watch           # Watch mode
-npm run package         # Production build
-npm run test            # Run tests
-npm run test:watch      # Watch mode tests
-npm run test:coverage   # Run tests with coverage
-npm run lint            # Lint source
-npm run format          # Format source
-```
-
-### Project Structure
-
-```
-src/
-├── extension.ts                         # VS Code entry (activate/deactivate)
-├── types.ts                             # Shared host↔webview message contracts
-├── core/
-│   ├── ExtensionLifecycle.ts            # Service wiring + activation/deactivation
-│   └── commands/                        # Command registration
-│       ├── index.ts                     # registerCommands() orchestrator
-│       └── terminalCommands.ts          # start, paste, file references
-├── providers/
-│   ├── TerminalProvider.ts              # Main sidebar terminal webview provider
-│   ├── MessageRouter.ts                 # Message dispatch + handlers
-│   ├── SessionRuntime.ts                # Start/restart/instance switching
-│   └── CodeActionProvider.ts            # Diagnostic code action provider
-├── terminals/
-│   └── TerminalManager.ts              # node-pty process lifecycle
-├── services/
-│   ├── InstanceStore.ts                # In-memory instance state + EventEmitter
-│   ├── InstanceController.ts           # Instance lifecycle orchestration
-│   ├── InstanceDiscoveryService.ts     # Running instance discovery + auto-spawn
-│   ├── InstanceRegistry.ts             # Instance persistence (globalState)
-│   ├── ConnectionResolver.ts           # 4-tier port resolution + client pool
-│   ├── OpenCodeApiClient.ts            # HTTP client (retry/backoff)
-│   ├── PortManager.ts                  # Ephemeral port allocation
-│   ├── NativeTerminalManager.ts         # Native terminal backend
-│   ├── terminalBackends.ts              # Backend registry
-│   ├── DataThrottleService.ts           # Batched terminal data delivery
-│   ├── ContextManager.ts               # Active editor/selection observer
-│   ├── ContextSharingService.ts        # @file#L context formatter
-│   ├── FileReferenceManager.ts         # File reference serialization
-│   ├── InstanceQuickPick.ts            # Quick pick UI for instance selection
-│   ├── OutputChannelService.ts         # Singleton logging service
-│   ├── OutputCaptureManager.ts         # Terminal output capture
-│   └── aiTools/                        # AI tool operator system
-├── webview/
-│   ├── main.ts                         # Terminal bootstrap (xterm.js + WebGL)
-│   ├── terminal-manager.ts             # Terminal instance & drag/drop manager
-│   ├── terminal/                       # Terminal container, keyboard, config
-│   ├── toolbar/                        # Toolbar buttons & pills
-│   ├── clipboard/                      # Clipboard handling
-│   ├── messages/                       # Host message handling
-│   ├── links/                          # Link handling
-│   ├── dragdrop/                       # Drag & drop handling
-│   └── shared/                         # Shared utilities
-├── utils/
-└── test/mocks/
-    ├── vscode.ts                       # VS Code API mock
-    └── node-pty.ts                     # node-pty mock
-```
-
-## Implementation Details
-
-Based on the excellent vscode-sidebar-terminal extension, streamlined specifically for AI Sidebar Terminal:
-
-- **Terminal Backend**: node-pty for PTY support
-- **Terminal Frontend**: xterm.js with WebGL rendering
-- **Process Management**: Automatic AI tool lifecycle
-- **Communication**: HTTP API + WebView messaging
-- **Port Management**: Ephemeral port allocation (16384-65535)
 
 ## License
 

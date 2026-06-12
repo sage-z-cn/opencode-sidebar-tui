@@ -11,13 +11,14 @@
 - **自动启动 AI 工具**: 侧边栏激活时自动启动所选 AI 编程助手
 - **完整 TUI 支持**: xterm.js + WebGL 渲染的终端模拟
 - **多 AI 工具支持**: 内置 OpenCode、Claude Code、Codex、Gemini CLI、Kimi Code、Qwen Code、Mimo Code，可自定义扩展
-- **多窗格分屏**: 基于 xterm.js 将终端分割为多个窗格，支持标签页管理
+- **单终端模式**: 专注的单终端体验，支持会话/实例切换
 - **Pill Dropdown 工具栏**: 统一的 pill 式下拉菜单，快速切换 AI 工具
 - **HTTP API 集成**: 通过 HTTP API 与 OpenCode CLI 双向通信
 - **自动上下文共享**: 终端打开时自动共享编辑器上下文
 - **带行号的文件引用**: 以 `@filename#L10-L20` 语法发送文件引用
 - **代码操作**: 对错误和警告触发诊断代码操作
-- **键盘快捷键**: `Alt+A`、`Cmd+Alt+A` 快速操作
+- **键盘快捷键**: `Alt+A` 发送文件引用，`Cmd+Alt+A` 发送所有打开文件
+- **图片粘贴支持**: 从剪贴板直接粘贴图片到终端
 - **拖放支持**: 按住 Shift 拖放文件/文件夹发送引用
 - **右键菜单集成**: 在资源管理器或编辑器中右键发送到 AI 终端
 - **辅助侧边栏**: 将终端停靠在辅助侧边栏实现分屏工作流
@@ -208,89 +209,6 @@ npx @vscode/vsce package
   "ai-sidebar-terminal.defaultAiTool": "opencode"
 }
 ```
-
-## 环境要求
-
-- VS Code 1.106.0 或更高版本
-- Node.js 20.0.0 或更高版本
-- 至少一个受支持的 AI 工具已安装且可通过命令行访问
-
-## 开发
-
-### 构建命令
-
-```bash
-npm run compile         # 开发构建
-npm run watch           # 监听模式
-npm run package         # 生产构建
-npm run test            # 运行测试
-npm run test:watch      # 监听模式测试
-npm run test:coverage   # 运行测试并输出覆盖率
-npm run lint            # 代码检查
-npm run format          # 代码格式化
-```
-
-### 项目结构
-
-```
-src/
-├── extension.ts                         # VS Code 入口（activate/deactivate）
-├── types.ts                             # 宿主↔WebView 消息契约
-├── core/
-│   ├── ExtensionLifecycle.ts            # 服务编排 + 激活/停用
-│   └── commands/                        # 命令注册
-│       ├── index.ts                     # registerCommands() 编排器
-│       └── terminalCommands.ts          # 启动、粘贴、文件引用
-├── providers/
-│   ├── TerminalProvider.ts              # 主侧边栏终端 WebView 提供者
-│   ├── MessageRouter.ts                 # 消息分发 + 处理器
-│   ├── SessionRuntime.ts                # 启动/重启/实例切换
-│   └── CodeActionProvider.ts            # 诊断代码操作提供者
-├── terminals/
-│   └── TerminalManager.ts              # node-pty 进程生命周期
-├── services/
-│   ├── InstanceStore.ts                # 内存实例状态 + EventEmitter
-│   ├── InstanceController.ts           # 实例生命周期编排
-│   ├── InstanceDiscoveryService.ts     # 运行实例发现 + 自动拉起
-│   ├── InstanceRegistry.ts             # 实例持久化（globalState）
-│   ├── ConnectionResolver.ts           # 4 层端口解析 + 客户端池
-│   ├── OpenCodeApiClient.ts            # HTTP 客户端（重试/退避）
-│   ├── PortManager.ts                  # 临时端口分配
-│   ├── NativeTerminalManager.ts         # 原生终端后端
-│   ├── terminalBackends.ts              # 后端注册表
-│   ├── DataThrottleService.ts           # 批量终端数据投递
-│   ├── ContextManager.ts               # 活动编辑器/选区观察者
-│   ├── ContextSharingService.ts        # @file#L 上下文格式化器
-│   ├── FileReferenceManager.ts         # 文件引用序列化
-│   ├── InstanceQuickPick.ts            # 实例选择 QuickPick UI
-│   ├── OutputChannelService.ts         # 单例日志服务
-│   ├── OutputCaptureManager.ts         # 终端输出捕获
-│   └── aiTools/                        # AI 工具操作符系统
-├── webview/
-│   ├── main.ts                         # 终端启动（xterm.js + WebGL）
-│   ├── terminal-manager.ts             # 终端实例与拖放管理器
-│   ├── terminal/                       # 终端容器、键盘、配置
-│   ├── toolbar/                        # 工具栏按钮 & Pills
-│   ├── clipboard/                      # 剪贴板处理
-│   ├── messages/                       # 宿主消息处理
-│   ├── links/                          # 链接处理
-│   ├── dragdrop/                       # 拖放处理
-│   └── shared/                         # 共享工具
-├── utils/
-└── test/mocks/
-    ├── vscode.ts                       # VS Code API 模拟
-    └── node-pty.ts                     # node-pty 模拟
-```
-
-## 实现细节
-
-基于 vscode-sidebar-terminal 扩展，针对 AI 侧边栏终端进行精简：
-
-- **终端后端**: node-pty PTY 支持
-- **终端前端**: xterm.js + WebGL 渲染
-- **进程管理**: 自动 AI 工具生命周期管理
-- **通信**: HTTP API + WebView 消息传递
-- **端口管理**: 临时端口分配（16384-65535）
 
 ## 许可证
 
