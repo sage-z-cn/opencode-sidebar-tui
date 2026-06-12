@@ -137,8 +137,8 @@ describe("InstanceQuickPick", () => {
     await new InstanceQuickPick(instanceStore, discoveryService).show();
 
     const quickPick = quickPicks[0];
-    expect(quickPick.title).toBe("OpenCode Tmux Sessions");
-    expect(quickPick.placeholder).toBe("Select a tmux session to connect...");
+    expect(quickPick.title).toBe("Sessions");
+    expect(quickPick.placeholder).toBe("Select a session to connect...");
     expect(quickPick.show).toHaveBeenCalledOnce();
     expect(quickPick.busy).toBe(false);
     expect(quickPick.items).toHaveLength(7);
@@ -161,7 +161,7 @@ describe("InstanceQuickPick", () => {
     expect(quickPick.items[3]).toMatchObject({
       label: "$(circle-large-outline) External :4300",
       description: "PID 2 — /workspace/external",
-      detail: "Discovered externally-running tmux session",
+      detail: "Discovered externally-running session",
       action: { type: "connect", instanceId: "discovered-4300", port: 4300 },
     });
     expect(quickPick.items.map((item) => item.label)).not.toContain(
@@ -173,7 +173,7 @@ describe("InstanceQuickPick", () => {
       action: { type: "refresh" },
     });
     expect(quickPick.items[5]).toMatchObject({
-      label: "$(add) Spawn New Tmux Session",
+      label: "$(add) Spawn New Session",
       action: { type: "spawn" },
     });
     expect(quickPick.items[6]).toMatchObject({
@@ -198,7 +198,7 @@ describe("InstanceQuickPick", () => {
 
     expect(quickPicks[0].items).toEqual([
       expect.objectContaining({
-        label: "$(add) Spawn New Tmux Session",
+        label: "$(add) Spawn New Session",
         action: { type: "spawn" },
       }),
       expect.objectContaining({
@@ -268,7 +268,7 @@ describe("InstanceQuickPick", () => {
 
     expect(setActiveSpy).toHaveBeenCalledWith("connected");
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-      "Switched to tmux session: connected",
+      "Switched to session: connected",
     );
     expect(secondQuickPick.dispose).toHaveBeenCalledOnce();
   });
@@ -293,7 +293,7 @@ describe("InstanceQuickPick", () => {
     await acceptHandlers[0]();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      "Failed to select tmux session: cannot switch",
+      "Failed to select session: cannot switch",
     );
   });
 
@@ -342,7 +342,7 @@ describe("InstanceQuickPick", () => {
     await acceptHandlers[0]();
 
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      "Failed to select tmux session: cannot switch string",
+      "Failed to select session: cannot switch string",
     );
   });
 
@@ -380,7 +380,7 @@ describe("InstanceQuickPick", () => {
     );
     expect(connectSetActiveSpy).toHaveBeenCalledWith("discovered-4600");
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-      "Connected to tmux session on port 4600",
+      "Connected to session on port 4600",
     );
 
     const noControllerStore = new InstanceStore();
@@ -489,7 +489,7 @@ describe("InstanceQuickPick", () => {
 
     expect(controller.disconnect).toHaveBeenCalledWith("active");
     expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-      "Disconnected from tmux session",
+      "Disconnected from session",
     );
 
     controller.disconnect.mockRejectedValueOnce(new Error("disconnect failed"));

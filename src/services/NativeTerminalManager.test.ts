@@ -164,15 +164,6 @@ describe("NativeTerminalManager", () => {
       expect(manager.restore(malformedState)).toBeUndefined();
     });
 
-    it("returns undefined for wrong backend", () => {
-      const tmuxState: BackendSessionState = {
-        ...savedState,
-        backend: "tmux",
-      };
-
-      expect(manager.restore(tmuxState)).toBeUndefined();
-    });
-
     it("tracks lastSeenAt from original createdAt", () => {
       const plan = manager.restore(savedState);
 

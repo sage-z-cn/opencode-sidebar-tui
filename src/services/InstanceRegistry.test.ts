@@ -416,7 +416,7 @@ describe("InstanceRegistry", () => {
         config: {
           id: "global-backend",
           label: "Global Backend",
-          terminalBackend: "tmux",
+          terminalBackend: "native",
         },
         runtime: { terminalBackend: "native" },
         state: "connected",
@@ -426,9 +426,9 @@ describe("InstanceRegistry", () => {
           id: "workspace-backend",
           workspaceUri: "file:///workspace",
           label: "Workspace Backend",
-          terminalBackend: "zellij",
+          terminalBackend: "native",
         },
-        runtime: { terminalBackend: "tmux" },
+        runtime: { terminalBackend: "native" },
         state: "connected",
       });
       store.setActive("workspace-backend");
@@ -443,21 +443,21 @@ describe("InstanceRegistry", () => {
       ] as { instances: Array<{ terminalBackend?: string }> };
       expect(globalConfigs[0]).toMatchObject({
         id: "global-backend",
-        terminalBackend: "tmux",
+        terminalBackend: "native",
       });
       expect(workspaceState.instances[0]).toMatchObject({
         id: "workspace-backend",
-        terminalBackend: "zellij",
+        terminalBackend: "native",
       });
 
       const hydratedStore = new InstanceStore();
       new InstanceRegistry(context as any).hydrate(hydratedStore);
 
       expect(hydratedStore.get("global-backend")?.config.terminalBackend).toBe(
-        "tmux",
+        "native",
       );
       expect(hydratedStore.get("workspace-backend")?.config.terminalBackend).toBe(
-        "zellij",
+        "native",
       );
       expect(hydratedStore.getActive().config.id).toBe("workspace-backend");
     });
@@ -516,29 +516,7 @@ describe("InstanceRegistry", () => {
       );
     });
 
-    it("keeps config.terminalBackend when runtime has a different backend", async () => {
-      const { context, globalValues } = createContext();
-      const registry = new InstanceRegistry(context as any);
-      const store = new InstanceStore();
-
-      store.upsert({
-        config: { id: "config-wins", terminalBackend: "tmux" },
-        runtime: { terminalBackend: "native" },
-        state: "connected",
-      });
-
-      await registry.persist(store);
-
-      const globalConfigs = globalValues[GLOBAL_INSTANCES_KEY] as Array<{
-        terminalBackend?: string;
-      }>;
-      expect(globalConfigs[0]).toMatchObject({
-        id: "config-wins",
-        terminalBackend: "tmux",
-      });
-    });
-
-    it("persists multiple mixed backend types without cross-contaminating configs", async () => {
+    it("persists multiple global and workspace instances without cross-contaminating configs", async () => {
       const { context, globalValues, workspaceValues } = createContext();
       const registry = new InstanceRegistry(
         context as unknown as ConstructorParameters<typeof InstanceRegistry>[0],
@@ -546,38 +524,38 @@ describe("InstanceRegistry", () => {
       const store = new InstanceStore();
 
       store.upsert({
-        config: { id: "native-global", terminalBackend: "native" },
+        config: { id: "global-one", terminalBackend: "native" },
         runtime: { terminalBackend: "native" },
         state: "connected",
       });
       store.upsert({
-        config: { id: "tmux-global", terminalBackend: "tmux" },
-        runtime: { terminalBackend: "tmux" },
+        config: { id: "global-two", terminalBackend: "native" },
+        runtime: { terminalBackend: "native" },
         state: "connected",
       });
       store.upsert({
         config: {
-          id: "zellij-workspace",
-          workspaceUri: "file:///workspace/zellij",
-          terminalBackend: "zellij",
+          id: "workspace-instance",
+          workspaceUri: "file:///workspace/project",
+          terminalBackend: "native",
         },
-        runtime: { terminalBackend: "zellij" },
+        runtime: { terminalBackend: "native" },
         state: "connected",
       });
 
       await registry.persist(store);
 
       expect(globalValues[GLOBAL_INSTANCES_KEY]).toEqual([
-        { id: "native-global", terminalBackend: "native" },
-        { id: "tmux-global", terminalBackend: "tmux" },
+        { id: "global-one", terminalBackend: "native" },
+        { id: "global-two", terminalBackend: "native" },
       ]);
       expect(workspaceValues[WORKSPACE_INSTANCES_KEY]).toEqual({
-        activeInstanceId: "native-global",
+        activeInstanceId: "global-one",
         instances: [
           {
-            id: "zellij-workspace",
-            workspaceUri: "file:///workspace/zellij",
-            terminalBackend: "zellij",
+            id: "workspace-instance",
+            workspaceUri: "file:///workspace/project",
+            terminalBackend: "native",
           },
         ],
       });

@@ -40,8 +40,8 @@ export class InstanceQuickPick {
 
   public async show(): Promise<void> {
     const quickPick = vscode.window.createQuickPick<InstanceQuickPickItem>();
-    quickPick.title = l10n.t("OpenCode Tmux Sessions");
-    quickPick.placeholder = l10n.t("Select a tmux session to connect...");
+    quickPick.title = l10n.t("Sessions");
+    quickPick.placeholder = l10n.t("Select a session to connect...");
     quickPick.busy = true;
     quickPick.show();
 
@@ -113,8 +113,8 @@ export class InstanceQuickPick {
     }
 
     items.push({
-      label: `$(add) ${l10n.t("Spawn New Tmux Session")}`,
-      description: l10n.t("Start a new OpenCode tmux session for this workspace"),
+      label: `$(add) ${l10n.t("Spawn New Session")}`,
+      description: l10n.t("Start a new session for this workspace"),
       action: { type: "spawn" },
     });
 
@@ -172,7 +172,7 @@ export class InstanceQuickPick {
             workspace: instance.workspacePath,
           })
         : `PID ${instance.pid}`,
-      detail: l10n.t("Discovered externally-running tmux session"),
+      detail: l10n.t("Discovered externally-running session"),
       action: {
         type: "connect",
         instanceId,
@@ -185,7 +185,7 @@ export class InstanceQuickPick {
     return [
       {
         label: `$(warning) ${l10n.t("Failed to discover instances")}`,
-        description: l10n.t("Try spawning a new tmux session"),
+        description: l10n.t("Try spawning a new session"),
         action: { type: "spawn" },
       },
       {
@@ -204,13 +204,13 @@ export class InstanceQuickPick {
         try {
           this.instanceStore.setActive(action.instanceId);
           vscode.window.showInformationMessage(
-            l10n.t("Switched to tmux session: {instanceId}", {
+            l10n.t("Switched to session: {instanceId}", {
               instanceId: action.instanceId,
             }),
           );
         } catch (error) {
           vscode.window.showErrorMessage(
-            l10n.t("Failed to select tmux session: {error}", {
+            l10n.t("Failed to select session: {error}", {
               error: error instanceof Error ? error.message : String(error),
             }),
           );
@@ -224,7 +224,7 @@ export class InstanceQuickPick {
             await this.controller.connect(action.instanceId, action.port);
             this.instanceStore.setActive(action.instanceId);
             vscode.window.showInformationMessage(
-              l10n.t("Connected to tmux session on port {port}", {
+              l10n.t("Connected to session on port {port}", {
                 port: action.port,
               }),
             );
@@ -248,7 +248,7 @@ export class InstanceQuickPick {
           });
           this.instanceStore.setActive(action.instanceId);
           vscode.window.showInformationMessage(
-            l10n.t("Connected to tmux session on port {port}", {
+            l10n.t("Connected to instance on port {port}", {
               port: action.port,
             }),
           );
@@ -261,7 +261,7 @@ export class InstanceQuickPick {
           try {
             await this.controller.disconnect(action.instanceId);
             vscode.window.showInformationMessage(
-              l10n.t("Disconnected from tmux session"),
+              l10n.t("Disconnected from session"),
             );
           } catch (error) {
             vscode.window.showErrorMessage(

@@ -29,8 +29,6 @@ interface InstanceRuntime {
   port?: number;
   pid?: number;
   terminalKey?: string;
-  tmuxSessionId?: string;
-  zellijSessionId?: string;
   terminalBackend?: TerminalBackendType;
   backendState?: BackendSessionState;
   lastSeenAt?: number;
