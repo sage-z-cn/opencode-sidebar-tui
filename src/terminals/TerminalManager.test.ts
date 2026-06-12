@@ -629,6 +629,9 @@ describe("TerminalManager", () => {
     });
 
     it("should fall back to the SHELL environment variable on non-Windows", () => {
+      Object.defineProperty(process, "platform", {
+        value: "linux",
+      });
       vscode.env.shell = "";
       process.env.SHELL = "/bin/zsh";
       const configuration = {
@@ -653,6 +656,9 @@ describe("TerminalManager", () => {
     });
 
     it("should fall back to bash on non-Windows when SHELL is empty", () => {
+      Object.defineProperty(process, "platform", {
+        value: "linux",
+      });
       vscode.env.shell = "";
       process.env.SHELL = "";
       const configuration = {

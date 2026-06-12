@@ -7,6 +7,7 @@ import { OutputCaptureManager } from "../services/OutputCaptureManager";
 import { OpenCodeApiClient } from "../services/OpenCodeApiClient";
 import { OutputChannelService } from "../services/OutputChannelService";
 import { PortManager } from "../services/PortManager";
+import type { TmuxSessionManager } from "../services/TmuxSessionManager";
 import { TerminalManager } from "../terminals/TerminalManager";
 import { TerminalProvider } from "../providers/TerminalProvider";
 import { DEFAULT_AI_TOOLS } from "../types";
@@ -188,7 +189,7 @@ describe("multi-pane regression coverage", () => {
 
     const providerRegistration = vi
       .mocked(vscode.window.registerWebviewViewProvider)
-      .mock.calls.find((call) => call[0] === "ai-sidebar-terminal");
+      .mock.calls.find((call) => call[0] === TerminalProvider.viewType);
 
     expect(providerRegistration).toBeDefined();
 

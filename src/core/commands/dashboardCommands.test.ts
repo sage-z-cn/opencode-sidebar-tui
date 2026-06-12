@@ -7,6 +7,7 @@ import type * as vscodeTypes from "../../test/mocks/vscode";
 import type { DashboardCommandDependencies } from "./dashboardCommands";
 import { registerDashboardCommands } from "./dashboardCommands";
 import * as typesModule from "../../types";
+import { l10n } from "../../i18n";
 import ts from "typescript";
 import type { TerminalProvider } from "../../providers/TerminalProvider";
 import type { TmuxSessionManager } from "../../services/TmuxSessionManager";
@@ -86,6 +87,10 @@ function loadDashboardInternals(): DashboardInternals {
 
       if (specifier === "../../types") {
         return typesModule;
+      }
+
+      if (specifier === "../../i18n") {
+        return { l10n };
       }
 
       throw new Error(`Unexpected dashboardCommands dependency: ${specifier}`);
