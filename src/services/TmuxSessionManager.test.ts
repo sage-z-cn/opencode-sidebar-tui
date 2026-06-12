@@ -639,13 +639,18 @@ describe("TmuxSessionManager", () => {
     await manager.registerSessionHooks("repo-a", 99);
     await manager.unregisterSessionHooks("repo-a");
 
+    const hookCommand =
+      process.platform === "win32"
+        ? 'run-shell "echo noop"'
+        : 'run-shell "kill -USR2 99 2>/dev/null || true"';
+
     expect(vi.mocked(execFile).mock.calls[0]?.[1]).toEqual([
       "set-hook",
       "-g",
       "-t",
       "repo-a",
       "after-split-window",
-      'run-shell "kill -USR2 99 2>/dev/null || true"',
+      hookCommand,
     ]);
     expect(vi.mocked(execFile).mock.calls[5]?.[1]).toEqual([
       "set-hook",
@@ -1100,7 +1105,7 @@ describe("TmuxSessionManager", () => {
         if (separator === "\t" && value === "__visible_sparse__") {
           return [null!, "1", "2", "3", "4"];
         }
-        return originalSplit.call(value, separator, limit);
+        return Reflect.apply(originalSplit, value, [separator, limit]) as string[];
       };
       const splitSpy = vi
         .spyOn(String.prototype, "split")
@@ -1372,7 +1377,7 @@ describe("TmuxSessionManager", () => {
             "4",
           ];
         }
-        return originalSplit.call(value, separator, limit);
+        return Reflect.apply(originalSplit, value, [separator, limit]) as string[];
       };
       const splitSpy = vi
         .spyOn(String.prototype, "split")

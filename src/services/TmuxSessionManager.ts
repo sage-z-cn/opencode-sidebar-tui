@@ -870,36 +870,34 @@ export class TmuxSessionManager {
       const toolsArr = Array.isArray(tools) ? tools : [];
 
       const processMap = new Map<number, { ppid: number; command: string }>();
-      if (process.platform !== "win32") {
-        try {
-          const psOutput = await new Promise<string>((resolve, reject) => {
-            this.runExecFile(
-              "ps",
-              ["-ax", "-o", "pid=,ppid=,command="],
-              (error, stdout) => {
-                if (error) {
-                  reject(error);
-                } else {
-                  resolve(stdout?.toString() ?? "");
-                }
-              },
-            );
-          });
+      try {
+        const psOutput = await new Promise<string>((resolve, reject) => {
+          this.runExecFile(
+            "ps",
+            ["-ax", "-o", "pid=,ppid=,command="],
+            (error, stdout) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(stdout?.toString() ?? "");
+              }
+            },
+          );
+        });
 
-          psOutput.split(/\r?\n/).forEach((line) => {
-            const trimmed = line.trim();
-            if (trimmed.length === 0) return;
-            const parts = trimmed.match(/^\s*(\d+)\s+(\d+)\s+(.+)$/);
-            if (parts) {
-              const pid = parseInt(parts[1], 10);
-              const ppid = parseInt(parts[2], 10);
-              const command = parts[3];
-              processMap.set(pid, { ppid, command });
-            }
-          });
-        } catch {
-          // Ignore ps errors, just use currentCommand
-        }
+        psOutput.split(/\r?\n/).forEach((line) => {
+          const trimmed = line.trim();
+          if (trimmed.length === 0) return;
+          const parts = trimmed.match(/^\s*(\d+)\s+(\d+)\s+(.+)$/);
+          if (parts) {
+            const pid = parseInt(parts[1], 10);
+            const ppid = parseInt(parts[2], 10);
+            const command = parts[3];
+            processMap.set(pid, { ppid, command });
+          }
+        });
+      } catch {
+        // Ignore ps errors, just use currentCommand
       }
 
       // Build child map: parentPid -> childPids[]
