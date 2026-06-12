@@ -5,6 +5,18 @@ All notable changes to the "AI Sidebar Terminal" extension will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-06-13
+
+### Changed
+
+- **Architecture**: Remove multi-pane layout, tmux/zellij/dashboard backends, and backend-selector UI. Simplify to a single-terminal native-only model.
+- **Toolbar**: Remove rerender button and add dynamic editor attachment icon.
+
+### Fixed
+
+- **Paste**: Enable image paste when clipboard has no text.
+- **Paths**: Normalize host-specific path separators for cross-platform consistency.
+
 ## [2.6.0] - 2026-06-11
 
 ### Added
