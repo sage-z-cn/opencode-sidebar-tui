@@ -4,36 +4,28 @@
 
 [中文文档](https://github.com/sage-z-cn/ai-sidebar-terminal/blob/main/README.zh-CN.md)
 
-Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, Mimo Code, or any custom AI tool) in the VS Code sidebar with full terminal and tmux session management.
+Embed multiple AI coding agents (OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, Mimo Code, or any custom AI tool) in the VS Code sidebar with full terminal management.
 
 ## Features
 
 - **Auto-launch AI Tools**: Automatically start your chosen AI coding agent when the sidebar is activated
 - **Full TUI Support**: Complete terminal emulation with xterm.js and WebGL rendering
 - **Multi-AI Tool Support**: Built-in support for OpenCode, Claude Code, Codex, Gemini CLI, Kimi Code, Qwen Code, Mimo Code with custom tool configuration
-- **Pill Dropdown Toolbar**: Unified pill-style dropdowns for quick AI tool and backend switching
-- **Terminal Managers**: Dedicated tmux session management surface with inline pane and window controls
-- **Tmux Integration**: Automatic tmux session discovery, workspace-scoped session filtering, and tmux status bar hidden in sidebar
-- **Native Shell Switching**: Toggle between AI tools and a native shell in the same terminal
-- **Return to Workspace Banner**: Quick navigation back to the active workspace from Terminal Managers
+- **Multi-Pane Layout**: Split the terminal into multiple panes with tabs, powered by xterm.js
+- **Pill Dropdown Toolbar**: Unified pill-style dropdowns for quick AI tool switching
 - **HTTP API Integration**: Bidirectional communication with OpenCode CLI via HTTP API
 - **Auto-Context Sharing**: Automatically shares editor context when terminal opens
 - **File References with Line Numbers**: Send file references with `@filename#L10-L20` syntax
 - **Code Actions**: Diagnostic-triggered code actions for errors and warnings
-- **Keyboard Shortcuts**: Quick access with `Alt+A`, `Cmd+Alt+A`, and `Cmd+Alt+T`
+- **Keyboard Shortcuts**: Quick access with `Alt+A` and `Cmd+Alt+A`
 - **Drag & Drop Support**: Hold Shift and drag files/folders to send as references
-- **Context Menu Integration**: Right-click files in Explorer or text in Editor to send to OpenCode
+- **Context Menu Integration**: Right-click files in Explorer or text in Editor to send to AI terminal
 - **Secondary Sidebar**: Dock the terminal in the secondary sidebar for split-screen workflows
 - **Configurable**: Customize command, font, terminal settings, HTTP API behavior, and AI tool preferences
 
 ## Architecture
 
-This extension provides a **sidebar-only** terminal experience. OpenCode runs embedded in the VS Code sidebar Activity Bar, not in the native VS Code terminal panel.
-
-The extension consists of two primary sidebar views:
-
-1. **OpenCode Terminal** (secondary sidebar): The main interactive TUI session.
-2. **Terminal Managers**: A dedicated surface for managing tmux sessions, panes, and windows.
+This extension provides a **sidebar-only** terminal experience. AI tools run embedded in the VS Code sidebar Activity Bar, not in the native VS Code terminal panel.
 
 ### Communication Architecture
 
@@ -56,7 +48,7 @@ The extension uses a hybrid communication approach:
 
 ```bash
 git clone https://github.com/sage-z-cn/ai-sidebar-terminal.git
-cd opencode-sidebar-tui
+cd ai-sidebar-terminal
 ```
 
 2. Install dependencies:
@@ -86,17 +78,17 @@ npx @vscode/vsce package
 
 ## Usage
 
-1. Click the OpenCode icon in the Activity Bar (sidebar) to open Terminal Managers
-2. The AI Sidebar Terminal is available in the secondary sidebar
-3. AI Sidebar Terminal automatically starts when the terminal view is activated
-4. Interact with OpenCode directly in the sidebar
+1. Click the AI Sidebar Terminal icon in the Activity Bar (sidebar)
+2. The terminal automatically starts when the view is activated
+3. Interact with your AI tool directly in the sidebar
 
 ## Commands
 
 ### Basic Commands
 
-- **AI Sidebar Terminal: Start OpenCode** - Manually start OpenCode
+- **AI Sidebar Terminal: Start OpenCode** - Manually start the AI tool
 - **AI Sidebar Terminal: Paste** - Paste text into the terminal
+- **AI Sidebar Terminal: Focus Terminal** - Focus the sidebar terminal
 
 ### File Reference Commands
 
@@ -108,46 +100,14 @@ npx @vscode/vsce package
 - **Send to AI Terminal** - Send selected text or file from context menu to the active AI agent
 - **Send to Active Terminal** - Send selected text to the active terminal
 
-### Tmux Session Commands
-
-- **Open Tmux Session in New Window** - Open the current tmux session in a new VS Code window
-- **Spawn Tmux Session for Workspace** - Create a new tmux session scoped to the current workspace
-- **Select OpenCode Tmux Session** - Choose from a list of available tmux sessions
-- **Switch Tmux Session** - Switch to a different tmux session
-- **Browse Tmux Sessions** (`Cmd+Alt+T` / `Ctrl+Alt+T`) - Browse and switch between tmux sessions
-- **Switch to Native Shell** - Toggle between OpenCode and a native shell
-- **Open Terminal Managers** - Open the Terminal Managers view
-
-### Tmux Pane Commands
-
-- **Switch to Pane** - Switch focus to a specific tmux pane
-- **Split Pane Horizontal** - Split the current pane horizontally
-- **Split Pane Vertical** - Split the current pane vertically
-- **Split Pane with Command** - Split the pane and run a specific command
-- **Send Text to Pane** - Send text directly to a specific tmux pane
-- **Resize Pane** - Adjust the size of the current tmux pane
-- **Swap Panes** - Swap positions of two tmux panes
-- **Kill Pane** - Close the current tmux pane
-
-### Tmux Window Commands
-
-- **Next Window** - Switch to the next tmux window
-- **Previous Window** - Switch to the previous tmux window
-- **Create Window** - Create a new tmux window
-- **Select Window** - Choose from available tmux windows
-- **Kill Window** - Close the current tmux window
-- **Kill Session** - Kill the current tmux session
-- **Refresh Terminal Manager** - Refresh Terminal Managers
-
 ### Keyboard Shortcuts
 
-| Shortcut                   | Command              | Context                        |
-| -------------------------- | -------------------- | ------------------------------ |
-| `Alt+A`                    | Send File Reference  | Editor or Terminal             |
-| `Cmd+Alt+A` / `Ctrl+Alt+A` | Send All Open Files  | Editor or Terminal             |
-| `Cmd+Alt+T` / `Ctrl+Alt+T` | Browse Tmux Sessions | Terminal focused               |
-| `Cmd+V` / `Ctrl+V`         | Paste                | Terminal focused               |
-| `Ctrl+P`                   | Quick Open (native)  | Terminal focused (passthrough) |
+| Shortcut                   | Command             | Context                        |
+| -------------------------- | ------------------- | ------------------------------ |
+| `Alt+A`                    | Send File Reference | Editor or Terminal             |
+| `Cmd+Alt+A` / `Ctrl+Alt+A` | Send All Open Files | Editor or Terminal             |
+| `Cmd+V` / `Ctrl+V`         | Paste               | Terminal focused               |
+| `Ctrl+P`                   | Pass through        | Terminal focused (passthrough) |
 
 ### Context Menu Options
 
@@ -157,17 +117,6 @@ npx @vscode/vsce package
 ### Drag & Drop
 
 - Hold **Shift** and drag files/folders to the terminal to send as `@file` references
-
-## Terminal Managers
-
-The Terminal Managers view provides advanced tmux session and pane management directly within the VS Code sidebar:
-
-- **Session Discovery**: Automatically detects existing tmux sessions on your system.
-- **Workspace Filtering**: Filters sessions to show those relevant to your current workspace.
-- **Pane Controls**: Inline buttons to split panes (horizontal/vertical), switch focus, resize, swap, and kill panes.
-- **Window Controls**: Navigate, create, select, and kill tmux windows.
-- **Return to Workspace**: A quick-access banner to navigate back to the active workspace session.
-- **Clean UI**: The tmux status bar is automatically hidden within the sidebar terminal to maximize vertical space.
 
 ## HTTP API Integration
 
@@ -199,13 +148,13 @@ The extension communicates with OpenCode CLI via an HTTP API for reliable bidire
 
 ## Auto-Context Sharing
 
-When enabled, the extension automatically shares editor context with OpenCode when the terminal opens:
+When enabled, the extension automatically shares editor context with the AI tool when the terminal opens:
 
 - **Open Files**: Lists all currently open files
 - **Active Selection**: Includes line numbers for selected text
 - **Format**: `@path/to/file#L10-L20`
 
-This feature eliminates the need to manually share context when starting a new OpenCode session.
+This feature eliminates the need to manually share context when starting a new session.
 
 ## Configuration
 
@@ -213,60 +162,62 @@ Available settings in VS Code settings (`Cmd+,` / `Ctrl+,`):
 
 ### Terminal Settings
 
-| Setting                       | Type    | Default           | Description                                             |
-| ----------------------------- | ------- | ----------------- | ------------------------------------------------------- |
-| `ai-sidebar-terminal.autoStart`       | boolean | `true`            | Automatically start OpenCode when the view is activated |
-| `ai-sidebar-terminal.autoStartOnOpen` | boolean | `true`            | Automatically start OpenCode when sidebar is opened     |
-| `ai-sidebar-terminal.fontSize`        | number  | `14`              | Terminal font size in pixels (6-25)                     |
-| `ai-sidebar-terminal.fontFamily`      | string  | Nerd Font stack\* | Terminal font family                                    |
-| `ai-sidebar-terminal.cursorBlink`     | boolean | `true`            | Enable cursor blinking                                  |
-| `ai-sidebar-terminal.cursorStyle`     | string  | `"block"`         | Cursor style: `block`, `underline`, or `bar`            |
-| `ai-sidebar-terminal.scrollback`      | number  | `10000`           | Maximum lines in scrollback buffer (0-100000)           |
-| `ai-sidebar-terminal.autoFocusOnSend` | boolean | `true`            | Auto-focus sidebar after sending file references        |
-| `ai-sidebar-terminal.shellPath`       | string  | `""`              | Custom shell path (empty = VS Code default)             |
-| `ai-sidebar-terminal.shellArgs`       | array   | `[]`              | Custom shell arguments                                  |
+| Setting                              | Type    | Default           | Description                                          |
+| ------------------------------------ | ------- | ----------------- | ---------------------------------------------------- |
+| `ai-sidebar-terminal.fontSize`       | number  | `12`              | Terminal font size in pixels (6-25)                  |
+| `ai-sidebar-terminal.fontFamily`     | string  | Nerd Font stack\* | Terminal font family                                 |
+| `ai-sidebar-terminal.cursorBlink`    | boolean | `true`            | Enable cursor blinking                               |
+| `ai-sidebar-terminal.cursorStyle`    | string  | `"block"`         | Cursor style: `block`, `underline`, or `bar`         |
+| `ai-sidebar-terminal.scrollback`     | number  | `10000`           | Maximum lines in scrollback buffer (0-100000)        |
+| `ai-sidebar-terminal.autoFocusOnSend` | boolean | `true`            | Auto-focus sidebar after sending file references     |
+| `ai-sidebar-terminal.autoStartOnOpen` | boolean | `true`            | Automatically start AI tool when sidebar is opened   |
+| `ai-sidebar-terminal.shellPath`      | string  | `""`              | Custom shell path (empty = VS Code default)          |
+| `ai-sidebar-terminal.shellArgs`      | array   | `[]`              | Custom shell arguments                               |
+| `ai-sidebar-terminal.sendKeybindingsToShell` | boolean | `true` | Send Ctrl/Cmd shortcuts to terminal |
 
 \* Default: `'JetBrainsMono Nerd Font', 'FiraCode Nerd Font', 'CascadiaCode NF', Menlo, monospace`
 
 ### HTTP API Settings
 
-| Setting                         | Type    | Default | Description                                      |
-| ------------------------------- | ------- | ------- | ------------------------------------------------ |
-| `ai-sidebar-terminal.enableHttpApi`     | boolean | `true`  | Enable HTTP API for OpenCode communication       |
-| `ai-sidebar-terminal.httpTimeout`       | number  | `5000`  | HTTP API request timeout in ms (1000-30000)      |
-| `ai-sidebar-terminal.autoShareContext`  | boolean | `true`  | Auto-share editor context with OpenCode          |
-| `ai-sidebar-terminal.contextDebounceMs` | number  | `500`   | Debounce delay for context updates (100-5000 ms) |
+| Setting                                  | Type    | Default | Description                                      |
+| ---------------------------------------- | ------- | ------- | ------------------------------------------------ |
+| `ai-sidebar-terminal.enableHttpApi`      | boolean | `true`  | Enable HTTP API for OpenCode communication       |
+| `ai-sidebar-terminal.httpTimeout`        | number  | `5000`  | HTTP API request timeout in ms (1000-30000)      |
+| `ai-sidebar-terminal.autoShareContext`   | boolean | `true`  | Auto-share editor context with AI tool           |
+| `ai-sidebar-terminal.contextDebounceMs`  | number  | `500`   | Debounce delay for context updates (100-5000 ms) |
 
 ### AI Tool Settings
 
-| Setting                       | Type    | Default                       | Description                                               |
-| ----------------------------- | ------- | ----------------------------- | --------------------------------------------------------- |
-| `ai-sidebar-terminal.aiTools`         | array   | `[{opencode, claude, codex}]` | Configure AI coding tools with custom paths and arguments |
-| `ai-sidebar-terminal.defaultAiTool`   | string  | `"opencode"`                  | Default AI tool for new tmux sessions                     |
-| `ai-sidebar-terminal.enableAutoSpawn` | boolean | `true`                        | Auto-spawn OpenCode if not running                        |
-
-### Tmux Settings
-
-| Setting                          | Type    | Default | Description                                                            |
-| -------------------------------- | ------- | ------- | ---------------------------------------------------------------------- |
-| `ai-sidebar-terminal.nativeShellDefault` | string  | `""`    | Default behavior for native shell switch (`""`, `"opencode"`, `"shell"`) |
-| `ai-sidebar-terminal.tmuxSessionDefault` | string  | `""`    | Default behavior for new tmux sessions (`""`, `"opencode"`, `"shell"`) |
-| `ai-sidebar-terminal.showTmuxWindowControls` | boolean | `true` | Show direct tmux session/window controls in the terminal toolbar       |
+| Setting                                | Type    | Default                        | Description                                               |
+| -------------------------------------- | ------- | ------------------------------ | --------------------------------------------------------- |
+| `ai-sidebar-terminal.aiTools`          | array   | `[{opencode, claude, codex}]` | Configure AI coding tools with custom paths and arguments |
+| `ai-sidebar-terminal.defaultAiTool`    | string  | `"opencode"`                   | Default AI tool for new terminal sessions                 |
+| `ai-sidebar-terminal.enableAutoSpawn`  | boolean | `true`                         | Auto-spawn AI tool if not running                         |
+| `ai-sidebar-terminal.promptAiToolOnSession` | boolean | `true`                    | Show AI tool selector when creating a new session         |
 
 ### Advanced Settings
 
-| Setting                            | Type   | Default                | Description                                      |
-| ---------------------------------- | ------ | ---------------------- | ------------------------------------------------ |
-| `ai-sidebar-terminal.logLevel`             | string | `"info"`               | Log level: `debug`, `info`, `warn`, `error`      |
-| `ai-sidebar-terminal.maxDiagnosticLength`  | number | `500`                  | Maximum length of diagnostic messages (100-2000) |
-| `ai-sidebar-terminal.codeActionSeverities` | array  | `["error", "warning"]` | Diagnostic severities that trigger code actions  |
+| Setting                                       | Type   | Default                 | Description                                      |
+| --------------------------------------------- | ------ | ----------------------- | ------------------------------------------------ |
+| `ai-sidebar-terminal.logLevel`                | string | `"info"`                | Log level: `debug`, `info`, `warn`, `error`      |
+| `ai-sidebar-terminal.maxDiagnosticLength`     | number | `500`                   | Maximum length of diagnostic messages (100-2000) |
+| `ai-sidebar-terminal.codeActionSeverities`    | array  | `["error", "warning"]`  | Diagnostic severities that trigger code actions  |
+| `ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen` | boolean | `true`        | Close secondary sidebar when opening editor tab  |
+
+### Pane Settings
+
+| Setting                                       | Type    | Default      | Description                                          |
+| --------------------------------------------- | ------- | ------------ | ---------------------------------------------------- |
+| `ai-sidebar-terminal.pane.defaultSplitDirection` | string  | `"horizontal"` | Default split direction (horizontal / vertical)   |
+| `ai-sidebar-terminal.pane.focusOnClick`       | boolean | `true`       | Focus a pane when clicking on it                     |
+| `ai-sidebar-terminal.pane.showPaneActions`    | boolean | `true`       | Show pane action buttons (split, close)              |
+| `ai-sidebar-terminal.pane.renderer`           | string  | `"auto"`     | Renderer: `webgl`, `canvas`, or `auto`               |
 
 ### Example Configuration
 
 ```json
 {
-  "ai-sidebar-terminal.autoStart": true,
-  "ai-sidebar-terminal.fontSize": 14,
+  "ai-sidebar-terminal.fontSize": 12,
   "ai-sidebar-terminal.fontFamily": "'JetBrainsMono Nerd Font', monospace",
   "ai-sidebar-terminal.cursorBlink": true,
   "ai-sidebar-terminal.cursorStyle": "block",
@@ -282,7 +233,7 @@ Available settings in VS Code settings (`Cmd+,` / `Ctrl+,`):
 
 - VS Code 1.106.0 or higher
 - Node.js 20.0.0 or higher
-- OpenCode (or any supported AI tool: `claude`, `codex`, `gemini`, `kimi`, `mimo`, etc.) installed and accessible via command line
+- At least one supported AI tool installed and accessible via command line
 
 ## Development
 
@@ -305,24 +256,16 @@ npm run format          # Format source
 src/
 ├── extension.ts                         # VS Code entry (activate/deactivate)
 ├── types.ts                             # Shared host↔webview message contracts
-├── types.test.ts                        # Type contract tests
 ├── core/
 │   ├── ExtensionLifecycle.ts            # Service wiring + activation/deactivation
 │   └── commands/                        # Command registration
 │       ├── index.ts                     # registerCommands() orchestrator
-│       ├── terminalCommands.ts          # start, restart, paste, file references
-│       ├── tmuxSessionCommands.ts       # session switch, create, spawn, browse
-│       └── tmuxPaneCommands.ts          # pane + window commands + QuickPick helpers
+│       └── terminalCommands.ts          # start, paste, file references
 ├── providers/
 │   ├── TerminalProvider.ts              # Main sidebar terminal webview provider
-│   ├── TerminalProvider.test.ts         # Provider tests
-│   ├── TerminalDashboardProvider.ts     # Terminal Managers provider
-│   ├── TerminalDashboardProvider.test.ts # Dashboard tests
-│   ├── CodeActionProvider.ts            # Diagnostic code action provider
-│   ├── CodeActionProvider.test.ts       # Code action tests
-│   └── opencode/                        # Terminal core modules
-│       ├── OpenCodeMessageRouter.ts     # Message dispatch + handlers
-│       └── OpenCodeSessionRuntime.ts    # Start/restart/tmux/instance switching
+│   ├── MessageRouter.ts                 # Message dispatch + handlers
+│   ├── SessionRuntime.ts                # Start/restart/instance switching
+│   └── CodeActionProvider.ts            # Diagnostic code action provider
 ├── terminals/
 │   └── TerminalManager.ts              # node-pty process lifecycle
 ├── services/
@@ -333,28 +276,33 @@ src/
 │   ├── ConnectionResolver.ts           # 4-tier port resolution + client pool
 │   ├── OpenCodeApiClient.ts            # HTTP client (retry/backoff)
 │   ├── PortManager.ts                  # Ephemeral port allocation
-│   ├── TmuxSessionManager.ts           # tmux CLI wrapper (sessions, panes, windows)
+│   ├── NativeTerminalManager.ts         # Native terminal backend
+│   ├── terminalBackends.ts              # Backend registry
+│   ├── PaneStore.ts                     # Pane state management
+│   ├── DataThrottleService.ts           # Batched pane data delivery
 │   ├── ContextManager.ts               # Active editor/selection observer
 │   ├── ContextSharingService.ts        # @file#L context formatter
 │   ├── FileReferenceManager.ts         # File reference serialization
 │   ├── InstanceQuickPick.ts            # Quick pick UI for instance selection
 │   ├── OutputChannelService.ts         # Singleton logging service
-│   └── OutputCaptureManager.ts         # Terminal output capture
+│   ├── OutputCaptureManager.ts         # Terminal output capture
+│   └── aiTools/                        # AI tool operator system
 ├── webview/
-│   ├── main.ts                         # Terminal webview (xterm.js + WebGL)
-│   ├── terminal.html                   # Terminal webview HTML
-│   ├── terminal.css                    # Terminal webview styles
-│   ├── dashboard-manager.ts            # Dashboard webview logic
-│   ├── dashboard.html                  # Dashboard webview HTML
-│   └── dashboard.css                   # Dashboard webview styles
+│   ├── main.ts                         # Terminal bootstrap (xterm.js + WebGL)
+│   ├── pane-manager.ts                 # Multi-pane lifecycle
+│   ├── pane-message-router.ts          # Pane message routing
+│   ├── layout/                         # Layout engine (multi-pane)
+│   ├── tab-bar/                        # Tab bar UI
+│   ├── pane-actions/                   # Pane action buttons
+│   ├── focus/                          # Focus management
+│   ├── toolbar/                        # Toolbar buttons
+│   ├── clipboard/                      # Clipboard handling
+│   ├── terminal/                       # Terminal container, keyboard, AI selector
+│   └── messages/                       # Host message handling
 ├── utils/
-│   └── PromptFormatter.ts              # Prompt formatting utilities
-├── test/
-│   └── mocks/
-│       ├── vscode.ts                   # VS Code API mock
-│       └── node-pty.ts                 # node-pty mock
-└── __tests__/
-    └── setup.ts                        # Vitest global setup
+└── test/mocks/
+    ├── vscode.ts                       # VS Code API mock
+    └── node-pty.ts                     # node-pty mock
 ```
 
 ## Implementation Details
@@ -363,15 +311,10 @@ Based on the excellent vscode-sidebar-terminal extension, streamlined specifical
 
 - **Terminal Backend**: node-pty for PTY support
 - **Terminal Frontend**: xterm.js with WebGL rendering
-- **Process Management**: Automatic OpenCode lifecycle
+- **Process Management**: Automatic AI tool lifecycle
 - **Communication**: HTTP API + WebView messaging
 - **Port Management**: Ephemeral port allocation (16384-65535)
-
-## Upstream Sync
-
-This fork maintains an `origin-main` branch that mirrors the upstream repository. See [SYNC_UPSTREAM.md](SYNC_UPSTREAM.md) for the sync workflow.
 
 ## License
 
 MIT — see [LICENSE](LICENSE) for details.
-

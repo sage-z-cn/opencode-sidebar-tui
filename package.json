@@ -96,72 +96,6 @@
         "icon": "$(clippy)"
       },
       {
-        "command": "ai-sidebar-terminal.openInNewWindow",
-        "title": "%command.ai-sidebar-terminal.openInNewWindow.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(empty-window)"
-      },
-      {
-        "command": "ai-sidebar-terminal.spawnForWorkspace",
-        "title": "%command.ai-sidebar-terminal.spawnForWorkspace.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(add)"
-      },
-      {
-        "command": "ai-sidebar-terminal.selectInstance",
-        "title": "%command.ai-sidebar-terminal.selectInstance.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(server-environment)"
-      },
-      {
-        "command": "ai-sidebar-terminal.switchTmuxSession",
-        "title": "%command.ai-sidebar-terminal.switchTmuxSession.title%",
-        "category": "%command.category.ai-sidebar-terminal%"
-      },
-      {
-        "command": "ai-sidebar-terminal.createTmuxSession",
-        "title": "%command.ai-sidebar-terminal.createTmuxSession.title%"
-      },
-      {
-        "command": "ai-sidebar-terminal.browseTmuxSessions",
-        "title": "%command.ai-sidebar-terminal.browseTmuxSessions.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(server-environment)"
-      },
-      {
-        "command": "ai-sidebar-terminal.switchNativeShell",
-        "title": "%command.ai-sidebar-terminal.switchNativeShell.title%",
-        "category": "%command.category.ai-sidebar-terminal%"
-      },
-      {
-        "command": "ai-sidebar-terminal.killNativeShell",
-        "title": "%command.ai-sidebar-terminal.killNativeShell.title%"
-      },
-      {
-        "command": "ai-sidebar-terminal.openTerminalManager",
-        "title": "%command.ai-sidebar-terminal.openTerminalManager.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(server)"
-      },
-      {
-        "command": "ai-sidebar-terminal.toggleDashboard",
-        "title": "%command.ai-sidebar-terminal.toggleDashboard.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(dashboard)"
-      },
-      {
-        "command": "ai-sidebar-terminal.toggleTmuxCommandToolbar",
-        "title": "%command.ai-sidebar-terminal.toggleTmuxCommandToolbar.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(list-tree)"
-      },
-      {
-        "command": "ai-sidebar-terminal.openDashboardInEditor",
-        "title": "%command.ai-sidebar-terminal.openDashboardInEditor.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(editor-layout)"
-      },
-      {
         "command": "ai-sidebar-terminal.openTerminalInEditor",
         "title": "%command.ai-sidebar-terminal.openTerminalInEditor.title%",
         "category": "%command.category.ai-sidebar-terminal%",
@@ -175,110 +109,11 @@
         "title": "%command.ai-sidebar-terminal.restoreTerminalToSidebar.title%",
         "category": "%command.category.ai-sidebar-terminal%",
         "icon": "$(layout-sidebar-left)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxSwitchPane",
-        "title": "%command.ai-sidebar-terminal.tmuxSwitchPane.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(check)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxSplitPaneH",
-        "title": "%command.ai-sidebar-terminal.tmuxSplitPaneH.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(split-horizontal)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxSplitPaneV",
-        "title": "%command.ai-sidebar-terminal.tmuxSplitPaneV.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(split-vertical)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxSplitPaneWithCommand",
-        "title": "%command.ai-sidebar-terminal.tmuxSplitPaneWithCommand.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(terminal)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxSendTextToPane",
-        "title": "%command.ai-sidebar-terminal.tmuxSendTextToPane.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(file-symlink-file)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxResizePane",
-        "title": "%command.ai-sidebar-terminal.tmuxResizePane.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(move)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxSwapPane",
-        "title": "%command.ai-sidebar-terminal.tmuxSwapPane.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(arrow-swap)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxKillPane",
-        "title": "%command.ai-sidebar-terminal.tmuxKillPane.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(trash)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxNextWindow",
-        "title": "%command.ai-sidebar-terminal.tmuxNextWindow.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(chevron-right)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxPrevWindow",
-        "title": "%command.ai-sidebar-terminal.tmuxPrevWindow.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(chevron-left)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxCreateWindow",
-        "title": "%command.ai-sidebar-terminal.tmuxCreateWindow.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(add)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxKillWindow",
-        "title": "%command.ai-sidebar-terminal.tmuxKillWindow.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(trash)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxSelectWindow",
-        "title": "%command.ai-sidebar-terminal.tmuxSelectWindow.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(list-selection)"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxKillSession",
-        "title": "%command.ai-sidebar-terminal.tmuxKillSession.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(trash)"
-      },
-      {
-        "command": "ai-sidebar-terminal.killTmuxSession",
-        "title": "%command.ai-sidebar-terminal.killTmuxSession.title%"
-      },
-      {
-        "command": "ai-sidebar-terminal.tmuxRefresh",
-        "title": "%command.ai-sidebar-terminal.tmuxRefresh.title%",
-        "category": "%command.category.ai-sidebar-terminal%",
-        "icon": "$(refresh)"
       }
     ],
     "menus": {
       "view/title": [],
       "editor/title": [
-        {
-          "command": "ai-sidebar-terminal.openTerminalManager",
-          "group": "navigation",
-          "when": "ai-sidebar-terminal.active"
-        },
         {
           "command": "ai-sidebar-terminal.openTerminalInEditor",
           "group": "navigation@1",
@@ -318,31 +153,14 @@
         "when": "editorTextFocus || terminalFocus"
       },
       {
-        "command": "ai-sidebar-terminal.browseTmuxSessions",
-        "key": "ctrl+alt+t",
-        "mac": "cmd+alt+t",
-        "when": "focusedView == 'ai-sidebar-terminal-view'"
-      },
-      {
-        "command": "-workbench.action.quickOpen",
-        "key": "ctrl+p",
-        "when": "focusedView == 'ai-sidebar-terminal-view'"
-      },
-      {
-        "command": "-workbench.action.quickOpenNavigateNextInFilePicker",
-        "key": "ctrl+p",
-        "when": "inFilesPicker && inQuickOpen"
-      },
-      {
         "command": "ai-sidebar-terminal.paste",
         "key": "ctrl+v",
         "mac": "cmd+v",
         "when": "focusedView == 'ai-sidebar-terminal-view'"
       },
       {
-        "command": "ai-sidebar-terminal.toggleTmuxCommandToolbar",
-        "key": "ctrl+alt+m",
-        "mac": "cmd+alt+m",
+        "command": "-workbench.action.quickOpen",
+        "key": "ctrl+p",
         "when": "focusedView == 'ai-sidebar-terminal-view'"
       }
     ],
@@ -411,11 +229,6 @@
           "default": true,
           "description": "%configuration.ai-sidebar-terminal.sendKeybindingsToShell.description%"
         },
-        "ai-sidebar-terminal.showTmuxWindowControls": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.ai-sidebar-terminal.showTmuxWindowControls.description%"
-        },
         "ai-sidebar-terminal.autoShareContext": {
           "type": "boolean",
           "default": true,
@@ -462,22 +275,6 @@
           "type": "boolean",
           "default": true,
           "description": "%configuration.ai-sidebar-terminal.enableAutoSpawn.description%"
-        },
-        "ai-sidebar-terminal.terminalBackend": {
-          "type": "string",
-          "default": "native",
-          "enum": [
-            "native",
-            "tmux",
-            "zellij"
-          ],
-          "enumDescriptions": [
-            "%configuration.ai-sidebar-terminal.terminalBackend.enumDescription.native%",
-            "%configuration.ai-sidebar-terminal.terminalBackend.enumDescription.tmux%",
-            "%configuration.ai-sidebar-terminal.terminalBackend.enumDescription.zellij%"
-          ],
-          "description": "%configuration.ai-sidebar-terminal.terminalBackend.description%",
-          "order": 1
         },
         "ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen": {
           "type": "boolean",
@@ -648,8 +445,7 @@
     "@xterm/addon-web-links": "^0.12.0",
     "@xterm/addon-webgl": "^0.19.0",
     "@xterm/xterm": "^6.0.0",
-    "node-pty": "^1.2.0-beta.11",
-    "preact": "^10.29.1"
+    "node-pty": "^1.2.0-beta.11"
   },
   "overrides": {
     "serialize-javascript": "^7.0.5"
