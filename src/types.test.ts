@@ -1,18 +1,13 @@
 import { describe, it, expect } from "vitest";
 import type {
-  BackendPaneConfig,
   HostMessage,
   PaneConfig,
   PaneLayout,
   TerminalBackendType,
-  TmuxDashboardActionMessage,
-  TmuxDashboardHostMessage,
-  TmuxPaneSyncMessage,
   WebviewMessage,
 } from "./types";
 import {
   DEFAULT_AI_TOOLS,
-  TMUX_RAW_ALLOWED_SUBCOMMANDS,
   detectAiToolName,
   getToolDetectionPatterns,
   getToolLaunchCommand,
@@ -56,9 +51,6 @@ describe("Types", () => {
         },
         { type: "triggerPaste", paneId: "pane-1" },
         { type: "imagePasted", data: "data:image/png;base64,AA==", paneId: "pane-1" },
-        { type: "switchSession", sessionId: "workspace-a", paneId: "pane-1" },
-        { type: "killSession", sessionId: "workspace-a", paneId: "pane-1" },
-        { type: "createTmuxSession", paneId: "pane-1" },
         {
           type: "launchAiTool",
           sessionId: "workspace-a",
@@ -66,43 +58,17 @@ describe("Types", () => {
           savePreference: true,
           paneId: "pane-1",
         },
-        { type: "zoomTmuxPane", paneId: "pane-1" },
-        { type: "toggleDashboard", paneId: "pane-1" },
         { type: "toggleEditorAttachment", paneId: "pane-1" },
-        {
-          type: "sendTmuxPromptChoice",
-          choice: "tmux",
-          paneId: "pane-1",
-        },
-        {
-          type: "selectTerminalBackend",
-          backend: "zellij",
-          paneId: "pane-1",
-        },
-        {
-          type: "paneSwitchBackend",
-          paneId: "pane-1",
-          backend: "tmux",
-        },
-        { type: "cycleTerminalBackend", paneId: "pane-1" },
         { type: "requestAiToolSelector", paneId: "pane-1" },
-        {
-          type: "executeTmuxCommand",
-          commandId: "ai-sidebar-terminal.tmuxCreateWindow",
-          paneId: "pane-1",
-        },
-        {
-          type: "executeTmuxRawCommand",
-          subcommand: "rename-session",
-          args: ["workspace-renamed"],
-          paneId: "pane-1",
-        },
         { type: "requestRestart", paneId: "pane-1" },
+        { type: "paneCreate", direction: "horizontal", paneId: "pane-1" },
+        { type: "paneDelete", paneId: "pane-1" },
+        { type: "openSettings", paneId: "pane-1" },
+        { type: "openKeyboardShortcuts", paneId: "pane-1" },
       ];
 
-      expect(messages).toHaveLength(25);
+      expect(messages).toHaveLength(18);
       expect(messages[0]?.paneId).toBe("pane-1");
-      expect(messages[23]?.type).toBe("executeTmuxRawCommand");
     });
 
     it("should accept all variants without paneId for backward compatibility", () => {
@@ -121,37 +87,20 @@ describe("Types", () => {
         { type: "setClipboard", text: "clipboard text" },
         { type: "triggerPaste" },
         { type: "imagePasted", data: "data:image/png;base64,AA==" },
-        { type: "switchSession", sessionId: "workspace-a" },
-        { type: "killSession", sessionId: "workspace-a" },
-        { type: "createTmuxSession" },
         {
           type: "launchAiTool",
           sessionId: "workspace-a",
           tool: "opencode",
           savePreference: true,
         },
-        { type: "zoomTmuxPane" },
-        { type: "toggleDashboard" },
         { type: "toggleEditorAttachment" },
-        { type: "sendTmuxPromptChoice", choice: "tmux" },
-        { type: "selectTerminalBackend", backend: "zellij" },
-        { type: "cycleTerminalBackend" },
         { type: "requestAiToolSelector" },
-        {
-          type: "executeTmuxCommand",
-          commandId: "ai-sidebar-terminal.tmuxCreateWindow",
-        },
-        {
-          type: "executeTmuxRawCommand",
-          subcommand: "rename-session",
-          args: ["workspace-renamed"],
-        },
         { type: "requestRestart" },
       ];
 
-      expect(messages).toHaveLength(24);
+      expect(messages).toHaveLength(14);
       expect(messages[0]?.paneId).toBeUndefined();
-      expect(messages[23]?.type).toBe("requestRestart");
+      expect(messages[13]?.type).toBe("requestRestart");
     });
 
     it("should accept terminalInput message", () => {
@@ -275,132 +224,6 @@ describe("Types", () => {
       ]);
     });
 
-    it("should accept tmux session control messages", () => {
-      const switchMessage: WebviewMessage = {
-        type: "switchSession",
-        sessionId: "workspace-a",
-      };
-      const killMessage: WebviewMessage = {
-        type: "killSession",
-        sessionId: "workspace-a",
-      };
-      const createMessage: WebviewMessage = {
-        type: "createTmuxSession",
-      };
-
-      expect(switchMessage.type).toBe("switchSession");
-      expect(switchMessage.sessionId).toBe("workspace-a");
-      expect(killMessage.type).toBe("killSession");
-      expect(killMessage.sessionId).toBe("workspace-a");
-      expect(createMessage.type).toBe("createTmuxSession");
-    });
-
-    it("should accept terminal backend selection messages", () => {
-      const backend: TerminalBackendType = "zellij";
-      const selectMessage: WebviewMessage = {
-        type: "selectTerminalBackend",
-        backend,
-      };
-      const switchMessage: WebviewMessage = {
-        type: "paneSwitchBackend",
-        paneId: "pane-2",
-        backend: "tmux",
-      };
-      const cycleMessage: WebviewMessage = { type: "cycleTerminalBackend" };
-
-      expect(selectMessage.backend).toBe("zellij");
-      if (switchMessage.type === "paneSwitchBackend") {
-        expect(switchMessage.paneId).toBe("pane-2");
-        expect(switchMessage.backend).toBe("tmux");
-      }
-      expect(cycleMessage.type).toBe("cycleTerminalBackend");
-    });
-
-    it("should accept executeTmuxCommand messages for supported toolbar commands", () => {
-      const message: WebviewMessage = {
-        type: "executeTmuxCommand",
-        commandId: "ai-sidebar-terminal.tmuxCreateWindow",
-      };
-
-      expect(message.type).toBe("executeTmuxCommand");
-      expect(message.commandId).toBe("ai-sidebar-terminal.tmuxCreateWindow");
-    });
-
-    it("should accept executeTmuxRawCommand messages for supported native tmux commands", () => {
-      const message: WebviewMessage = {
-        type: "executeTmuxRawCommand",
-        subcommand: "rename-session",
-        args: ["workspace-renamed"],
-      };
-
-      expect(message.type).toBe("executeTmuxRawCommand");
-      expect(message.subcommand).toBe("rename-session");
-      expect(message.args).toEqual(["workspace-renamed"]);
-      expect(TMUX_RAW_ALLOWED_SUBCOMMANDS).toContain("choose-tree");
-    });
-
-    it("should accept tmux command toolbar host messages", () => {
-      const message: HostMessage = {
-        type: "toggleTmuxCommandToolbar",
-      };
-
-      expect(message.type).toBe("toggleTmuxCommandToolbar");
-    });
-  });
-
-  describe("Tmux dashboard messages", () => {
-    it("should accept tmux dashboard action messages", () => {
-      const createMessage: TmuxDashboardActionMessage = {
-        action: "create",
-      };
-      const switchNativeMessage: TmuxDashboardActionMessage = {
-        action: "switchNativeShell",
-      };
-      const activateMessage: TmuxDashboardActionMessage = {
-        action: "activate",
-        sessionId: "workspace-a-2",
-      };
-
-      expect(createMessage.action).toBe("create");
-      expect(switchNativeMessage.action).toBe("switchNativeShell");
-      expect(activateMessage.action).toBe("activate");
-      expect(activateMessage.sessionId).toBe("workspace-a-2");
-
-      const launchMessage: TmuxDashboardActionMessage = {
-        action: "launchAiTool",
-        sessionId: "workspace-a-2",
-        tool: "custom-tool",
-        savePreference: true,
-      };
-      expect(launchMessage.action).toBe("launchAiTool");
-      expect(launchMessage.tool).toBe("custom-tool");
-    });
-
-    it("should accept tmux dashboard host messages", () => {
-      const message: TmuxDashboardHostMessage = {
-        type: "updateTmuxSessions",
-        workspace: "repo-a",
-        sessions: [
-          {
-            id: "repo-a-2",
-            name: "repo-a-2",
-            workspace: "repo-a",
-            isActive: true,
-          },
-        ],
-      };
-
-      expect(message.type).toBe("updateTmuxSessions");
-      expect(message.workspace).toBe("repo-a");
-      expect(message.sessions[0]?.isActive).toBe(true);
-    });
-
-    it("uses default AI tools baseline", () => {
-      expect(DEFAULT_AI_TOOLS[0]?.name).toBe("opencode");
-      expect(DEFAULT_AI_TOOLS[0]?.args).toEqual(["-c"]);
-      expect(DEFAULT_AI_TOOLS[1]?.name).toBe("claude");
-      expect(DEFAULT_AI_TOOLS[1]?.aliases).toContain("claude");
-    });
   });
 
   describe("HostMessage", () => {
@@ -415,11 +238,11 @@ describe("Types", () => {
         { type: "clearTerminal", paneId: "pane-1" },
         { type: "focusTerminal", paneId: "pane-1" },
         { type: "webviewVisible", paneId: "pane-1" },
-        { type: "paneBackendChanged", paneId: "pane-1", backend: "zellij" },
       ];
 
-      expect(messages[0]?.paneId).toBe("pane-1");
-      expect(messages[5]?.type).toBe("paneBackendChanged");
+      const first = messages[0] as { paneId?: string };
+      expect(first?.paneId).toBe("pane-1");
+      expect(messages.length).toBe(5);
     });
 
     it("should accept terminalOutput message", () => {
@@ -466,10 +289,6 @@ describe("Types", () => {
         paneId: "pane-1",
         command: "npm run dev",
         cwd: "/workspace",
-        backend: "tmux",
-        backendConfig: {
-          tmux: { sessionId: "workspace-a", paneId: "%1" },
-        },
       };
 
       const legacyConfig: PaneConfig = {
@@ -479,46 +298,9 @@ describe("Types", () => {
       };
 
       expect(layout.children?.[0]?.paneId).toBe("pane-2");
-      expect(config.backend).toBe("tmux");
-      expect(config.backendConfig?.tmux?.paneId).toBe("%1");
-      expect(legacyConfig.backend).toBeUndefined();
-      expect(legacyConfig.backendConfig).toBeUndefined();
-    });
-
-    it("should accept backend pane config shapes and tmux pane sync messages", () => {
-      const backendConfig: BackendPaneConfig = {
-        tmux: { sessionId: "session-1", paneId: "%2" },
-        zellij: { sessionId: "zellij-session-1" },
-        native: {},
-      };
-      const syncMessages: TmuxPaneSyncMessage[] = [
-        { paneId: "pane-1", tmuxPaneId: "%1", action: "created" },
-        { paneId: "pane-1", tmuxPaneId: "%1", action: "resized" },
-        { paneId: "pane-1", tmuxPaneId: "%1", action: "removed" },
-      ];
-
-      expect(backendConfig.tmux?.sessionId).toBe("session-1");
-      expect(backendConfig.zellij?.sessionId).toBe("zellij-session-1");
-      expect(backendConfig.native).toEqual({});
-      expect(syncMessages.map((message) => message.action)).toEqual([
-        "created",
-        "resized",
-        "removed",
-      ]);
-    });
-
-    it("should narrow pane backend host messages by discriminant", () => {
-      const message: HostMessage = {
-        type: "paneBackendChanged",
-        paneId: "pane-3",
-        backend: "native",
-      };
-
-      if (message.type === "paneBackendChanged") {
-        const backend: TerminalBackendType = message.backend;
-        expect(message.paneId).toBe("pane-3");
-        expect(backend).toBe("native");
-      }
+      expect(config.paneId).toBe("pane-1");
+      expect(config.command).toBe("npm run dev");
+      expect(legacyConfig.paneId).toBe("pane-legacy");
     });
   });
 
@@ -542,15 +324,12 @@ describe("Types", () => {
 
       const result = resolveAiToolConfigs(userTools);
 
-      // User override for opencode
       const opencode = result.find((t) => t.name === "opencode");
       expect(opencode?.label).toBe("My OpenCode");
       expect(opencode?.path).toBe("/custom/opencode");
       expect(opencode?.args).toEqual(["--debug"]);
-      // Default aliases/operator preserved when user doesn't provide
       expect(opencode?.operator).toBe("opencode");
 
-      // All other defaults still present
       expect(result.find((t) => t.name === "claude")).toBeDefined();
       expect(result.find((t) => t.name === "codex")).toBeDefined();
       expect(result.find((t) => t.name === "mimo")).toBeDefined();
@@ -561,10 +340,8 @@ describe("Types", () => {
         { name: "custom-tool", label: "Custom" },
       ]);
 
-      // All defaults present
       expect(result.find((t) => t.name === "opencode")).toBeDefined();
 
-      // Custom tool appended at the end
       const custom = result.find((t) => t.name === "custom-tool");
       expect(custom?.label).toBe("Custom");
     });
@@ -577,7 +354,6 @@ describe("Types", () => {
 
       expect(result.find((t) => t.name === "codex")).toBeUndefined();
       expect(result.find((t) => t.name === "custom")).toBeUndefined();
-      // Other defaults still present
       expect(result.find((t) => t.name === "opencode")).toBeDefined();
     });
 
@@ -587,7 +363,6 @@ describe("Types", () => {
       ]);
 
       const opencode = result.find((t) => t.name === "opencode");
-      // Default args preserved (user didn't provide any)
       expect(opencode?.args).toEqual(["-c"]);
       expect(opencode?.operator).toBe("opencode");
     });
@@ -606,7 +381,6 @@ describe("Types", () => {
         },
       ]);
 
-      // Only valid entry parsed
       const custom = result.find((t) => t.name === "custom");
       expect(custom).toEqual({
         name: "custom",
@@ -618,7 +392,6 @@ describe("Types", () => {
         enabled: undefined,
       });
 
-      // Defaults still included
       expect(result.find((t) => t.name === "opencode")).toBeDefined();
     });
 
@@ -627,7 +400,6 @@ describe("Types", () => {
         { name: "no-args-array", label: "No Args Array", args: "--bad" },
       ]);
 
-      // Custom tool (not in defaults), args normalized to []
       const tool = result.find((t) => t.name === "no-args-array");
       expect(tool?.args).toEqual([]);
     });
@@ -676,4 +448,3 @@ describe("Types", () => {
     });
   });
 });
-

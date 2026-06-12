@@ -1,50 +1,11 @@
-export const TMUX_WEBVIEW_COMMAND_IDS = [
-  "ai-sidebar-terminal.browseTmuxSessions",
-  "ai-sidebar-terminal.createTmuxSession",
-  "ai-sidebar-terminal.tmuxSwitchPane",
-  "ai-sidebar-terminal.tmuxCreateWindow",
-  "ai-sidebar-terminal.tmuxNextWindow",
-  "ai-sidebar-terminal.tmuxPrevWindow",
-  "ai-sidebar-terminal.tmuxSelectWindow",
-  "ai-sidebar-terminal.tmuxKillWindow",
-  "ai-sidebar-terminal.tmuxSplitPaneH",
-  "ai-sidebar-terminal.tmuxSplitPaneV",
-  "ai-sidebar-terminal.tmuxSplitPaneWithCommand",
-  "ai-sidebar-terminal.tmuxSendTextToPane",
-  "ai-sidebar-terminal.tmuxResizePane",
-  "ai-sidebar-terminal.tmuxSwapPane",
-  "ai-sidebar-terminal.tmuxKillPane",
-  "ai-sidebar-terminal.tmuxKillSession",
-  "ai-sidebar-terminal.tmuxRefresh",
-] as const;
 
-export type TmuxWebviewCommandId = (typeof TMUX_WEBVIEW_COMMAND_IDS)[number];
-
-export const TMUX_RAW_ALLOWED_SUBCOMMANDS = [
-  "rename-session",
-  "rename-window",
-  "last-window",
-  "last-pane",
-  "rotate-window",
-  "select-layout",
-  "display-panes",
-  "copy-mode",
-  "clear-history",
-  "detach-client",
-  "move-window",
-  "move-pane",
-  "respawn-pane",
-  "choose-tree",
-] as const;
-
-export type TmuxRawSubcommand = (typeof TMUX_RAW_ALLOWED_SUBCOMMANDS)[number];
 
 export interface DroppedBlobFile {
   name: string;
   data: string;
 }
 
-export type TerminalBackendType = "native" | "tmux" | "zellij";
+export type TerminalBackendType = "native";
 
 export type PaneLayout = {
   tabId: string;
@@ -58,21 +19,7 @@ export type PaneConfig = {
   paneId: string;
   command?: string;
   cwd?: string;
-  backend?: TerminalBackendType;
-  backendConfig?: BackendPaneConfig;
 };
-
-export interface BackendPaneConfig {
-  tmux?: { sessionId?: string; paneId?: string };
-  zellij?: { sessionId?: string };
-  native?: Record<string, never>;
-}
-
-export interface TerminalBackendAvailability {
-  native: boolean;
-  tmux: boolean;
-  zellij: boolean;
-}
 
 export type WebviewMessage =
   | { type: "terminalInput"; data: string; paneId?: string }
@@ -99,9 +46,6 @@ export type WebviewMessage =
   | { type: "setClipboard"; text: string; paneId?: string }
   | { type: "triggerPaste"; paneId?: string }
   | { type: "imagePasted"; data: string; paneId?: string }
-  | { type: "switchSession"; sessionId: string; paneId?: string }
-  | { type: "killSession"; sessionId: string; paneId?: string }
-  | { type: "createTmuxSession"; paneId?: string }
   | {
       type: "launchAiTool";
       sessionId: string;
@@ -110,44 +54,9 @@ export type WebviewMessage =
       targetPaneId?: string;
       paneId?: string;
     }
-  | { type: "zoomTmuxPane"; paneId?: string }
-  | { type: "toggleDashboard"; paneId?: string }
   | { type: "toggleEditorAttachment"; paneId?: string }
-  | {
-      type: "sendTmuxPromptChoice";
-      choice: "tmux" | "shell" | "zellij";
-      paneId?: string;
-    }
-  | {
-      type: "selectTerminalBackend";
-      backend: TerminalBackendType;
-      paneId?: string;
-    }
-  | {
-      type: "paneSwitchBackend";
-      paneId: string;
-      backend: TerminalBackendType;
-    }
-  | { type: "cycleTerminalBackend"; paneId?: string }
-  | {
-      type: "switchToBackend";
-      backend: TerminalBackendType;
-      sessionId?: string;
-      paneId?: string;
-    }
-  | { type: "requestAiToolSelector"; paneId?: string }
-  | {
-      type: "executeTmuxCommand";
-      commandId: TmuxWebviewCommandId;
-      paneId?: string;
-    }
-  | {
-      type: "executeTmuxRawCommand";
-      subcommand: TmuxRawSubcommand;
-      args?: string[];
-      paneId?: string;
-    }
   | { type: "requestRestart"; paneId?: string }
+  | { type: "requestAiToolSelector"; paneId?: string }
   | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
   | { type: "paneDelete"; paneId?: string }
   | { type: "openSettings"; paneId?: string }
@@ -163,13 +72,6 @@ export interface AiToolConfig {
   aliases?: string[];
   operator?: string;
   enabled?: boolean;
-}
-
-export interface BackendOption {
-  type: TerminalBackendType;
-  sessionId?: string;
-  label: string;
-  group: string;
 }
 
 export const DEFAULT_AI_TOOLS: readonly AiToolConfig[] = [
@@ -346,130 +248,6 @@ export function detectAiToolName(
   return undefined;
 }
 
-export type NativeShellDto = {
-  id: string;
-  label?: string;
-  state: string;
-  isActive: boolean;
-};
-
-export type TmuxDashboardActionMessage =
-  | { action: "refresh" }
-  | { action: "toggleScope" }
-  | { action: "create" }
-  | { action: "createNativeShell" }
-  | { action: "switchNativeShell" }
-  | { action: "activateNativeShell"; instanceId: string }
-  | { action: "killNativeShell"; instanceId: string }
-  | { action: "activate"; sessionId: string }
-  | {
-      action: "showAiToolSelector";
-      sessionId: string;
-      sessionName: string;
-      targetPaneId?: string;
-    }
-  | { action: "expandPanes"; sessionId: string }
-  | { action: "createWindow"; sessionId: string }
-  | { action: "nextWindow"; sessionId: string }
-  | { action: "prevWindow"; sessionId: string }
-  | { action: "killWindow"; sessionId: string; windowId: string }
-  | { action: "killSession"; sessionId: string }
-  | { action: "selectWindow"; sessionId: string; windowId: string }
-  | {
-      action: "switchPane";
-      sessionId: string;
-      paneId: string;
-      windowId?: string;
-    }
-  | {
-      action: "splitPane";
-      sessionId: string;
-      paneId?: string;
-      direction: "h" | "v";
-    }
-  | {
-      action: "splitPaneWithCommand";
-      sessionId: string;
-      paneId?: string;
-      direction: "h" | "v";
-      command: string;
-    }
-  | { action: "killPane"; sessionId: string; paneId: string }
-  | {
-      action: "resizePane";
-      sessionId: string;
-      paneId: string;
-      direction: string;
-      amount: number;
-    }
-  | {
-      action: "swapPane";
-      sessionId: string;
-      sourcePaneId: string;
-      targetPaneId: string;
-    }
-  | {
-      action: "launchAiTool";
-      sessionId: string;
-      tool: string;
-      savePreference: boolean;
-      targetPaneId?: string;
-    };
-
-export type TmuxDashboardSessionDto = {
-  id: string;
-  name: string;
-  workspace: string;
-  isActive: boolean;
-  paneCount?: number;
-  preview?: string;
-};
-
-export type TmuxDashboardPaneDto = {
-  paneId: string;
-  index: number;
-  title: string;
-  isActive: boolean;
-  currentCommand?: string;
-  panePid?: number;
-  resolvedTool?: string;
-  windowId?: string;
-  currentPath?: string;
-  paneLeft?: number;
-  paneTop?: number;
-  paneWidth?: number;
-  paneHeight?: number;
-};
-
-export type TmuxDashboardWindowDto = {
-  windowId: string;
-  index: number;
-  name: string;
-  isActive: boolean;
-  panes: TmuxDashboardPaneDto[];
-};
-
-export type TmuxDashboardHostMessage =
-  | {
-      type: "updateTmuxSessions";
-      sessions: TmuxDashboardSessionDto[];
-      nativeShells?: NativeShellDto[];
-      workspace: string;
-      windows?: Record<string, TmuxDashboardWindowDto[]>;
-      panes?: Record<string, TmuxDashboardPaneDto[]>;
-      showingAll?: boolean;
-      tools?: AiToolConfig[];
-      tmuxAvailable?: boolean;
-    }
-  | {
-      type: "showAiToolSelector";
-      sessionId: string;
-      sessionName: string;
-      defaultTool?: string;
-      tools?: AiToolConfig[];
-      targetPaneId?: string;
-    };
-
 export const ALLOWED_IMAGE_TYPES = [
   "image/png",
   "image/jpeg",
@@ -477,26 +255,6 @@ export const ALLOWED_IMAGE_TYPES = [
   "image/gif",
 ];
 export const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
-
-export interface TmuxSession {
-  id: string;
-  name: string;
-  workspace: string;
-  isActive: boolean;
-}
-
-export interface TreeSnapshot {
-  type: "treeSnapshot";
-  sessions: TmuxSession[];
-  activeSessionId: string | null;
-  emptyState?: "no-workspace" | "no-tmux" | "no-sessions";
-}
-
-export type TmuxPaneSyncMessage = {
-  paneId: string;
-  tmuxPaneId: string;
-  action: "created" | "removed" | "resized";
-};
 
 export type HostMessage =
   | { type: "requestPaste" }
@@ -510,9 +268,6 @@ export type HostMessage =
   | {
       type: "platformInfo";
       platform: string;
-      tmuxAvailable?: boolean;
-      zellijAvailable?: boolean;
-      backendAvailability?: TerminalBackendAvailability;
       activeBackend?: TerminalBackendType;
     }
   | {
@@ -523,27 +278,8 @@ export type HostMessage =
       cursorStyle: "block" | "underline" | "bar";
       scrollback: number;
       sendKeybindingsToShell?: boolean;
-      showTmuxWindowControls?: boolean;
     }
-  | {
-      type: "activeSession";
-      sessionName: string;
-      sessionId: string;
-      windowIndex?: number;
-      windowName?: string;
-      canKillPane?: boolean;
-      backend?: TerminalBackendType;
-      aiToolLabel?: string;
-      aiTools?: readonly { name: string; label: string }[];
-      backendOptions?: readonly BackendOption[];
-    }
-  | {
-      type: "activeSession";
-      backend?: TerminalBackendType;
-      aiToolLabel?: string;
-      aiTools?: readonly { name: string; label: string }[];
-      backendOptions?: readonly BackendOption[];
-    }
+  | { type: "activeSession"; backend?: TerminalBackendType; aiToolLabel?: string; aiTools?: readonly { name: string; label: string }[] }
   | {
       type: "showAiToolSelector";
       sessionId: string;
@@ -551,27 +287,6 @@ export type HostMessage =
       defaultTool?: string;
       tools?: AiToolConfig[];
       targetPaneId?: string;
-    }
-  | {
-      type: "updateDashboard";
-      sessions: TmuxDashboardSessionDto[];
-      workspace: string;
-      showingAll?: boolean;
-    }
-  | { type: "toggleDashboard"; visible: boolean }
-  | { type: "toggleTmuxCommandToolbar" }
-  | {
-      type: "showTmuxPrompt";
-      workspaceName: string;
-      tmuxAvailable?: boolean;
-      zellijAvailable?: boolean;
-      activeBackend?: TerminalBackendType;
-    }
-  | { type: "paneCreate"; direction?: "horizontal" | "vertical"; paneId?: string }
-  | {
-      type: "paneBackendChanged";
-      paneId: string;
-      backend: TerminalBackendType;
     }
   | { type: "paneDelete"; paneId?: string };
 
@@ -599,8 +314,6 @@ export interface ExtensionConfig {
   enableAutoSpawn: boolean;
   codeActionSeverities: DiagnosticSeverity[];
   collapseSecondaryBarOnEditorOpen: boolean;
-  terminalBackend: TerminalBackendType;
-  showTmuxWindowControls: boolean;
   'pane.defaultSplitDirection': "horizontal" | "vertical";
   'pane.focusOnClick': boolean;
   'pane.showPaneActions': boolean;
