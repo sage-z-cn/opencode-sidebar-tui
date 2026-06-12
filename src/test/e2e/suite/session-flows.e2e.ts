@@ -21,60 +21,30 @@ function assertCommandRegistered(commands: string[], commandId: string): void {
 }
 
 suite("Session flows", () => {
-  test("registers tmux-related commands", async () => {
+  test("registers core session commands", async () => {
     const commands = await getRegisteredCommands();
 
-    assertCommandRegistered(commands, "ai-sidebar-terminal.switchTmuxSession");
-    assertCommandRegistered(commands, "ai-sidebar-terminal.spawnForWorkspace");
-    assertCommandRegistered(commands, "ai-sidebar-terminal.browseTmuxSessions");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.start");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.focus");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.sendToAiTerminal");
   });
 
-  test("registers zellij-capable session controls", async () => {
-    const extension = await activateExtension();
-    const commands = await vscode.commands.getCommands(true);
-    const packageJSON = extension.packageJSON as {
-      contributes?: {
-        configuration?: {
-          properties?: Record<
-            string,
-            {
-              enum?: string[];
-            }
-          >;
-        };
-      };
-    };
-    const terminalBackend =
-      packageJSON.contributes?.configuration?.properties?.[
-        "ai-sidebar-terminal.terminalBackend"
-      ];
-
-    assert.ok(
-      terminalBackend?.enum?.includes("zellij"),
-      "terminalBackend should support zellij",
-    );
-    assertCommandRegistered(commands, "ai-sidebar-terminal.browseTmuxSessions");
-    assertCommandRegistered(commands, "ai-sidebar-terminal.switchTmuxSession");
-  });
-
-  test("executes switchTmuxSession command without requiring tmux", async () => {
+  test("executes start command without requiring external process", async () => {
     await activateExtension();
 
     await assert.doesNotReject(
       async () =>
-        vscode.commands.executeCommand("ai-sidebar-terminal.switchTmuxSession"),
+        vscode.commands.executeCommand("ai-sidebar-terminal.start"),
     );
   });
 
-  test("executes switchNativeShell command", async () => {
+  test("executes focus command", async () => {
     const commands = await getRegisteredCommands();
-    assertCommandRegistered(commands, "ai-sidebar-terminal.switchNativeShell");
+    assertCommandRegistered(commands, "ai-sidebar-terminal.focus");
 
     await assert.doesNotReject(
       async () =>
-        vscode.commands.executeCommand("ai-sidebar-terminal.switchNativeShell"),
+        vscode.commands.executeCommand("ai-sidebar-terminal.focus"),
     );
   });
 });
-
-

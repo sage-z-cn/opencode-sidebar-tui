@@ -53,7 +53,7 @@ const nerdFontStack =
 const configurationSpecs: Record<string, ConfigurationSpec> = {
   "ai-sidebar-terminal.fontSize": {
     type: "number",
-    defaultValue: 14,
+    defaultValue: 12,
     minimum: 6,
     maximum: 25,
   },
@@ -85,10 +85,6 @@ const configurationSpecs: Record<string, ConfigurationSpec> = {
     type: "boolean",
     defaultValue: true,
   },
-  "ai-sidebar-terminal.showTmuxWindowControls": {
-    type: "boolean",
-    defaultValue: true,
-  },
   "ai-sidebar-terminal.autoShareContext": { type: "boolean", defaultValue: true },
   "ai-sidebar-terminal.httpTimeout": {
     type: "number",
@@ -115,11 +111,6 @@ const configurationSpecs: Record<string, ConfigurationSpec> = {
     maximum: 2000,
   },
   "ai-sidebar-terminal.enableAutoSpawn": { type: "boolean", defaultValue: true },
-  "ai-sidebar-terminal.terminalBackend": {
-    type: "string",
-    defaultValue: "tmux",
-    enumValues: ["native", "tmux", "zellij"],
-  },
   "ai-sidebar-terminal.collapseSecondaryBarOnEditorOpen": {
     type: "boolean",
     defaultValue: true,
@@ -176,7 +167,7 @@ suite("Comprehensive configuration contributions", () => {
     const properties = getConfigurationProperties(extension);
     const expectedPropertyIds = Object.keys(configurationSpecs).sort();
 
-    assert.strictEqual(expectedPropertyIds.length, 24);
+    assert.strictEqual(expectedPropertyIds.length, 22);
     assert.deepStrictEqual(Object.keys(properties).sort(), expectedPropertyIds);
   });
 
@@ -264,10 +255,9 @@ suite("Runtime configuration defaults", () => {
         operator: "codex",
       },
     ]);
-    assert.strictEqual(defaultValue("terminalBackend"), "tmux");
     assert.strictEqual(defaultValue("autoStartOnOpen"), true);
     assert.strictEqual(defaultValue("enableHttpApi"), true);
-    assert.strictEqual(defaultValue("fontSize"), 14);
+    assert.strictEqual(defaultValue("fontSize"), 12);
   });
 });
 

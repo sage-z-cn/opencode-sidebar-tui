@@ -104,24 +104,15 @@ suite("AI tool selector E2E surface", () => {
     assert.strictEqual(itemProperties?.operator?.type, "string");
   });
 
-  test("supports available terminal backends for selector launch flows", async () => {
-    const extension = await activateExtension();
-    const properties = getConfigurationProperties(extension);
-    const terminalBackend = properties["ai-sidebar-terminal.terminalBackend"];
-
-    assert.strictEqual(terminalBackend?.type, "string");
-    assert.deepStrictEqual(terminalBackend?.enum, ["native", "tmux", "zellij"]);
-  });
-
-  test("registers selector-triggering and dashboard commands", async () => {
+  test("registers core commands for tool interaction", async () => {
     await activateExtension();
     const commands = await vscode.commands.getCommands(true);
     const expectedCommands = [
-      "ai-sidebar-terminal.switchTmuxSession",
-      "ai-sidebar-terminal.browseTmuxSessions",
-      "ai-sidebar-terminal.switchNativeShell",
-      "ai-sidebar-terminal.toggleDashboard",
-      "ai-sidebar-terminal.openDashboardInEditor",
+      "ai-sidebar-terminal.start",
+      "ai-sidebar-terminal.paste",
+      "ai-sidebar-terminal.focus",
+      "ai-sidebar-terminal.sendToTerminal",
+      "ai-sidebar-terminal.sendAtMention",
     ];
 
     for (const command of expectedCommands) {

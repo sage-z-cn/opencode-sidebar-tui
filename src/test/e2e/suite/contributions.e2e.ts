@@ -112,18 +112,13 @@ suite("Package contribution metadata", () => {
     const expectedKeybindings = [
       {
         command: "ai-sidebar-terminal.sendAtMention",
-        key: "ctrl+alt+l",
-        mac: "cmd+alt+l",
+        key: "alt+a",
+        mac: "alt+a",
       },
       {
         command: "ai-sidebar-terminal.sendAllOpenFiles",
         key: "ctrl+alt+a",
         mac: "cmd+alt+a",
-      },
-      {
-        command: "ai-sidebar-terminal.browseTmuxSessions",
-        key: "ctrl+alt+t",
-        mac: "cmd+alt+t",
       },
     ];
 

@@ -28,13 +28,13 @@ suite("Webview registration", () => {
     assert.strictEqual(terminalView.type, "webview");
   });
 
-  test("registers the dashboard view command", async () => {
+  test("registers the sidebar view as webview", async () => {
     await activateExtension();
 
     const commands = await vscode.commands.getCommands(true);
     assert.ok(
-      commands.includes("ai-sidebar-terminal.toggleDashboard"),
-      "Dashboard command should be registered",
+      commands.includes("ai-sidebar-terminal.focus"),
+      "Focus command should be registered to activate sidebar view",
     );
   });
 

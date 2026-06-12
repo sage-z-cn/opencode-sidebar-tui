@@ -25,42 +25,6 @@ const commandCategories = {
     "ai-sidebar-terminal.sendAllOpenFiles",
     "ai-sidebar-terminal.sendToAiTerminal",
   ],
-  "tmux-session": [
-    "ai-sidebar-terminal.openInNewWindow",
-    "ai-sidebar-terminal.spawnForWorkspace",
-    "ai-sidebar-terminal.selectInstance",
-    "ai-sidebar-terminal.switchTmuxSession",
-    "ai-sidebar-terminal.createTmuxSession",
-    "ai-sidebar-terminal.browseTmuxSessions",
-    "ai-sidebar-terminal.switchNativeShell",
-    "ai-sidebar-terminal.killNativeShell",
-    "ai-sidebar-terminal.tmuxKillSession",
-    "ai-sidebar-terminal.killTmuxSession",
-  ],
-  "tmux-pane": [
-    "ai-sidebar-terminal.tmuxSwitchPane",
-    "ai-sidebar-terminal.tmuxSplitPaneH",
-    "ai-sidebar-terminal.tmuxSplitPaneV",
-    "ai-sidebar-terminal.tmuxSplitPaneWithCommand",
-    "ai-sidebar-terminal.tmuxSendTextToPane",
-    "ai-sidebar-terminal.tmuxResizePane",
-    "ai-sidebar-terminal.tmuxSwapPane",
-    "ai-sidebar-terminal.tmuxKillPane",
-  ],
-  "tmux-window": [
-    "ai-sidebar-terminal.tmuxNextWindow",
-    "ai-sidebar-terminal.tmuxPrevWindow",
-    "ai-sidebar-terminal.tmuxCreateWindow",
-    "ai-sidebar-terminal.tmuxKillWindow",
-    "ai-sidebar-terminal.tmuxSelectWindow",
-  ],
-  dashboard: [
-    "ai-sidebar-terminal.openTerminalManager",
-    "ai-sidebar-terminal.toggleDashboard",
-    "ai-sidebar-terminal.toggleTmuxCommandToolbar",
-    "ai-sidebar-terminal.openDashboardInEditor",
-    "ai-sidebar-terminal.tmuxRefresh",
-  ],
 } as const satisfies Record<string, readonly string[]>;
 
 function allExpectedCommands(): string[] {
@@ -91,7 +55,7 @@ suite("Comprehensive command registration", () => {
       packageJSON.contributes?.commands?.map(({ command }) => command) ?? [];
     const expectedCommands = allExpectedCommands();
 
-    assert.strictEqual(expectedCommands.length, 37);
+    assert.strictEqual(expectedCommands.length, 9);
     assert.deepStrictEqual(
       [...new Set(expectedCommands)].sort(),
       [...expectedCommands].sort(),
@@ -99,5 +63,3 @@ suite("Comprehensive command registration", () => {
     assert.deepStrictEqual(contributedCommands.sort(), expectedCommands.sort());
   });
 });
-
-
