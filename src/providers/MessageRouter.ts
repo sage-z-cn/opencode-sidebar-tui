@@ -426,7 +426,9 @@ export class MessageRouter {
 
     if (shiftKey) {
       const fileRefs = this.provider.formatDroppedFiles(
-        dedupedFiles.map((file) => vscode.workspace.asRelativePath(file)),
+        dedupedFiles.map((file) =>
+          vscode.workspace.asRelativePath(file).replace(/\\/g, "/"),
+        ),
         true,
       );
       this.logger.info(`[PROVIDER] Writing with @: ${fileRefs}`);
@@ -453,7 +455,9 @@ export class MessageRouter {
       }
     } else {
       const filePaths = this.provider.formatDroppedFiles(
-        dedupedFiles.map((file) => vscode.workspace.asRelativePath(file)),
+        dedupedFiles.map((file) =>
+          vscode.workspace.asRelativePath(file).replace(/\\/g, "/"),
+        ),
         false,
       );
       this.logger.info(`[PROVIDER] Writing without @: ${filePaths}`);

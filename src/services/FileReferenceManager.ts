@@ -6,6 +6,10 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
+function toPosixPath(filePath: string): string {
+  return filePath.replace(/\\/g, "/");
+}
+
 export interface FileReference {
   id: string;
   path: string;
@@ -125,9 +129,11 @@ export class FileReferenceManager {
       throw new Error("No workspace folder open");
     }
 
-    const absolutePath = path.isAbsolute(dirPath)
-      ? dirPath
-      : path.join(workspaceFolder.uri.fsPath, dirPath);
+    const absolutePath = toPosixPath(
+      path.isAbsolute(dirPath)
+        ? dirPath
+        : path.join(workspaceFolder.uri.fsPath, dirPath),
+    );
 
     // Check if directory exists
     if (
@@ -144,10 +150,9 @@ export class FileReferenceManager {
       const entries = fs.readdirSync(currentPath, { withFileTypes: true });
 
       for (const entry of entries) {
-        const fullPath = path.join(currentPath, entry.name);
-        const relativePath = path.relative(
-          workspaceFolder.uri.fsPath,
-          fullPath,
+        const fullPath = toPosixPath(path.join(currentPath, entry.name));
+        const relativePath = toPosixPath(
+          path.relative(workspaceFolder.uri.fsPath, fullPath),
         );
 
         // Skip node_modules, .git, and other common ignore patterns

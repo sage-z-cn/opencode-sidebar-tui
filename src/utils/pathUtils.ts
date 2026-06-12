@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import path from "node:path";
 
 export interface NormalizePathOptions {
   caseFolding?: "auto" | "win32-only" | "always" | "never";
@@ -26,7 +26,9 @@ export function normalizeComparablePath(
     const absolutePath =
       hasDrivePrefix || hasUncPrefix || withoutTrailingSlash.startsWith("/")
         ? withoutTrailingSlash
-        : resolve(withoutTrailingSlash);
+        : platform === "win32"
+          ? path.win32.resolve(withoutTrailingSlash)
+          : path.posix.resolve(withoutTrailingSlash);
     normalized = absolutePath.replace(/\\/g, "/");
   } else {
     normalized = trimmed.replace(/\\/g, "/");

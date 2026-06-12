@@ -742,11 +742,11 @@ export class TerminalDashboardProvider
       .toString();
     const nonce = this.getNonce();
 
-    const templatePath = path.join(
-      this.context.extensionPath,
+    const templatePath = vscode.Uri.joinPath(
+      this.context.extensionUri,
       "dist",
       "dashboard.html",
-    );
+    ).fsPath;
     const template = fs.readFileSync(templatePath, "utf-8");
 
     return template
