@@ -44,7 +44,6 @@
   "Failed to disconnect: {error}": "断开连接失败：{error}",
   "External": "外部",
   "PID {pid} — {workspace}": "PID {pid} — {workspace}",
-  "Refresh terminal": "刷新终端",
   "Restart terminal": "重启终端",
   "Settings": "设置",
   "Extension settings": "扩展设置",

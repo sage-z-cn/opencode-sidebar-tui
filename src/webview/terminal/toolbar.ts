@@ -3,7 +3,6 @@ import html from "./toolbar.html?raw";
 
 const titleL10nMap: Record<string, string> = {
   toggleEditor: l10n.t("Toggle editor mode"),
-  rerender: l10n.t("Refresh terminal"),
   restart: l10n.t("Restart terminal"),
   settings: l10n.t("Settings"),
   extensionSettings: l10n.t("Extension settings"),

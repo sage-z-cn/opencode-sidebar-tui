@@ -663,6 +663,7 @@ export class TerminalProvider
         "sendKeybindingsToShell",
         true,
       ),
+      isEditorTab: this._panel !== undefined,
     };
   }
 

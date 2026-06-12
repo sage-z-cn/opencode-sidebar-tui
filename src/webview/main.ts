@@ -12,11 +12,11 @@ import { initTerminal } from "./terminal";
 import { createMessageHandler, type MessageHandlerCallbacks } from "./messages";
 import {
   setupReloadButton,
-  setupRerenderButton,
   setupEditorAttachmentButton,
   setupSettingsButton,
   initPills,
   updatePillsFromActiveSession,
+  updateEditorAttachmentIcon,
 } from "./toolbar";
 
 const callbacks: MessageHandlerCallbacks = {
@@ -48,6 +48,12 @@ const callbacks: MessageHandlerCallbacks = {
 
   onPlatformInfo(message) {
     void message;
+  },
+
+  onTerminalConfig(message) {
+    if (message.isEditorTab !== undefined) {
+      updateEditorAttachmentIcon(message.isEditorTab);
+    }
   },
 };
 
@@ -113,7 +119,6 @@ function initApp(): void {
   );
 
   setupReloadButton();
-  setupRerenderButton();
   setupEditorAttachmentButton();
   setupSettingsButton();
   initPills();

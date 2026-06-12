@@ -15,6 +15,9 @@ export interface MessageHandlerCallbacks {
   onPlatformInfo?: (
     message: Extract<HostMessage, { type: "platformInfo" }>,
   ) => void;
+  onTerminalConfig?: (
+    message: Extract<HostMessage, { type: "terminalConfig" }>,
+  ) => void;
 }
 
 export interface MessageHandler {
@@ -96,6 +99,7 @@ export function createMessageHandler(
             }
             scheduleRefresh(() => terminal.refresh(0, terminal.rows - 1));
           }
+          callbacks.onTerminalConfig?.(message);
           break;
 
         case "requestPaste":

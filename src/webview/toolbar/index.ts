@@ -74,18 +74,11 @@ export function setupReloadButton(): void {
   });
 }
 
-export function setupRerenderButton(): void {
-  document.getElementById("btn-rerender")?.addEventListener("click", () => {
-    const currentHeight = document.body.offsetHeight;
-
-    document.body.style.maxHeight = `${currentHeight - 10}px`;
-    document.body.style.width = "99%";
-
-    setTimeout(() => {
-      document.body.style.maxHeight = "";
-      document.body.style.width = "";
-    }, 500);
-  });
+export function updateEditorAttachmentIcon(isEditorTab: boolean): void {
+  const btn = document.getElementById("btn-toggle-editor-attachment");
+  if (btn) {
+    btn.textContent = isEditorTab ? "↗" : "↖";
+  }
 }
 
 export function setupEditorAttachmentButton(): void {

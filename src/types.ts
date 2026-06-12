@@ -251,6 +251,7 @@ export type HostMessage =
       cursorStyle: "block" | "underline" | "bar";
       scrollback: number;
       sendKeybindingsToShell?: boolean;
+      isEditorTab?: boolean;
     }
   | { type: "activeSession"; backend?: TerminalBackendType; aiToolLabel?: string; aiTools?: readonly { name: string; label: string }[] }
   | {
